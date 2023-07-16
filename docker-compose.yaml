@@ -1,0 +1,18 @@
+version: '3'
+services:
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - VARIABLE_NAME=actual_value
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_VARIABLE_NAME=actual_value

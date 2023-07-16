@@ -1,0 +1,19 @@
+# Use an official Python runtime as the base image
+FROM python:3.9
+
+WORKDIR /
+
+# Copy requirements.txt to the working directory
+COPY myapp/requirements.txt ./
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY ./myapp /myapp
+COPY ./run.py /run.py
+
+# Make port 5000 available to the world outside this container
+EXPOSE 5000
+
+# Run run.py when the container launches
+CMD ["python", "/run.py"]
