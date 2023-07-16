@@ -1,21 +1,25 @@
 from myapp.agents.master_ai import MasterAI
 from myapp.services.message_service import MessageService
-from myapp import db, socketio
-
-
-message_service = MessageService(db)
+from myapp import socketio
 
 class DebateManager:
-    def __init__(self, uid, conversation_id, role1, role2, num_rounds=4):
+    def __init__(self, uid, conversation_id, role1, role2, app, num_rounds=4):
         self.uid = uid
         self.conversation_id = conversation_id
         self.role1 = role1
         self.role2 = role2
         self.num_rounds = num_rounds
 
+        # Initialize MessageService
+        self.message_service = None
+        if app is not None:
+            db = app.config['db']
+            self.message_service = MessageService(db)
+
+
         # Initialize two agents
-        self.agent1 = MasterAI(message_service, system_message_content=self.role1)
-        self.agent2 = MasterAI(message_service, system_message_content=self.role2)
+        self.agent1 = MasterAI(self.message_service, system_message_content=self.role1)
+        self.agent2 = MasterAI(self.message_service, system_message_content=self.role2)
 
 
     def start_debate(self, topic):
@@ -24,7 +28,7 @@ class DebateManager:
         opening_argument_content = self.agent1.pass_to_debateAI({'message_content': f"You are in a debate and have been chosen to go first. The topic to be debated is: {topic}. Please make your opening argument."})
 
         # Create a new message for the opening argument
-        message_service.create_message(conversation_id=self.conversation_id, user_id=self.uid, message_content=opening_argument_content, message_from='chatbot', chatbot_id='333')
+        self.message_service.create_message(conversation_id=self.conversation_id, user_id=self.uid, message_content=opening_argument_content, message_from='chatbot', chatbot_id='333')
 
         # Emit the opening argument
         opening_argument = {"content": opening_argument_content}
@@ -38,12 +42,10 @@ class DebateManager:
                 response_content = self.agent1.pass_to_debateAI({'message_content': response_content})
 
             # Create a new message for each response
-            message_service.create_message(conversation_id=self.conversation_id, user_id=self.uid, message_content=response_content, message_from='chatbot', chatbot_id='333')
+            self.message_service.create_message(conversation_id=self.conversation_id, user_id=self.uid, message_content=response_content, message_from='chatbot', chatbot_id='333')
 
             # Emit the response
             response = {"content": response_content}
-            print (response)
-            print(f'Emitting message to room {self.conversation_id}')
             socketio.emit('new_message', response, room=self.conversation_id)
 
 

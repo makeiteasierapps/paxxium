@@ -1,16 +1,18 @@
-from flask import Blueprint
+from flask import Blueprint, current_app
 from flask_socketio import join_room, emit
-from myapp import socketio, db
+from myapp import socketio
 from myapp.services.debate_services import DebateManager
 from myapp.services.firebase_service import FirebaseService
 from myapp.services.conversation_service import ConversationService
 
 debate = Blueprint('debate', __name__)
 firebase_service = FirebaseService()
-conversation_service = ConversationService(db)
+
 
 @socketio.on('start_debate')
 def handle_start_debate(data):
+    db = current_app.config['db']
+    conversation_service = ConversationService(db)
     id_token = data['idToken']
     decoded_token = firebase_service.verify_id_token(id_token)
     if not decoded_token:
@@ -23,7 +25,7 @@ def handle_start_debate(data):
 
     # Create a new conversation
     new_conversation_id = conversation_service.create_conversation(uid, '333', 'AgentDebate')
-    debate_manager = DebateManager(uid, new_conversation_id, role_1, role_2)
+    debate_manager = DebateManager(uid, new_conversation_id, role_1, role_2, current_app)
    
     # Emit the new conversation details back to the client
     emit('debate_started', {

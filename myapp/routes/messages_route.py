@@ -1,16 +1,17 @@
-from flask import Blueprint, request, jsonify
-from myapp import db
+from flask import Blueprint, request, jsonify, current_app
 from myapp.services.message_service import MessageService
 from myapp.services.firebase_service import FirebaseService
 from myapp.agents.master_ai import MasterAI
 
 messages = Blueprint('messages', __name__)
-message_service = MessageService(db)
+
 firebase_service = FirebaseService()
 
 
 @messages.route('/<string:conversation_id>/messages', methods=['GET'])
 def get_messages(conversation_id):
+    db = current_app.config['db']
+    message_service = MessageService(db)
     id_token = request.headers['Authorization']
     decoded_token = firebase_service.verify_id_token(id_token)
     uid = decoded_token['uid']
@@ -53,6 +54,8 @@ def validate_message(data, uid, conversation_id):
         raise ValueError("Message content, user id, chatbot id, and conversation id are required")
 
 def process_message(data, uid, conversation_id):
+    db = current_app.config['db']
+    message_service = MessageService(db)
     message_content = data.get('message_content')
     message_from = data.get('message_from')
     bot_name = data.get('agent_name')

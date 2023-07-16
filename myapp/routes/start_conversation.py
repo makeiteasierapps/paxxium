@@ -1,19 +1,19 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 from myapp.services.firebase_service import FirebaseService
-from myapp import db
 from myapp.services.bot_service import BotService
 from myapp.services.conversation_service import ConversationService
 from myapp.services.message_service import MessageService
 from myapp.agents.master_ai import MasterAI
 
 start_conversation = Blueprint('start_conversation', __name__)
-bot_service = BotService(db)
-conversation_service = ConversationService(db)
-message_service = MessageService(db)
 firebase_service = FirebaseService()
 
 @start_conversation.route('/start_conversation', methods=['POST'])
 def conversation_start():
+    db = current_app.config['db']
+    bot_service = BotService(db)
+    conversation_service = ConversationService(db)
+    message_service = MessageService(db)
     # Authenticates user
     id_token = request.headers['Authorization']
     decoded_token = firebase_service.verify_id_token(id_token)
@@ -29,14 +29,6 @@ def conversation_start():
     uid = decoded_token['uid']
     if not uid or not bot_profile_id:
         return {'message': 'User ID and Bot Profile ID are required'}, 400
-
-
-
-
-    # Verify bot profile exists
-    # bot_profile = bot_service.get_bot_profile(bot_profile_id)
-    # if not bot_profile:
-    #     return {'message': f'Bot profile {bot_profile_id} does not exist'}, 404
 
     # Create a new chatbot in the database
     chatbot, chatbot_id = bot_service.create_chatbot(bot_profile_id)
