@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile-backend
     ports:
       - "5000:5000"
+    env_file:
+      - ./myapp/.env
     environment:
       - VARIABLE_NAME=actual_value
   frontend:
@@ -14,5 +16,7 @@ services:
       dockerfile: Dockerfile-frontend
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       - REACT_APP_VARIABLE_NAME=actual_value
