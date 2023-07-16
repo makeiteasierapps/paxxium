@@ -2768,9 +2768,12 @@ class SQLCompiler(Compiled):
         return type_coerce.typed_expression._compiler_dispatch(self, **kw)
 
     def visit_cast(self, cast, **kwargs):
-        return "CAST(%s AS %s)" % (
+        type_clause = cast.typeclause._compiler_dispatch(self, **kwargs)
+        match = re.match("(.*)( COLLATE .*)", type_clause)
+        return "CAST(%s AS %s)%s" % (
             cast.clause._compiler_dispatch(self, **kwargs),
-            cast.typeclause._compiler_dispatch(self, **kwargs),
+            match.group(1) if match else type_clause,
+            match.group(2) if match else "",
         )
 
     def _format_frame_clause(self, range_, **kw):
@@ -6363,11 +6366,9 @@ class StrSQLCompiler(SQLCompiler):
         return self._generate_generic_binary(binary, " <not regexp> ", **kw)
 
     def visit_regexp_replace_op_binary(self, binary, operator, **kw):
-        replacement = binary.modifiers["replacement"]
-        return "<regexp replace>(%s, %s, %s)" % (
+        return "<regexp replace>(%s, %s)" % (
             binary.left._compiler_dispatch(self, **kw),
             binary.right._compiler_dispatch(self, **kw),
-            replacement._compiler_dispatch(self, **kw),
         )
 
     def visit_try_cast(self, cast, **kwargs):
@@ -7156,6 +7157,8 @@ class IdentifierPreparer:
 
     """
 
+    _includes_none_schema_translate: bool = False
+
     def __init__(
         self,
         dialect,
@@ -7196,9 +7199,11 @@ class IdentifierPreparer:
         prep = self.__class__.__new__(self.__class__)
         prep.__dict__.update(self.__dict__)
 
+        includes_none = None in schema_translate_map
+
         def symbol_getter(obj):
             name = obj.schema
-            if name in schema_translate_map and obj._use_schema_map:
+            if obj._use_schema_map and (name is not None or includes_none):
                 if name is not None and ("[" in name or "]" in name):
                     raise exc.CompileError(
                         "Square bracket characters ([]) not supported "
@@ -7211,16 +7216,38 @@ class IdentifierPreparer:
                 return obj.schema
 
         prep.schema_for_object = symbol_getter
+        prep._includes_none_schema_translate = includes_none
         return prep
 
     def _render_schema_translates(self, statement, schema_translate_map):
         d = schema_translate_map
         if None in d:
+            if not self._includes_none_schema_translate:
+                raise exc.InvalidRequestError(
+                    "schema translate map which previously did not have "
+                    "`None` present as a key now has `None` present; compiled "
+                    "statement may lack adequate placeholders.  Please use "
+                    "consistent keys in successive "
+                    "schema_translate_map dictionaries."
+                )
+
             d["_none"] = d[None]
 
         def replace(m):
             name = m.group(2)
-            effective_schema = d[name]
+            if name in d:
+                effective_schema = d[name]
+            else:
+                if name in (None, "_none"):
+                    raise exc.InvalidRequestError(
+                        "schema translate map which previously had `None` "
+                        "present as a key now no longer has it present; don't "
+                        "know how to apply schema for compiled statement. "
+                        "Please use consistent keys in successive "
+                        "schema_translate_map dictionaries."
+                    )
+                effective_schema = name
+
             if not effective_schema:
                 effective_schema = self.dialect.default_schema_name
                 if not effective_schema:
