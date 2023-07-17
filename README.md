@@ -3,7 +3,9 @@
 To spin this up, you will need two .env files.
 
 Backend -
+
 location:
+
 <img src="backend.png" alt="Backend" width="300">
 
 contents:
