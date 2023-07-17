@@ -47,3 +47,5 @@ Starting the app is done by running `python run.py` and `npm start` from the roo
 Sign up for an account and be redirected.
 
 Clicking "New Chat" will give the user three AI Agents to choose from: GPT 3.5, GPT-4, or AgentDebate. GPT 3.5 and 4 are clones of Chat-GPT (almost). AgentDebate allows the user to pick a topic and set the role for two different AI Agents.
+
+Custom workflow added.
