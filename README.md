@@ -1,4 +1,4 @@
-## Paxxium
+# Paxxium
 
 To spin this up, you will need two .env files.
 
