@@ -45,4 +45,4 @@ jobs:
         FRONTENV: ${{ secrets.FRONTENV }}
       run: |
         echo "$FRONTENV" > ./.env
-        npm run build
+        CI=false npm run build
