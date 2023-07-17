@@ -4,17 +4,17 @@ To spin this up, you will need two .env files.
 
 ## Backend
 
-file location:
-
-<img src="backend.png" alt="Backend" width="300">
-
-env contents:
-
-OPENAI_API_KEY
-
-SERPAPI_API_KEY
-
-ACTIVELOOP_TOKEN
+  file location:
+  
+    <img src="backend.png" alt="Backend" width="300">
+  
+  env contents:
+  
+    OPENAI_API_KEY=
+  
+    SERPAPI_API_KEY=
+  
+    ACTIVELOOP_TOKEN=
 
 You will also need to set up a Firebase project with authentication and Firestore database. *I am willing to share this upon request. The location of where to put that file can be seen in the above photo.
 
@@ -26,19 +26,19 @@ You will also need to set up a Firebase project with authentication and Firestor
   
   env contents:
   
-    REACT_APP_FIREBASE_API_KEY
+    REACT_APP_FIREBASE_API_KEY=
   
-    REACT_APP_FIREBASE_AUTH_DOMAIN
+    REACT_APP_FIREBASE_AUTH_DOMAIN=
   
-    REACT_APP_FIREBASE_PROJECT_ID
+    REACT_APP_FIREBASE_PROJECT_ID=
   
-    REACT_APP_FIREBASE_STORAGE_BUCKET
+    REACT_APP_FIREBASE_STORAGE_BUCKET=
   
-    REACT_APP_FIREBASE_MESSAGING_SENDER_ID
+    REACT_APP_FIREBASE_MESSAGING_SENDER_ID=
   
-    REACT_APP_FIREBASE_APP_ID
+    REACT_APP_FIREBASE_APP_ID=
   
-    REACT_APP_FIREBASE_MEASUREMENT_ID 
+    REACT_APP_FIREBASE_MEASUREMENT_ID=
   
     Again, I am willing to share this upon request.
 
