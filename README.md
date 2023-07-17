@@ -20,28 +20,27 @@ You will also need to set up a Firebase project with authentication and Firestor
 
 ## Frontend
 
-file location:
-
-<img src="frontend.png" alt="Frontend" width="300">
-
-env contents:
-
-REACT_APP_FIREBASE_API_KEY
-
-REACT_APP_FIREBASE_AUTH_DOMAIN
-
-REACT_APP_FIREBASE_PROJECT_ID
-
-REACT_APP_FIREBASE_STORAGE_BUCKET
-
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID
-
-REACT_APP_FIREBASE_APP_ID
-
-REACT_APP_FIREBASE_MEASUREMENT_ID 
-
-
-Again, I am willing to share this upon request.
+  file location:
+  
+    <img src="frontend.png" alt="Frontend" width="300">
+  
+  env contents:
+  
+    REACT_APP_FIREBASE_API_KEY
+  
+    REACT_APP_FIREBASE_AUTH_DOMAIN
+  
+    REACT_APP_FIREBASE_PROJECT_ID
+  
+    REACT_APP_FIREBASE_STORAGE_BUCKET
+  
+    REACT_APP_FIREBASE_MESSAGING_SENDER_ID
+  
+    REACT_APP_FIREBASE_APP_ID
+  
+    REACT_APP_FIREBASE_MEASUREMENT_ID 
+  
+    Again, I am willing to share this upon request.
 
 Starting the app is done by running `python run.py` and `npm start` from the root.
 
