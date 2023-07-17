@@ -40,7 +40,7 @@ You will also need to set up a Firebase project with authentication and Firestor
   
     REACT_APP_FIREBASE_MEASUREMENT_ID=
   
-    Again, I am willing to share this upon request.
+  Again, I am willing to share this upon request.
 
 Starting the app is done by running `python run.py` and `npm start` from the root.
 
