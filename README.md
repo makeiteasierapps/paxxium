@@ -2,7 +2,7 @@
 
 To spin this up, you will need two .env files.
 
-## Backend -
+## Backend
 
 file location:
 
@@ -18,7 +18,7 @@ ACTIVELOOP_TOKEN
 
 You will also need to set up a Firebase project with authentication and Firestore database. *I am willing to share this upon request. The location of where to put that file can be seen in the above photo.
 
-## Frontend -
+## Frontend
 
 file location:
 
