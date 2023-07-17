@@ -20,7 +20,13 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f myapp/requirements.txt ]; then pip install -r myapp/requirements.txt; fi
     - name: Build
-      run: python run.py
+      env: 
+        BACKENV: ${{ secrets.BACKENV }}
+        FIREBASEADMINSDK: ${{ secrets.FIREBASEADMINSDK }}
+      run: |
+        echo "$FIREBASEADMINSDK" > ./myapp/paxxium-firebase-adminsdk-2l9cl-3bb25d079e.json
+        echo "$BACKENV" > ./myapp/.env
+        python run.py
     - name: Run tests
       run: pytest
 
@@ -35,4 +41,8 @@ jobs:
     - name: Install dependencies
       run: npm ci
     - name: Build
-      run: npm start
+      env: 
+        FRONTENV: ${{ secrets.FRONTENV }}
+      run: |
+        echo "$FRONTENV" > ./.env
+        npm start
