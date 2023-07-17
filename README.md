@@ -4,7 +4,7 @@ To spin this up, you will need two .env files.
 
 Backend -
 
-location:
+file location:
 
 <img src="backend.png" alt="Backend" width="300">
 
@@ -20,7 +20,7 @@ You will also need to set up a Firebase project with authentication and Firestor
 
 Frontend -
 
-location:
+file location:
 
 <img src="frontend.png" alt="Frontend" width="300">
 
