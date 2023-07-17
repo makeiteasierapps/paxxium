@@ -10,7 +10,9 @@ location:
 
 contents:
 OPENAI_API_KEY
+
 SERPAPI_API_KEY
+
 ACTIVELOOP_TOKEN
 
 You will also need to set up a Firebase project with authentication and Firestore database. *I am willing to share this upon request. The location of where to put that file can be seen in the above photo.
