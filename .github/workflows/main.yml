@@ -30,7 +30,6 @@ jobs:
       run: pytest
 
   build-react:
-    needs: build-python
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
