@@ -9,6 +9,7 @@ location:
 <img src="backend.png" alt="Backend" width="300">
 
 contents:
+
 OPENAI_API_KEY
 
 SERPAPI_API_KEY
@@ -18,10 +19,13 @@ ACTIVELOOP_TOKEN
 You will also need to set up a Firebase project with authentication and Firestore database. *I am willing to share this upon request. The location of where to put that file can be seen in the above photo.
 
 Frontend -
+
 location:
+
 <img src="frontend.png" alt="Frontend" width="300">
 
 contents:
+
 Firebase config settings. Again, I am willing to share this upon request.
 
 Starting the app is done by running `python run.py` and `npm start` from the root.
