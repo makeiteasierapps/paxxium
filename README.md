@@ -4,7 +4,7 @@ To spin this up, you will need two .env files.
 
 Backend -
 location:
-<img src="backend.png" alt="Backend" width="400">
+<img src="backend.png" alt="Backend" width="300">
 
 contents:
 OPENAI_API_KEY
@@ -15,7 +15,7 @@ You will also need to set up a Firebase project with authentication and Firestor
 
 Frontend -
 location:
-<img src="frontend.png" alt="Frontend" width="400">
+<img src="frontend.png" alt="Frontend" width="300">
 
 contents:
 Firebase config settings. Again, I am willing to share this upon request.
