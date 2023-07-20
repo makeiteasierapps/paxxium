@@ -29,7 +29,7 @@ jobs:
         FIREBASEADMINSDK: ${{ secrets.FIREBASEADMINSDK }}
         ENCRYPTION: ${{ secrets.ENCRYPTION }}
       run: |
-        mkdir -p /myapp/fb_config
+        sudo mkdir -p /myapp/fb_config
         echo "$FIREBASEADMINSDK" > ./myapp/fb_config/paxxium-firebase-adminsdk-2l9cl-3bb25d079e.json
         echo "$ENCRYPTION" > ./myapp/fb_configpaxxium-7194e2941e9f.json
         echo "$BACKENV" > ./myapp/.env
