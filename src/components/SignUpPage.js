@@ -12,14 +12,13 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-
+  
 const StyledContainer = styled(Container)(({ theme }) => ({
     marginTop: theme.spacing(8),
     display: 'flex',
@@ -27,8 +26,15 @@ const StyledContainer = styled(Container)(({ theme }) => ({
     alignItems: 'center',
   }));
   
-
-
+  const StyledAvatar = styled(Avatar)(({ theme }) => ({
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  }));
+  
+  const WelcomeMessageText = styled(Typography)(({ theme }) => ({
+    marginTop: theme.spacing(2),
+    fontSize: '1.1rem',
+  }));
 
 export default function SignUp() {
     const [formValid, setFormValid] = useState({
@@ -135,42 +141,28 @@ export default function SignUp() {
     };
 
     return (
-        <Container component="main" maxWidth="xs">
-            <Box
-                sx={{
-                    marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}
-            >
+        <StyledContainer component="main" maxWidth="xs">
+            <Box >
                 <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
                     Sign up
                 </Typography>
-                <Typography
+                <WelcomeMessageText
                     sx={{ mt: 2 }}
                     variant="body2"
                     color="text.secondary"
                 >
-                    In order to provide you with the best service, we need your
-                    OpenAI API key and SerpAPI key. These keys are used to fetch
-                    necessary data and to provide you with the best user
-                    experience. Please note that we take your security seriously
-                    and these keys will be stored securely and will not be
-                    shared with any third parties.
-                </Typography>
-                <Typography
-                    sx={{ mt: 2 }}
-                    variant="body2"
-                    color="text.secondary"
-                >
-                    After submitting the form, we will review your application
-                    and you will be notified when your subscription has been
-                    approved.
-                </Typography>
+                    In order to use the app a couple of api keys are needed.
+                    OpenAI is a paid api but it is very reasonable, and SerpAPI
+                    is has a generous free tier. I take security serious, keys are encrypted
+                    using Google's Key Management Service (KMS), stored and used only on the server side.
+                    
+                   <br /><br />  
+                    Once your account has been approved you will be notified.
+
+                </WelcomeMessageText>
                 <Box
                     component="form"
                     noValidate
@@ -306,6 +298,6 @@ export default function SignUp() {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Container>
+        </StyledContainer>
     );
 }
