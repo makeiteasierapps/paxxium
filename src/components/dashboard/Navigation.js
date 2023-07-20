@@ -29,6 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDrawer } from '../../contexts/DrawerContext';
 import { getAuth, signOut } from 'firebase/auth';
 
+
 const drawerWidth = 240;
 
 const NavBar = styled(MuiAppBar, {
@@ -83,10 +84,9 @@ export default function Navigation() {
     } = useContext(ChatContext);
 
     const [openChat, setOpenChat] = React.useState(false);
-    const [openRoom, setOpenRoom] = React.useState(false);
     const navigate = useNavigate();
 
-    const { idToken, setIdToken } = useContext(AuthContext);
+    const { idToken, setIdToken, setUser } = useContext(AuthContext);
     const { open, setOpen } = useDrawer();
 
     const handleDrawerOpen = () => {
@@ -102,6 +102,7 @@ export default function Navigation() {
         signOut(auth)
             .then(function () {
                 setIdToken(null);
+                setUser(null);
                 navigate('/');
             })
             .catch(function (error) {

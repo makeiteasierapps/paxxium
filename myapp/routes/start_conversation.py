@@ -40,8 +40,8 @@ def conversation_start():
     The user has just initiated a conversation with you, provide a welcome message and guidance on how you can help them.
     '''
     
-    master_ai = MasterAI(message_service)
-    master_ai.pass_to_masterAI(message_obj={'message_content': starter_prompt}, conversation_id=new_conversation_id, user_id=uid, chatbot_id=chatbot_id)
+    agent_greet = MasterAI(message_service)
+    agent_greet.pass_to_masterAI(message_obj={'message_content': starter_prompt}, conversation_id=new_conversation_id, user_id=uid, chatbot_id=chatbot_id)
     
     return {
         'message': f'A conversation has been started with bot {chatbot["bot_profile_id"]}.',

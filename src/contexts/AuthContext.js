@@ -22,11 +22,16 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
     const [idToken, setIdToken] = useState(null);
+    const [uid, setUid] = useState(null);
+    const [user, setUser] = useState(null);
+
     useEffect(() => {
         auth.onAuthStateChanged(function (user) {
             if (user) {
                 user.getIdToken().then(function (token) {
-                    setIdToken(token); // Update the idToken in the state
+                    setIdToken(token);
+                    setUid(user.uid);
+                    setUser(user);
                 });
             } else {
                 console.log('No user is signed in.');
@@ -34,7 +39,7 @@ const AuthProvider = ({ children }) => {
         });
     }, []);
     return (
-        <AuthContext.Provider value={{ idToken, setIdToken }}>
+        <AuthContext.Provider value={{ idToken, setIdToken, uid, setUid, setUser, user }}>
             {children}
         </AuthContext.Provider>
     );

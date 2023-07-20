@@ -7,7 +7,7 @@ import firebase_admin
 # Initialize the extension outside the factory function
 socketio = SocketIO()
 # Initialize Firebase
-cred = credentials.Certificate('myapp/paxxium-firebase-adminsdk-2l9cl-3bb25d079e.json')
+cred = credentials.Certificate('myapp/fb_config/paxxium-firebase-adminsdk-2l9cl-3bb25d079e.json')
 firebase_admin.initialize_app(cred)
 
 def create_app():

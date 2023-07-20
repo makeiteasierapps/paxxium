@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useContext, useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import Avatar from '@mui/material/Avatar';
@@ -11,49 +11,114 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useNavigate } from 'react-router-dom';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { AuthContext } from '../contexts/AuthContext';
 
 export default function SignUp() {
-    const [setFormValid] = useState(true);
-    const [setServerError] = useState('');
+    const [formValid, setFormValid] = useState({
+        username: true,
+        email: true,
+        password: true,
+        openAiApiKey: true,
+        serpApiKey: true,
+    });
+    const [serverError, setServerError] = useState('');
+    const [formValues, setFormValues] = useState({
+        username: '',
+        email: '',
+        password: '',
+        openAiApiKey: '',
+        serpApiKey: '',
+    });
+    const [open, setOpen] = useState(false);
     const navigate = useNavigate();
     const auth = getAuth();
-    const db = getFirestore();
+    const {idToken} = useContext(AuthContext);
+    const handleClose = () => {
+        setOpen(false);
+        navigate('/');
+    };
+
+    const isValid = {
+        // username must be between 5 and 10 characters long and can only contain alphanumeric characters and underscores
+        username: (username) =>
+            /^[a-zA-Z0-9_]{5,}[a-zA-Z]+[0-9]*$/.test(username),
+        // Email must be a valid email address
+        email: (email) =>
+            /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email),
+        // Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number
+        password: (password) =>
+            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(password),
+        // Must not be empty
+        openAiApiKey: (key) => key && key.trim().length > 0,
+        // Must not be empty
+        serpApiKey: (key) => key && key.trim().length > 0,
+    };
+
+    const errorMessages = {
+        username:
+            'Username should be 5 or more characters, and can contain alphanumeric characters and underscore.',
+        email: 'Invalid email address.',
+        password:
+            'Password should be 8 or more characters, and must contain at least one uppercase, one lowercase letter and a digit.',
+    };
+
+    const handleInputChange = (event) => {
+        const fieldName = event.target.name;
+        const value = event.target.value;
+        setFormValues({ ...formValues, [fieldName]: value });
+        setFormValid({ ...formValid, [fieldName]: isValid[fieldName](value) });
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
+        // Check if all fields are valid before submitting
+        if (Object.values(formValid).every((field) => field)) {
+            try {
+                const userCredential = await createUserWithEmailAndPassword(
+                    auth,
+                    formValues.email,
+                    formValues.password
+                );
+                const user = userCredential.user;
+                const uid = user.uid;
 
-        const payload = {
-            email: data.get('email'),
-            password: data.get('password'),
-            username: data.get('username'),
-        };
+                if (!user) {
+                    throw new Error('User not created');
+                }
 
-        if (Object.values(payload).some((x) => x === null || x === '')) {
-            setFormValid(false);
-            return;
-        }
+                const response = await fetch(
+                    'http://localhost:5000/signup',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: idToken,
+                        },
+                        body: JSON.stringify({
+                            uid: uid,
+                            username: formValues.username,
+                            openAiApiKey: formValues.openAiApiKey,
+                            serpApiKey: formValues.serpApiKey,
+                            authorized: false,
+                        }),
+                    }
+                );
 
-        try {
-            const userCredential = await createUserWithEmailAndPassword(
-                auth,
-                payload.email,
-                payload.password
-            );
-            const user = userCredential.user;
+                // If the request was not successful, throw an error
+                if (!response.ok) {
+                    throw new Error('Error when saving user data');
+                }
 
-            if (!user) {
-                throw new Error('User not created');
+                setOpen(true);
+            } catch (error) {
+                console.error(error);
+                setServerError(error.message);
             }
-
-            await setDoc(doc(db, 'users', user.uid), {
-                username: payload.username,
-            });
-
-            navigate('/home');
-        } catch (error) {
-            console.error(error);
-            setServerError(error.message);
         }
     };
 
@@ -73,6 +138,27 @@ export default function SignUp() {
                 <Typography component="h1" variant="h5">
                     Sign up
                 </Typography>
+                <Typography
+                    sx={{ mt: 2 }}
+                    variant="body2"
+                    color="text.secondary"
+                >
+                    In order to provide you with the best service, we need your
+                    OpenAI API key and SerpAPI key. These keys are used to fetch
+                    necessary data and to provide you with the best user
+                    experience. Please note that we take your security seriously
+                    and these keys will be stored securely and will not be
+                    shared with any third parties.
+                </Typography>
+                <Typography
+                    sx={{ mt: 2 }}
+                    variant="body2"
+                    color="text.secondary"
+                >
+                    After submitting the form, we will review your application
+                    and you will be notified when your subscription has been
+                    approved.
+                </Typography>
                 <Box
                     component="form"
                     noValidate
@@ -87,6 +173,14 @@ export default function SignUp() {
                                 id="username"
                                 label="Username"
                                 name="username"
+                                value={formValues.username}
+                                error={!formValid.username}
+                                helperText={
+                                    !formValid.username
+                                        ? errorMessages.username
+                                        : ''
+                                }
+                                onChange={handleInputChange}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -96,9 +190,52 @@ export default function SignUp() {
                                 id="email"
                                 label="Email Address"
                                 name="email"
+                                value={formValues.email}
+                                error={!formValid.email}
+                                helperText={
+                                    !formValid.email ? errorMessages.email : ''
+                                }
                                 autoComplete="email"
+                                onChange={handleInputChange}
                             />
                         </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                required
+                                fullWidth
+                                id="openAiApiKey"
+                                label="OpenAI API Key"
+                                name="openAiApiKey"
+                                value={formValues.openAiApiKey}
+                                error={!formValid.openAiApiKey}
+                                helperText={
+                                    !formValid.openAiApiKey
+                                        ? errorMessages.openAiApiKey
+                                        : ''
+                                }
+                                type="password"
+                                onChange={handleInputChange}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                required
+                                fullWidth
+                                id="serpApiKey"
+                                label="SerpAPI Key"
+                                name="serpApiKey"
+                                value={formValues.serpApiKey}
+                                error={!formValid.serpApiKey}
+                                helperText={
+                                    !formValid.serpApiKey
+                                        ? errorMessages.serpApiKey
+                                        : ''
+                                }
+                                type="password"
+                                onChange={handleInputChange}
+                            />
+                        </Grid>
+
                         <Grid item xs={12}>
                             <TextField
                                 required
@@ -107,7 +244,15 @@ export default function SignUp() {
                                 label="Password"
                                 type="password"
                                 id="password"
+                                value={formValues.password}
+                                error={!formValid.password}
+                                helperText={
+                                    !formValid.password
+                                        ? errorMessages.password
+                                        : ''
+                                }
                                 autoComplete="new-password"
+                                onChange={handleInputChange}
                             />
                         </Grid>
                     </Grid>
@@ -128,6 +273,27 @@ export default function SignUp() {
                     </Grid>
                 </Box>
             </Box>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {'Request Received'}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Your request has been received. You will be contacted
+                        when approved.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary" autoFocus>
+                        Ok
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }
