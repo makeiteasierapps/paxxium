@@ -26,14 +26,10 @@ const StyledContainer = styled(Container)(({ theme }) => ({
     alignItems: 'center',
   }));
   
-  const StyledAvatar = styled(Avatar)(({ theme }) => ({
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  }));
-  
   const WelcomeMessageText = styled(Typography)(({ theme }) => ({
     marginTop: theme.spacing(2),
-    fontSize: '1.1rem',
+    fontSize: '1.11rem',
+    textAlign: 'center',
   }));
 
 export default function SignUp() {
@@ -142,7 +138,6 @@ export default function SignUp() {
 
     return (
         <StyledContainer component="main" maxWidth="xs">
-            <Box >
                 <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
                     <LockOutlinedIcon />
                 </Avatar>
@@ -276,7 +271,7 @@ export default function SignUp() {
                         </Grid>
                     </Grid>
                 </Box>
-            </Box>
+            
             <Dialog
                 open={open}
                 onClose={handleClose}
