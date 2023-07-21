@@ -11,13 +11,19 @@ def test_get_messages(mock_verify_id_token, client, app, config):
         res = client.get(url_for('messages.get_messages', conversation_id='123'))
         assert res.status_code == 200
 
+@patch('myapp.services.user_services.UserService.get_keys')
+@patch('myapp.services.user_services.UserService.decrypt')
+@patch('myapp.services.user_services.UserService.check_authorization')
 @patch('firebase_admin.auth.verify_id_token')
-def test_conversation_start(mock_verify_id_token, client, app, config):
+def test_conversation_start(mock_verify_id_token, mock_check_authorization, mock_decrypt, mock_get_keys, client, app, config):
     app.config['SERVER_NAME'] = 'localhost:5000'
     app.config['APPLICATION_ROOT'] = '/'
     app.config['PREFERRED_URL_SCHEME'] = 'http'
     with app.app_context():
         mock_verify_id_token.return_value = {'uid': '123'}
+        mock_check_authorization.return_value = True
+        mock_get_keys.return_value = ('test_openai_key', 'test_serp_key')
+        mock_decrypt.return_value = 'decrypted_message'
         data = {
             'bot_profile_id': 'test_bot_profile_id',
             'bot_name': 'test_bot_name'
@@ -37,3 +43,9 @@ def test_conversation_start(mock_verify_id_token, client, app, config):
         assert json_response['conversation']['id'] != ''
         assert json_response['conversation']['user_id'] == '123'
         assert json_response['conversation']['agent_name'] == 'test_bot_name'
+         # Additional assertions to check the return values of get_keys and decrypt
+        assert mock_get_keys.return_value == ('test_openai_key', 'test_serp_key')
+        assert isinstance(mock_get_keys.return_value, tuple)
+        assert all(isinstance(item, str) for item in mock_get_keys.return_value)
+        assert mock_decrypt.return_value == 'decrypted_message'
+        assert isinstance(mock_decrypt.return_value, str)

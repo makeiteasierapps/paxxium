@@ -1,6 +1,5 @@
 import pytest
 from flask import current_app
-
 from myapp.services.message_service import MessageService
 from myapp.services.firebase_service import FirebaseService
 from myapp.agents.master_ai import MasterAI
