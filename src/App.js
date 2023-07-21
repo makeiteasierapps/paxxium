@@ -4,7 +4,6 @@ import {
     Route,
     Routes,
     useNavigate,
-    Navigate,
 } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import SignUpPage from './components/SignUpPage';
@@ -76,8 +75,10 @@ const AuthenticatedApp = () => {
                     });
 
                     const responseData = await response.json();
+                    console.log(responseData);
+                    console.log(typeof responseData.auth_status);
                     // Checks if admin as grtanted access to the app
-                    if (responseData.authorized) {
+                    if (responseData.auth_status) {
                         setIsAuthorized(true);
                         setUid(user.uid);
                         const userDoc = await getDoc(doc(db, 'users', uid));

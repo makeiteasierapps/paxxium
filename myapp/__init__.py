@@ -5,28 +5,31 @@ from firebase_admin import firestore, credentials
 import firebase_admin
 
 # Initialize the extension outside the factory function
-socketio = SocketIO()
+socketio = SocketIO(cors_allowed_origins="*", manage_session=False)
 # Initialize Firebase
 cred = credentials.Certificate('myapp/fb_config/paxxium-firebase-adminsdk-2l9cl-3bb25d079e.json')
 firebase_admin.initialize_app(cred)
 
 def create_app():
+
     # Create the Flask application
     app = Flask(__name__)
 
     # Configure CORS
-    CORS(app, supports_credentials=True)
+    CORS(app, origins=['http://localhost:3000'], supports_credentials=True, allow_headers=['Content-Type', 'Authorization'], methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+
 
     # Create the Firestore client
     db = firestore.client()
 
-    # Store db in the application config
+    # app config settings
     app.config['db'] = db
 
-    # Register your blueprints
+
+    # Register blueprints
     from myapp import views
     views.register_blueprints(app)
-
-    socketio.init_app(app, cors_allowed_origins="*")
+    
+    
+    socketio.init_app(app)
     return app
-

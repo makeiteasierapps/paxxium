@@ -14,6 +14,7 @@ def conversation_start():
     bot_service = BotService(db)
     conversation_service = ConversationService(db)
     message_service = MessageService(db)
+    
     # Authenticates user
     id_token = request.headers['Authorization']
     decoded_token = firebase_service.verify_id_token(id_token)
@@ -21,6 +22,7 @@ def conversation_start():
     if not decoded_token:
         return {'message': 'Invalid token'}, 403
 
+    # Gathers requested bots information
     data = request.get_json()
     bot_profile_id = data['bot_profile_id']
     bot_name = data['bot_name']
@@ -40,7 +42,8 @@ def conversation_start():
     The user has just initiated a conversation with you, provide a welcome message and guidance on how you can help them.
     '''
     
-    agent_greet = MasterAI(message_service)
+    
+    agent_greet = MasterAI(message_service, uid)
     agent_greet.pass_to_masterAI(message_obj={'message_content': starter_prompt}, conversation_id=new_conversation_id, user_id=uid, chatbot_id=chatbot_id)
     
     return {

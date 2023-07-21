@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, session
 from myapp.services.message_service import MessageService
 from myapp.services.firebase_service import FirebaseService
 from myapp.agents.master_ai import MasterAI
@@ -56,16 +56,23 @@ def validate_message(data, uid, conversation_id):
 def process_message(data, uid, conversation_id):
     db = current_app.config['db']
     message_service = MessageService(db)
+    
+    # Extrtact data from request
     message_content = data.get('message_content')
     message_from = data.get('message_from')
     bot_name = data.get('agent_name')
     chatbot_id = data.get('agent_id')
 
+    # Create a new message in the database
     new_message = message_service.create_message(conversation_id=conversation_id, message_content=message_content, message_from=message_from, user_id=uid, chatbot_id=chatbot_id)
-
+    
+    # Set up Agent
     model = message_service.select_model(bot_name)
-    master_agent = MasterAI(message_service, model=model)
+    master_agent = MasterAI(message_service, uid, model=model)
+    
+    # Pass message to Agent 
     response_from_llm = master_agent.pass_to_masterAI(message_obj=new_message, conversation_id=conversation_id, chatbot_id=chatbot_id, user_id=uid)
+    
     return jsonify(new_message, response_from_llm), 201
 
 
