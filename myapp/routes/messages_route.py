@@ -1,12 +1,17 @@
-from flask import Blueprint, request, jsonify, current_app, session
+from collections import OrderedDict
+from flask import Blueprint, request, jsonify, current_app
 from myapp.services.message_service import MessageService
 from myapp.services.firebase_service import FirebaseService
 from myapp.agents.master_ai import MasterAI
 
 messages = Blueprint('messages', __name__)
-
 firebase_service = FirebaseService()
 
+# This is the OrderedDict where we'll store the MasterAI instances
+master_ais = OrderedDict()
+
+# Max number of MasterAI instances that can be stored
+MAX_AI_INSTANCES = 1000  # This can be adjusted as per your requirements
 
 @messages.route('/<string:conversation_id>/messages', methods=['GET'])
 def get_messages(conversation_id):
@@ -56,7 +61,6 @@ def validate_message(data, uid, conversation_id):
 def process_message(data, uid, conversation_id):
     db = current_app.config['db']
     message_service = MessageService(db)
-    
     # Extrtact data from request
     message_content = data.get('message_content')
     message_from = data.get('message_from')
@@ -68,10 +72,24 @@ def process_message(data, uid, conversation_id):
     
     # Set up Agent
     model = message_service.select_model(bot_name)
-    master_agent = MasterAI(message_service, uid, model=model)
+    # Use (uid, conversation_id) as the key
+    key = (uid, conversation_id)
+
+
+    # If we don't have a MasterAI for this conversation, create a new one
+    if key not in master_ais:
+        # If we've reached the max number of instances, remove the oldest one
+        if len(master_ais) >= MAX_AI_INSTANCES:
+            master_ais.popitem(last=False)
+        
+        master_ais[key] = MasterAI(message_service, uid, model=model)
+    else:
+        # If we do have a MasterAI for this conversation, make sure it's using the correct model and move it to end
+        master_ais[key].model = model
+        master_ais.move_to_end(key)  # Moves the key to the end, meaning it is the most recently used
     
     # Pass message to Agent 
-    response_from_llm = master_agent.pass_to_masterAI(message_obj=new_message, conversation_id=conversation_id, chatbot_id=chatbot_id, user_id=uid)
+    response_from_llm = master_ais[key].pass_to_masterAI(message_obj=new_message, conversation_id=conversation_id, chatbot_id=chatbot_id, user_id=uid)
     
     return jsonify(new_message, response_from_llm), 201
 

@@ -1,49 +1,44 @@
-from flask import Blueprint, current_app
-from flask_socketio import join_room, emit
-from myapp import socketio
+from flask import Blueprint, current_app, request
 from myapp.services.debate_services import DebateManager
 from myapp.services.firebase_service import FirebaseService
 from myapp.services.conversation_service import ConversationService
 
-debate = Blueprint('debate', __name__)
+debate = Blueprint('start_debate', __name__)
 firebase_service = FirebaseService()
 
-
-@socketio.on('start_debate')
-def handle_start_debate(data):
+debate_managers = {}
+@debate.route('/start_debate', methods=['POST'])
+def handle_debate():
     db = current_app.config['db']
     conversation_service = ConversationService(db)
-    id_token = data['idToken']
+    # Authenticates user
+    id_token = request.headers['Authorization']
     decoded_token = firebase_service.verify_id_token(id_token)
-    if not decoded_token:
-        return
     uid = decoded_token['uid']
+    
+    if not decoded_token:
+        return {'message': 'Invalid token'}, 403
 
+    # Extract data from request
+    data = request.get_json()
     role_1 = data.get('role_1')
     role_2 = data.get('role_2')
     topic = data.get('topic')
-
-    # Create a new conversation
-    new_conversation_id = conversation_service.create_conversation(uid, '333', 'AgentDebate')
-    debate_manager = DebateManager(uid, new_conversation_id, role_1, role_2, current_app)
+    turn = data.get('turn')
    
-    # Emit the new conversation details back to the client
-    emit('debate_started', {
-        'message': 'A conversation has been started with bot "333"',
-        'conversation': {
-            'id': new_conversation_id,
-            'user_id': uid,
-            'agent_id': '333',
-            'agent_name': 'AgentDebate',
-        },
-    })
+    # Create a new conversation if it's the start of the debate
+    if turn == 0:
+        new_conversation_id = conversation_service.create_conversation(uid, '333', 'AgentDebate')
+        debate_manager = DebateManager(uid, new_conversation_id, role_1, role_2, current_app)
+        debate_managers[uid] = debate_manager
+    else:
+        debate_manager = debate_managers[uid]
     
-    # start debate in a different thread
-    socketio.start_background_task(debate_manager.start_debate, topic)
+    response_content, has_more_turns = debate_manager.start_debate(topic, turn)
 
-@socketio.on('join')
-def on_join(data):
-    print('Join event triggered')
-    room = data['room']
-    join_room(room)
-    emit('new_message', {'content': 'Welcome to the room!'}, room=room)
+    return {'message': response_content, 'hasMoreTurns': has_more_turns, 'conversation': {
+            'id': debate_manager.conversation_id,
+            'user_id': uid,
+            'agent_id': 333,
+            'agent_name': 'AgentDebate',
+        }}, 200

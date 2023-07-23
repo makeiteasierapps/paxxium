@@ -1,11 +1,8 @@
 from flask import Flask
-from flask_socketio import SocketIO
 from flask_cors import CORS
 from firebase_admin import firestore, credentials
 import firebase_admin
 
-# Initialize the extension outside the factory function
-socketio = SocketIO(cors_allowed_origins="*", manage_session=False)
 # Initialize Firebase
 cred = credentials.Certificate('myapp/fb_config/paxxium-firebase-adminsdk-2l9cl-3bb25d079e.json')
 firebase_admin.initialize_app(cred)
@@ -30,6 +27,4 @@ def create_app():
     from myapp import views
     views.register_blueprints(app)
     
-    
-    socketio.init_app(app)
     return app

@@ -14,7 +14,7 @@ const InputArea = styled('div')({
 });
 
 const MessageInput = () => {
-    const { selectedAgentId, selectedAgentName, userId, conversationId, setMessages } =
+    const { selectedAgentId, selectedAgentName, uid, conversationId, setMessages } =
         useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
     const [input, setInput] = useState('');
@@ -27,15 +27,14 @@ const MessageInput = () => {
     const sendMessage = async () => {
         const tempId = uuidv4(); // generate a temporary unique id
 
+        // Optomistic update
         const userMessage = {
             message_content: input,
             message_from: 'user',
-            user_id: userId,
+            user_id: uid,
             agent_id: selectedAgentId, 
             time_stamp: new Date().toISOString(),
         };
-
-        // add the user's message to the list
         setMessages((prevMessages) => [...prevMessages, userMessage]);
 
         const url = `http://localhost:5000/${conversationId}/messages`;
@@ -50,7 +49,7 @@ const MessageInput = () => {
                 body: JSON.stringify({
                     message_content: input,
                     message_from: 'user',
-                    user_id: userId,
+                    user_id: uid,
                     agent_id: selectedAgentId,
                     agent_name: selectedAgentName,
                 }),

@@ -3,7 +3,7 @@ import React, { useState, createContext } from 'react';
 export const ChatContext = createContext();
 
 export const ChatProvider = (props) => {
-    const [userId, setUserId] = useState(null);
+    const [uid, setUid] = useState(null);
     const [selectedAgentId, setSelectedAgentId] = useState(null);
     const [selectedAgentName, setSelectedAgentName] = useState(null);
     const [conversationList, setConversationList] = useState([]);
@@ -32,8 +32,8 @@ export const ChatProvider = (props) => {
     return (
         <ChatContext.Provider
             value={{
-                userId,
-                setUserId,
+                uid,
+                setUid,
                 selectedAgentId,
                 setSelectedAgentId,
                 selectedAgentName,

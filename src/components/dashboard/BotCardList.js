@@ -78,7 +78,6 @@ const BotCardList = ({ handleClose }) => {
     }, []);
 
     const showDebateSetupForm = () => {
-        // Add any logic you need here for botId and botName
         setOpen(true);
     };
 

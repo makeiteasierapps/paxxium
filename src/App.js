@@ -75,8 +75,6 @@ const AuthenticatedApp = () => {
                     });
 
                     const responseData = await response.json();
-                    console.log(responseData);
-                    console.log(typeof responseData.auth_status);
                     // Checks if admin as grtanted access to the app
                     if (responseData.auth_status) {
                         setIsAuthorized(true);

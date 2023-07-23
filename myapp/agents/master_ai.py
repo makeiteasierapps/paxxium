@@ -16,7 +16,6 @@ class MasterAI:
         # langchain.debug = True
         db = current_app.config['db']
         user_service = UserService(db)
-        user_service.check_authorization(uid)
         encrypted_openai_key, encrypted_serp_key = user_service.get_keys(uid)
         self.openai_api_key = user_service.decrypt(encrypted_openai_key)
         self.serp_key = user_service.decrypt(encrypted_serp_key)
