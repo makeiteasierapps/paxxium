@@ -1,4 +1,4 @@
-from flask import Blueprint, request, current_app, session
+from flask import Blueprint, request, current_app
 from myapp.services.user_services import UserService
 from myapp.services.firebase_service import FirebaseService
 
