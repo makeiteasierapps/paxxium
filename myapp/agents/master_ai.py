@@ -1,4 +1,5 @@
 from flask import current_app
+import langchain
 from langchain import (
     LLMMathChain,
     SerpAPIWrapper,
@@ -9,13 +10,14 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.agents import initialize_agent, AgentType, Tool
 from myapp.agents.tools.tools import SaveMessageTool
-from myapp.services.user_services import UserService
+
+
+
 
 class MasterAI:
     def __init__(self, message_service, uid, model="gpt-3.5-turbo-0613", system_message_content='You are a friendly expert in tech'):
-        # langchain.debug = True
-        db = current_app.config['db']
-        user_service = UserService(db)
+        langchain.debug = True
+        user_service = current_app.user_service
         encrypted_openai_key, encrypted_serp_key = user_service.get_keys(uid)
         self.openai_api_key = user_service.decrypt(encrypted_openai_key)
         self.serp_key = user_service.decrypt(encrypted_serp_key)
@@ -65,3 +67,32 @@ class MasterAI:
         message_content = message_obj['message_content']
         response = self.master_ai.run(message_content)
         return response
+    
+    def load_history_to_memory(self, conversation):
+        """ 
+        Takes a conversation object and loads the last 10 messages into memory
+        """
+        # Return out of method if memory already exists
+        memory_variables = self.memory.load_memory_variables({})
+        if memory_variables and memory_variables.get('memory'):
+            return
+        
+        # load the 5 most recent exchanges into memory
+        messages = conversation['messages']
+        pairs = []
+        for i in range(len(messages)-1, -1, -1):
+            message = messages[i]
+            message_from = message['message_from']
+            if message_from == 'user':
+                if i != 0:
+                    next_message = messages[i-1]
+                    next_message_from = next_message['message_from']
+                    if next_message_from == 'chatbot':
+                        pairs.append((message, next_message))
+                else:
+                    pairs.append((message, {"message_content": "This is not a part of your conversation, end of buffer", "message_from": "chatbot"}))
+            if len(pairs) == 5:
+                break
+        pairs.reverse()
+        for pair in pairs:
+            self.memory.save_context({"input": pair[0]['message_content']}, {"output": pair[1]['message_content']})

@@ -13,13 +13,12 @@ def check_authorization():
     db = current_app.config['db']
     id_token = request.headers['Authorization']
     decoded_token = firebase_service.verify_id_token(id_token)
-    
+
     if not decoded_token:
         return {'message': 'Invalid token'}, 403
 
     uid = decoded_token['uid']
     user_service = UserService(db)
     auth_status = user_service.check_authorization(uid)
-    
-    return {'auth_status': auth_status}, 200
 
+    return {'auth_status': auth_status}, 200
