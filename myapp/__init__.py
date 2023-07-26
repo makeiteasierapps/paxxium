@@ -3,7 +3,7 @@ from flask_cors import CORS
 from firebase_admin import firestore, credentials
 import firebase_admin
 from myapp.services.message_service import MessageService
-from myapp.services.master_ai_services import MasterAIService
+from myapp.services.master_agent_services import MasterAIService
 from myapp.services.user_services import UserService
 from myapp.services.bot_service import BotService
 from myapp.services.conversation_service import ConversationService

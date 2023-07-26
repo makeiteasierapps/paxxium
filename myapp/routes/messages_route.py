@@ -18,6 +18,12 @@ def get_messages(conversation_id):
 
     conversation_data = message_service.get_all_messages(uid, conversation_id)
     agent_name = conversation_data['bot_name']
+
+    # If the conversation requested is a debate no need to set an Agent instance
+    if agent_name == 'AgentDebate':
+        return jsonify(conversation_data), 200
+    
+    # Check if there is an instance in memory, if not create one and add memory
     agent = current_app.master_ai_service.check_and_set_ai_instance(uid, conversation_id, agent_name)
     agent.load_history_to_memory(conversation_data)
     return jsonify(conversation_data), 200

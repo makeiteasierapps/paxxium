@@ -15,7 +15,7 @@ from myapp.agents.tools.tools import SaveMessageTool
 
 
 
-class MasterAI:
+class MasterAgent:
     def __init__(self, message_service, uid, model="gpt-3.5-turbo-0613", system_message_content='You are a friendly expert in tech'):
         langchain.debug = True
         user_service = current_app.user_service
