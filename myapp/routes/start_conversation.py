@@ -1,20 +1,15 @@
 from flask import Blueprint, request, current_app
 from myapp.services.firebase_service import FirebaseService
-from myapp.services.bot_service import BotService
-from myapp.services.conversation_service import ConversationService
-from myapp.services.message_service import MessageService
-from myapp.agents.master_ai import MasterAI
+
 
 start_conversation = Blueprint('start_conversation', __name__)
 firebase_service = FirebaseService()
 
 @start_conversation.route('/start_conversation', methods=['POST'])
 def conversation_start():
-    db = current_app.config['db']
-    bot_service = BotService(db)
-    conversation_service = ConversationService(db)
-    message_service = MessageService(db)
-    
+    bot_service = current_app.bot_service
+    conversation_service = current_app.conversation_service
+        
     # Authenticates user
     id_token = request.headers['Authorization']
     decoded_token = firebase_service.verify_id_token(id_token)
@@ -37,15 +32,7 @@ def conversation_start():
     
     # Create a new conversation in the database
     new_conversation_id = conversation_service.create_conversation(uid, chatbot['bot_profile_id'], bot_name)
-    starter_prompt = '''
-    You are a friendly helpfuly Ai that specializes in tutoring. You are an expert on all subjects. 
-    The user has just initiated a conversation with you, provide a welcome message and guidance on how you can help them.
-    '''
-    
-    
-    agent_greet = MasterAI(message_service, uid)
-    agent_greet.pass_to_masterAI(message_obj={'message_content': starter_prompt}, conversation_id=new_conversation_id, user_id=uid, chatbot_id=chatbot_id)
-    
+
     return {
         'message': f'A conversation has been started with bot {chatbot["bot_profile_id"]}.',
         'conversation': {

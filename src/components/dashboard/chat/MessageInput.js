@@ -1,4 +1,11 @@
 import React, { useContext, useState } from 'react';
+import Prism from 'prismjs';
+import prettier from 'prettier/standalone';
+import parserBabel from 'prettier/plugins/babel';
+import estreeParser from 'prettier/plugins/estree';
+import 'prismjs/components/prism-javascript.min';
+import 'prismjs/components/prism-python';
+import 'prismjs/themes/prism-okaidia.css';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatContext } from '../../../contexts/ChatContext';
 import { TextField, IconButton, InputAdornment } from '@mui/material';
@@ -14,8 +21,13 @@ const InputArea = styled('div')({
 });
 
 const MessageInput = () => {
-    const { selectedAgentId, selectedAgentName, uid, conversationId, setMessages } =
-        useContext(ChatContext);
+    const {
+        selectedAgentId,
+        selectedAgentName,
+        uid,
+        conversationId,
+        setMessages,
+    } = useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
     const [input, setInput] = useState('');
     const [error, setError] = useState(null);
@@ -32,7 +44,7 @@ const MessageInput = () => {
             message_content: input,
             message_from: 'user',
             user_id: uid,
-            agent_id: selectedAgentId, 
+            agent_id: selectedAgentId,
             time_stamp: new Date().toISOString(),
         };
         setMessages((prevMessages) => [...prevMessages, userMessage]);
@@ -61,7 +73,6 @@ const MessageInput = () => {
 
             const data = await response.json();
             const [newMessage, responseFromLlm] = data;
-
             // If the server returns a new version of the user's message and a bot's response
             if (newMessage && responseFromLlm) {
                 setMessages((prevMessages) => {

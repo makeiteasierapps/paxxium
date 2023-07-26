@@ -7,7 +7,8 @@ from langchain import (
 from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
 from langchain.chat_models import ChatOpenAI
-from langchain.memory import ConversationBufferMemory
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler 
+from langchain.memory import ConversationBufferWindowMemory
 from langchain.agents import initialize_agent, AgentType, Tool
 from myapp.agents.tools.tools import SaveMessageTool
 
@@ -23,9 +24,9 @@ class MasterAI:
         self.serp_key = user_service.decrypt(encrypted_serp_key)
         self.uid = uid
         self.search = SerpAPIWrapper(serpapi_api_key=self.serp_key)
-        self.llm = ChatOpenAI(temperature=0, model=model, openai_api_key=self.openai_api_key)
+        self.llm = ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()], temperature=0, model=model, openai_api_key=self.openai_api_key)
         self.llm_math_chain = LLMMathChain.from_llm(llm=self.llm, verbose=True)
-        self.memory=ConversationBufferMemory(memory_key='memory', return_messages=True)
+        self.memory=ConversationBufferWindowMemory(memory_key='memory', return_messages=True, k=5)
         self.save_message = SaveMessageTool(memory=self.memory)
         
         self.tools = [

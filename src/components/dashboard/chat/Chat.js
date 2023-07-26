@@ -15,6 +15,8 @@ import ChatSection from './ChatSection';
 import MessagesContainer from './MessagesContainer';
 import AgentMessage from './AgentMessage';
 import UserMessage from './UserMessage';
+
+
 const MessageArea = styled(List)({
     flexGrow: 1,
     overflowY: 'auto',

@@ -5,6 +5,8 @@ import firebase_admin
 from myapp.services.message_service import MessageService
 from myapp.services.master_ai_services import MasterAIService
 from myapp.services.user_services import UserService
+from myapp.services.bot_service import BotService
+from myapp.services.conversation_service import ConversationService
 from myapp import views
 
 
@@ -29,6 +31,8 @@ def create_app():
     app.message_service = MessageService(db)
     app.master_ai_service = MasterAIService(app, app.message_service)
     app.user_service = UserService(db)
+    app.bot_service = BotService(db)
+    app.conversation_service = ConversationService(db)
 
     # Register blueprints
     views.register_blueprints(app)
