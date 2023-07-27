@@ -19,6 +19,7 @@ import { theme } from './Theme';
 import Navigation from './components/dashboard/Navigation';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const UnauthenticatedRoutes = () => (
     <Routes>
@@ -63,7 +64,7 @@ const AuthenticatedApp = () => {
         const fetchData = async () => {
             if (idToken && user) { 
                 try {
-                    const response = await fetch('http://localhost:5000/auth_check', {
+                    const response = await fetch(`${backendUrl}/auth_check`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

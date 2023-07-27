@@ -42,6 +42,10 @@ const highlightCode = async (message) => {
             lang = 'markdown';
         }
 
+        if (lang === 'jsx') {
+            lang = 'javascript';
+        }
+
         // fetch the prettier configuration for the language
         const prettierConfig = languageToParserMap[lang] || languageToParserMap.default;
 
@@ -64,7 +68,7 @@ const highlightCode = async (message) => {
         message.codeBlocks['CODEBLOCK' + count] = '<pre><code class="language-' + lang + '">' + highlightedCode + '</code></pre>';
         count++;
     }
-    message.message_content = highlightedStr;
+     message.message_content = await highlightedStr;
     return message;
 };
 

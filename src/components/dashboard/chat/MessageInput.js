@@ -13,6 +13,8 @@ import SendIcon from '@mui/icons-material/Send';
 import { styled } from '@mui/system';
 import { AuthContext } from '../../../contexts/AuthContext';
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
 const InputArea = styled('div')({
     padding: '20px',
     display: 'flex',
@@ -49,7 +51,7 @@ const MessageInput = () => {
         };
         setMessages((prevMessages) => [...prevMessages, userMessage]);
 
-        const url = `http://localhost:5000/${conversationId}/messages`;
+        const url = `${backendUrl}/${conversationId}/messages`;
 
         try {
             const response = await fetch(url, {

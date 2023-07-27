@@ -18,6 +18,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
   
 const StyledContainer = styled(Container)(({ theme }) => ({
     marginTop: theme.spacing(8),
@@ -106,7 +107,7 @@ export default function SignUp() {
                 }
 
                 const response = await fetch(
-                    'http://localhost:5000/signup',
+                    `${backendUrl}/signup`,
                     {
                         method: 'POST',
                         headers: {

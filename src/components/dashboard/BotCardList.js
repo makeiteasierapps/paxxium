@@ -9,7 +9,6 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { blueGrey } from '@mui/material/colors';
 import CheckIcon from '@mui/icons-material/Check';
 import DebateSetupForm from '../DebateForm';
-
 import {
     Card,
     CardContent,
@@ -23,6 +22,8 @@ import {
     DialogTitle,
     DialogContent,
 } from '@mui/material';
+
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const BotCard = styled(Card)(({ theme }) => ({
     transition: '0.3s',
@@ -65,7 +66,7 @@ const BotCardList = ({ handleClose }) => {
     };
 
     useEffect(() => {
-        fetch('http://localhost:5000/get_bots', {
+        fetch(`${backendUrl}/get_bots`, {
             method: 'GET',
             headers: {
                 Authorization: idToken,
@@ -86,7 +87,7 @@ const BotCardList = ({ handleClose }) => {
     };
 
     const startConversation = (bot_profile_id, bot_name) => {
-        fetch('http://localhost:5000/start_conversation', {
+        fetch(`${backendUrl}/start_conversation`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

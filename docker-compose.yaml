@@ -5,18 +5,18 @@ services:
       context: .
       dockerfile: Dockerfile-backend
     ports:
-      - "5000:5000"
+      - "5001:5000"
     env_file:
       - ./myapp/.env
     environment:
-      - VARIABLE_NAME=actual_value
+      - FRONTEND_URL=http://localhost:3001
   frontend:
     build: 
       context: .
       dockerfile: Dockerfile-frontend
     ports:
-      - "3000:3000"
+      - "3001:3000"
     env_file:
       - .env
     environment:
-      - REACT_APP_VARIABLE_NAME=actual_value
+      - REACT_APP_BACKEND_URL=http://localhost:5001

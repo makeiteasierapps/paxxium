@@ -29,6 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDrawer } from '../../contexts/DrawerContext';
 import { getAuth, signOut } from 'firebase/auth';
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const drawerWidth = 240;
 
@@ -177,7 +178,7 @@ export default function Navigation() {
     const handleDelete = async (id) => {
         try {
             const response = await fetch(
-                `http://localhost:5000/delete_conversation/${id}`,
+                `${backendUrl}/delete_conversation/${id}`,
                 {
                     method: 'DELETE',
                     headers: { Authorization: idToken },

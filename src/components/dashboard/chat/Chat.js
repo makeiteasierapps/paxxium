@@ -16,6 +16,7 @@ import MessagesContainer from './MessagesContainer';
 import AgentMessage from './AgentMessage';
 import UserMessage from './UserMessage';
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const MessageArea = styled(List)({
     flexGrow: 1,
@@ -60,7 +61,7 @@ const Chat = React.memo(() => {
     const fetchConversationsAndMessages = useCallback(async () => {
         try {
             const response = await fetch(
-                'http://localhost:5000/get_user_conversations',
+                `${backendUrl}/get_user_conversations`,
                 {
                     method: 'GET',
                     headers: {
@@ -98,7 +99,7 @@ const Chat = React.memo(() => {
     const fetchMessages = useCallback(
         async (conversationId) => {
             try {
-                const url = `http://localhost:5000/${conversationId}/messages`;
+                const url = `${backendUrl}/${conversationId}/messages`;
                 const messageResponse = await fetch(url, {
                     method: 'GET',
                     headers: {

@@ -3,6 +3,7 @@ import { styled } from '@mui/system';
 import { TextField, Button, Box } from '@mui/material';
 import { AuthContext } from '../contexts/AuthContext';
 import { ChatContext } from '../contexts/ChatContext';
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const FormContainer = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -55,7 +56,7 @@ function DebateSetupForm() {
         const startDebate = async (turn = 0) => {
             try {
                 const response = await fetch(
-                    'http://localhost:5000/start_debate',
+                    `${backendUrl}/start_debate`,
                     {
                         method: 'POST',
                         headers: {
