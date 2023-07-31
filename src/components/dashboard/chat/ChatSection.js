@@ -5,7 +5,7 @@ import { styled } from '@mui/system';
 const ChatSectionStyled = styled('div')(({ theme, open }) => ({
     marginLeft: -240,
     height: `calc(100vh - 64px)`,
-    width: '50%',
+    width: '70%',
     marginTop: 45,
     transition: theme.transitions.create('margin', {
         easing: theme.transitions.easing.sharp,

@@ -7,13 +7,19 @@ from langchain import (
 from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
 from langchain.chat_models import ChatOpenAI
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler 
+from langchain.callbacks.base import BaseCallbackHandler 
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.agents import initialize_agent, AgentType, Tool
 from myapp.agents.tools.tools import SaveMessageTool
 
 
 
+class StreamResponse(BaseCallbackHandler):  
+    def on_llm_new_token(self, token: str, **kwargs) -> None:  
+         from myapp import socketio
+         socketio.emit('token', token)
+         print(token)
+         socketio.sleep(0)
 
 class MasterAgent:
     def __init__(self, message_service, uid, model="gpt-3.5-turbo-0613", system_message_content='You are a friendly expert in tech'):
@@ -24,7 +30,7 @@ class MasterAgent:
         self.serp_key = user_service.decrypt(encrypted_serp_key)
         self.uid = uid
         self.search = SerpAPIWrapper(serpapi_api_key=self.serp_key)
-        self.llm = ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()], temperature=0, model=model, openai_api_key=self.openai_api_key)
+        self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse()], temperature=0, model=model, openai_api_key=self.openai_api_key)
         self.llm_math_chain = LLMMathChain.from_llm(llm=self.llm, verbose=True)
         self.memory=ConversationBufferWindowMemory(memory_key='memory', return_messages=True, k=5)
         self.save_message = SaveMessageTool(memory=self.memory)
@@ -57,7 +63,7 @@ class MasterAgent:
             )
         self.message_service = message_service
 
-    def pass_to_masterAI(self, message_obj, conversation_id, chatbot_id, user_id):
+    def pass_to_master_agent(self, message_obj, conversation_id, chatbot_id, user_id):
         message_content = message_obj['message_content']
         response = self.master_ai.run(message_content)                                 
         response_obj = self.message_service.create_message(conversation_id=conversation_id, message_from='chatbot', chatbot_id=chatbot_id, user_id=user_id, message_content=response)

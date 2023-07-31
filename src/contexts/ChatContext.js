@@ -10,6 +10,7 @@ export const ChatProvider = (props) => {
     const [conversationId, setConversationId] = useState(null);
     const [username, setUsername] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [isCodeBlock, setIsCodeBlock] = useState(false);
 
     const addConversation = (newConversation) => {
         setConversationList((prevConversations) => [
@@ -49,6 +50,8 @@ export const ChatProvider = (props) => {
                 setUsername,
                 messages,
                 setMessages,
+                isCodeBlock,
+                setIsCodeBlock,
             }}
         >
             {props.children}
