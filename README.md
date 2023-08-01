@@ -79,7 +79,8 @@ Feel free to fork and modify it according to your needs.
 
 ## Contact
 
-If you have any questions or want to get in touch, you can reach out to the project maintainer at [shaunoffenbacher@yahoo.com](mailto:email@shaunoffenbacher@yahoo.com).
+If you have any questions or want to get in touch, you can reach out to me at
+[shaunoffenbacher@yahoo.com](mailto:email@shaunoffenbacher@yahoo.com).
 
 
 
