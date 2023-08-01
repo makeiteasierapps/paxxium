@@ -67,11 +67,10 @@ class UserService:
     def decrypt(key):
         load_dotenv()
         os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-
+        
         # Use the KMS API to encrypt the data.
         kms_client = kms.KeyManagementServiceClient()
-        kms_key_name = 'projects/paxxium/locations/global/keyRings/agentKeys/cryptoKeys/agents'
-
+        kms_key_name = os.environ.get("KMS_KEY_NAME")
         decrypted_key = kms_client.decrypt(request={'name': kms_key_name, 'ciphertext': key,})
 
         return decrypted_key.plaintext
