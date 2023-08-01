@@ -17,6 +17,7 @@ To run Paxxium locally, follow these steps:
    `.env` contents:
 
     KMS_KEY_NAME=
+
     FRONTEND_URL=
 
 
@@ -80,17 +81,6 @@ Feel free to fork and modify it according to your needs.
 
 If you have any questions or want to get in touch, you can reach out to the project maintainer at [shaunoffenbacher@yahoo.com](mailto:email@shaunoffenbacher@yahoo.com).
 
----
-
-*Note: You might need to adjust the contact email, license information, and other placeholders accordingly.*
-
-Additional content suggestions:
-- Project architecture overview and explanation of key components.
-- A demo video or screenshots to showcase the app's features and usage.
-- Detailed instructions for deploying the app to a server or cloud platform.
-- A section for frequently asked questions (FAQs) to address common queries.
-- A roadmap of planned features and enhancements for the project's future.
-- Acknowledgments or credits for any third-party libraries, APIs, or resources used in the project.
 
 
 
