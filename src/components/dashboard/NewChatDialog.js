@@ -1,4 +1,4 @@
-import  React from 'react';
+import React from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -21,13 +21,14 @@ const NewChatDialog = ({ open, handleClose }) => {
         handleClose();
     };
 
-
     return (
-        <Dialog open={open} onClose={handleClose} maxWidth='md' fullWidth>
-            <DialogTitle variant='h4' align='center'>Select Your Bot</DialogTitle>
+        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+            <DialogTitle variant="h4" align="center">
+                Select Your Agent
+            </DialogTitle>
             <StyledDialogContent>
                 <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-                    <BotCardList handleClose={handleClose}/> 
+                    <BotCardList handleClose={handleClose} />
                 </Box>
             </StyledDialogContent>
             <DialogActions>

@@ -14,12 +14,13 @@ from myapp.agents.tools.tools import SaveMessageTool
 
 
 
-class StreamResponse(BaseCallbackHandler):  
+class StreamResponse(BaseCallbackHandler):
     def on_llm_new_token(self, token: str, **kwargs) -> None:  
-         from myapp import socketio
-         socketio.emit('token', token)
-         print(token)
-         socketio.sleep(0)
+        from myapp import socketio
+        socketio.emit('token', token)
+        
+        # This is needed to override batching
+        socketio.sleep(0)
 
 class MasterAgent:
     def __init__(self, message_service, uid, model="gpt-3.5-turbo-0613", system_message_content='You are a friendly expert in tech'):

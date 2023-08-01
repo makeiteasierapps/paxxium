@@ -55,27 +55,24 @@ function DebateSetupForm() {
 
         const startDebate = async (turn = 0) => {
             try {
-                const response = await fetch(
-                    `${backendUrl}/start_debate`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: idToken,
-                        },
-                        body: JSON.stringify({
-                            role_1: role1Description,
-                            role_2: role2Description,
-                            topic: topic,
-                            turn: turn,
-                        }),
-                    }
-                );
+                const response = await fetch(`${backendUrl}/start_debate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: idToken,
+                    },
+                    body: JSON.stringify({
+                        role_1: role1Description,
+                        role_2: role2Description,
+                        topic: topic,
+                        turn: turn,
+                    }),
+                });
                 const data = await response.json();
                 const newConversation = data.conversation;
                 setConversationId(newConversation.id);
                 setSelectedAgentId(newConversation.agent_id);
-                
+
                 if (turn === 0) {
                     addConversation(newConversation);
                 }
