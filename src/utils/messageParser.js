@@ -15,6 +15,10 @@ import 'prismjs/components/prism-yaml';
 import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/themes/prism-okaidia.css';
+import { useEffect, useRef, useCallback, useContext } from "react";
+import io from 'socket.io-client';
+import { ChatContext } from '../contexts/ChatContext';
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 // map languages to their corresponding prettier plugins
 const languageToParserMap = {
@@ -103,4 +107,150 @@ const highlightStringCode = async (code, lang) => {
         '</code></pre>'
     );
 };
+
+const ProcessResponse = () => {
+        // Define the processQueue function using useCallback to avoid unnecessary re-creations.
+        const queueRef = useRef([]);
+        const isProcessingRef = useRef(false);
+        const isStreamActiveRef = useRef(false);
+        const isCodeBlockRef = useRef(false);
+        const codeRef = useRef('');
+        const langRef = useRef('markdown');
+        const isLangLineRef = useRef(false);
+        const tokenizedCodeRef = useRef([]);
+        const ignoreNextToken = useRef(false);
+        const {setMessages} = useContext(ChatContext)
+
+        const socketRef = useRef(null);
+        // Set up the socket connection on mount and disconnect on unmount.
+        useEffect(() => {
+            socketRef.current = io.connect(backendUrl);
+    
+            return () => {
+                socketRef.current.disconnect();
+            };
+        }, []);
+        
+        const processQueue = useCallback(
+            async (newQueue) => {
+                // If the newQueue is empty, deactivate the stream and return.
+                if (newQueue.length === 0) {
+                    isStreamActiveRef.current = false;
+                    if (isProcessingRef.current) {
+                        isProcessingRef.current = false;
+                    }
+                    return;
+                }
+    
+                // If already processing, return to avoid concurrent processing.
+                if (isProcessingRef.current) {
+                    return;
+                }
+    
+                // Set the processing flag to true to avoid concurrent processing.
+                isProcessingRef.current = true;
+    
+                // Extract the first token from the queue and handle any consecutive empty strings.
+                let [token, ...remainingQueue] = newQueue;
+                while (token === '' && remainingQueue.length > 0) {
+                    [token, ...remainingQueue] = remainingQueue;
+                }
+    
+                // Check if the token marks the start or end of a code block.
+                if (token.startsWith('```') || token.startsWith('``')) {
+                    if (isCodeBlockRef.current) {
+                        token = '';
+                        // End of a code block, reset variables for the next code block.
+                        const highlightedCode = await highlightStringCode(
+                            codeRef.current,
+                            langRef.current
+                        );
+                        tokenizedCodeRef.current = highlightedCode
+                            .split(/(<[^>]*>)|\b/)
+                            .filter(Boolean);
+                        setMessages((prevMessages) => {
+                            const updatedMessages = [...prevMessages];
+                            console.log(updatedMessages);
+                            // Loop through each element of tokenizedCode and add it to the last element of updatedMessages
+                            for (
+                                let i = 0;
+                                i < tokenizedCodeRef.current.length;
+                                i++
+                            ) {
+                                updatedMessages[updatedMessages.length - 1] +=
+                                    tokenizedCodeRef.current[i];
+                            }
+                            tokenizedCodeRef.current = [];
+                            isCodeBlockRef.current = false;
+                            langRef.current = 'markdown';
+                            codeRef.current = ''; // Clear the tokenizedCode array
+                            return updatedMessages;
+                        });
+                    } else {
+                        // Start of a code block.
+                        isCodeBlockRef.current = true;
+                        isLangLineRef.current = true;
+                    }
+                } else if (isCodeBlockRef.current) {
+                    // Inside a code block.
+                    if (isLangLineRef.current) {
+                        // The first line of the code block may specify the language.
+                        langRef.current = token.trim() || 'markdown';
+                        if (langRef.current === 'jsx') {
+                            langRef.current = 'javascript';
+                        }
+                        isLangLineRef.current = false;
+                    } else {
+                        // Add the token to the code block.
+                        codeRef.current += token;
+                    }
+                }
+    
+                setMessages((prevMessages) => {
+                    const updatedMessages = [...prevMessages];
+                    const lastMessage = updatedMessages[updatedMessages.length - 1];
+    
+                    if (!isCodeBlockRef.current) {
+                        if (typeof lastMessage === 'string') {
+                            updatedMessages[updatedMessages.length - 1] += token;
+                        } else {
+                            updatedMessages.push(token);
+                        }
+                    }
+    
+                    return updatedMessages;
+                });
+    
+                // Reset the processing flag to allow the next token processing.
+                isProcessingRef.current = false;
+                // Update the queue with the remaining tokens.
+                queueRef.current = remainingQueue;
+            },
+            [setMessages] // Dependencies of the processQueue function.
+        );
+    
+        // Set up an effect to listen to incoming tokens and process them using the processQueue function.
+        useEffect(() => {
+            const handleToken = (token) => {
+                // Add the incoming token to the queue and process the queue.
+                queueRef.current = [...queueRef.current, token];
+                processQueue(queueRef.current);
+            };
+    
+            // Register the event listener for incoming tokens.
+            socketRef.current.on('token', handleToken);
+    
+            // Clean up by removing the event listener when the component is unmounted.
+            return () => {
+                socketRef.current.off('token', handleToken);
+            };
+        }, [processQueue]); // Run this effect whenever the processQueue function changes.
+    
+        // Set up an effect to call the processQueue function on the initial component mount.
+        useEffect(() => {
+            processQueue(queueRef.current);
+        }, [processQueue]); // Run this effect whenever the processQueue function changes.
+};
+
+export default ProcessResponse;
 export { highlightBlockCode, highlightStringCode };
