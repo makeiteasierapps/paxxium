@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { styled } from '@mui/system';
 import { TextField, Button, Box } from '@mui/material';
 import { AuthContext } from '../contexts/AuthContext';
@@ -24,7 +24,6 @@ function DebateSetupForm() {
         setSelectedAgentId,
         setSelectedAgentName,
         setConversationId,
-        conversationList,
         addConversation,
         setMessages,
     } = useContext(ChatContext);

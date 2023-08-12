@@ -44,7 +44,7 @@ const ScrollableCardContent = styled(CardContent)({
     textAlign: 'center',
 });
 
-const BotCardList = ({ handleClose }) => {
+const AgentMenu = ({ handleClose }) => {
     const [botProfiles, setBotProfiles] = useState([]);
     const {
         setSelectedAgentId,
@@ -100,7 +100,7 @@ const BotCardList = ({ handleClose }) => {
             .then((data) => {
                 const newConversation = data.conversation;
                 setConversationId(newConversation.id);
-                addConversation(newConversation); 
+                addConversation(newConversation);
                 setSelectedAgentId(newConversation.agent_id);
                 setSelectedAgentName(newConversation.agent_name);
                 handleClose();
@@ -225,10 +225,7 @@ const BotCardList = ({ handleClose }) => {
                     </ReactCardFlip>
                 </Grid>
             ))}
-            <Dialog
-                open={open}
-                onClose={handleDebateFormClose}
-            >
+            <Dialog open={open} onClose={handleDebateFormClose}>
                 <DialogTitle>Set Up Debate</DialogTitle>
                 <DialogContent>
                     <DebateSetupForm />
@@ -238,4 +235,4 @@ const BotCardList = ({ handleClose }) => {
     );
 };
 
-export default BotCardList;
+export default AgentMenu;

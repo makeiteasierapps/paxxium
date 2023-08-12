@@ -24,7 +24,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import MuiAppBar from '@mui/material/AppBar';
 import NewChatDialog from './NewChatDialog';
-import Marquee from '../Marquee';
+import Marquee from '../../utils/Marquee';
 import { useNavigate } from 'react-router-dom';
 import { useDrawer } from '../../contexts/DrawerContext';
 import { getAuth, signOut } from 'firebase/auth';

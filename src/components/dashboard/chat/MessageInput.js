@@ -1,9 +1,4 @@
-import React, {
-    useContext,
-    useState,
-    useEffect,
-    useRef,
-} from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import Prism from 'prismjs';
 import io from 'socket.io-client';
 import 'prismjs/components/prism-javascript.min';
@@ -14,7 +9,7 @@ import { TextField, IconButton, InputAdornment } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { styled } from '@mui/system';
 import { AuthContext } from '../../../contexts/AuthContext';
-import ProcessResponse from '../../../utils/messageParser';
+import ProcessResponse from '../../../utils/ProcessResponse';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const InputArea = styled('div')({
@@ -35,6 +30,7 @@ const MessageInput = () => {
     const { idToken } = useContext(AuthContext);
     const [input, setInput] = useState('');
     const socketRef = useRef(null);
+
     // Set up the socket connection on mount and disconnect on unmount.
     useEffect(() => {
         socketRef.current = io.connect(backendUrl);

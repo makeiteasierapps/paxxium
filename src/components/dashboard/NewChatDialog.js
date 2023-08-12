@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { useForm } from 'react-hook-form';
-import BotCardList from './BotCardList';
+import AgentMenu from './AgentMenu';
 import { styled } from '@mui/system';
 
 const StyledDialogContent = styled(DialogContent)({
@@ -28,7 +28,7 @@ const NewChatDialog = ({ open, handleClose }) => {
             </DialogTitle>
             <StyledDialogContent>
                 <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-                    <BotCardList handleClose={handleClose} />
+                    <AgentMenu handleClose={handleClose} />
                 </Box>
             </StyledDialogContent>
             <DialogActions>

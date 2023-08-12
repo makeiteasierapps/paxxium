@@ -52,10 +52,9 @@ const Chat = React.memo(() => {
   } = useContext(ChatContext);
 
   const [error, setError] = useState(null);
-
   const { idToken } = useContext(AuthContext);
-
   const messagesEndRef = useRef(null);
+
 
   // This function fetches the conversations and messages
   const fetchConversationsAndMessages = useCallback(async () => {
@@ -144,10 +143,12 @@ const Chat = React.memo(() => {
         <MessageArea>
           {messages.length === 0 && <StartNewConversation />}
           {messages.map((message, index) => {
+            console.log(message);
             if (message) {
               if (typeof message === "string") {
                 // This is a streaming message
-                return <AgentMessage key={index} message={message} />;
+                return <AgentMessage key={message.time_stamp} message={message} />;
+              // These are message objects lodaded from the database or on refresh.
               } else if (message.message_from === "chatbot") {
                 return <AgentMessage key={index} message={message} />;
               } else if (message.message_from === "user") {
