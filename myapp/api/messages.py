@@ -10,7 +10,6 @@ def authenticate_request(id_token=None):
         decoded_token = firebase_service.verify_id_token(id_token)
         if not decoded_token:
             return None
-        print('messages_route.py line 15', decoded_token['uid'])
         return decoded_token['uid']
     
     # Handle the case when idToken is not provided (e.g., for fetch requests)
@@ -18,9 +17,7 @@ def authenticate_request(id_token=None):
     decoded_token = firebase_service.verify_id_token(id_token)
     if not decoded_token:
         return None
-    print('messages_route.py line 15', decoded_token['uid'])
     return decoded_token['uid']
-
 
 
 @messages.route('/<string:conversation_id>/messages', methods=['POST'])
@@ -71,12 +68,13 @@ def process_message(data, uid, chat_id):
     # Emit the new message to the client over the WebSocket connection
     socketio.emit('message', response_from_llm)
 
-@messages.route('/<string:conversation_id>/messages/delete', methods=['DELETE'])
+@messages.route('/<string:conversation_id>/messages/clear', methods=['DELETE'])
 def clear_memory(conversation_id):
     uid = authenticate_request()
     message_service = current_app.message_service
     message_service.delete_all_messages(uid, conversation_id)
     return {'message': 'Memory cleared'}, 200
+
 
 
 

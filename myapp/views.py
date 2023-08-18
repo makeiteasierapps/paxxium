@@ -1,4 +1,4 @@
-from myapp.api.messages_route import messages
+from myapp.api.messages import messages
 from myapp.api.debate_route import debate
 from myapp.api.signup import signup
 from myapp.api.check_authorization import auth_check

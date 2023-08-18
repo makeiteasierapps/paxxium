@@ -59,8 +59,6 @@ class MessageService:
         batch.commit()
 
         agent_ref = master_agent_service.get_agent_by_key(user_id, conversation_id)
-        agent_ref.clear_memory()
-
-    
-    
+        
+        agent_ref.clear_memory()  # Use "await" here to correctly await the asynchronous function
 

@@ -69,7 +69,7 @@ class MasterAgent:
     
     def pass_to_master_agent(self, message_obj, conversation_id, user_id):
         data = message_obj['message_content']
-        message_content = 'THINGS YOU NEED TO KNOW:\n' + self.chat_constants + '\n' + data
+        message_content = 'CHAT DETAILS: \n' + self.chat_constants + '\n' + data
         response = self.master_ai.run(message_content)                                 
         response_obj = self.message_service.create_message(conversation_id=conversation_id, message_from='chatbot', user_id=user_id, message_content=response)
         
@@ -81,8 +81,15 @@ class MasterAgent:
         return response
     
     def clear_memory(self):
-        memory = self.memory.load_memory_variables({})
-        memory.clear()
+        self.memory = ConversationBufferWindowMemory(memory_key='memory', return_messages=True, k=3)
+        self.master_ai = initialize_agent(
+            self.tools,
+            self.llm,
+            agent=AgentType.OPENAI_FUNCTIONS,
+            memory=self.memory,
+            verbose=True,
+            agent_kwargs=self.agent_kwargs
+        )
     
     def load_history_to_memory(self, conversation):
         """ 
