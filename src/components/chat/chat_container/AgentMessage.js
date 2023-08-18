@@ -10,17 +10,31 @@ const BotMessageStyled = styled(ListItem)({
     backgroundColor: blueGrey[700],
     wordBreak: 'break-word',
     alignItems: 'flex-start',
+    flexDirection: 'column',
 });
 
 const MessageContent = styled('div')({
-    wordBreak: 'break-word',
+    maxHeight: '100%',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    width: '100%',
+    whiteSpace: 'pre-wrap',
 });
 
 const StyledCheckbox = styled(Checkbox)({
-    color: blueGrey[700], // Specify your styles here
+    // Specify your styles here
+    color: blueGrey[700],
+    // Specify your styles for checked state
     '&.Mui-checked': {
-        color: '#1C282E', // Specify your styles for checked state
+        color: '#1C282E',
     },
+});
+
+const StyledHeader = styled('div')({
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
 });
 
 const TextBlock = ({ text }) => {
@@ -66,6 +80,13 @@ function reducer(state, action) {
 const AgentMessage = ({ message }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
     const { checked, messageParts, isCodeBlock, ignoreNextMessage } = state;
+
+    // useEffect(() => {
+    //     console.log('AgentMessage is mounting');
+    //     return () => {
+    //         console.log('AgentMessage is unmounting');
+    //     };
+    // }, []);
 
     const processToken = useCallback(
         async (token) => {
@@ -136,15 +157,24 @@ const AgentMessage = ({ message }) => {
                     ) {
                         // Update the last TextBlock component
                         const lastPart = messageParts[messageParts.length - 1];
-                        lastPart.props.text += token;
-                        messageParts[messageParts.length - 1] = lastPart;
+                        const updatedLastPart = React.cloneElement(lastPart, {
+                            text: lastPart.props.text + token,
+                        });
+                        const updatedMessageParts = messageParts.map(
+                            (part, index) => {
+                                if (index === messageParts.length - 1) {
+                                    return updatedLastPart;
+                                } else {
+                                    return part;
+                                }
+                            }
+                        );
                         dispatch({
                             type: 'SET_MESSAGE_PARTS',
-                            payload: [...messageParts],
+                            payload: updatedMessageParts,
                         });
                     } else {
                         // Create a new TextBlock component
-                        console.log('new text block');
                         const part = (
                             <TextBlock
                                 key={`text${messageParts.length}`}
@@ -172,23 +202,26 @@ const AgentMessage = ({ message }) => {
 
     return (
         <BotMessageStyled>
-            <ListItemIcon>
-                <Avatar
-                    variant="square"
-                    sx={{
-                        bgcolor: 'secondary.main',
-                    }}
-                >
-                    <Icon icon="mdi:robot" style={{ fontSize: '33px' }} />
-                </Avatar>
-            </ListItemIcon>
-
+            <StyledHeader>
+                <ListItemIcon>
+                    <Avatar
+                        variant="square"
+                        sx={{
+                            bgcolor: 'secondary.main',
+                            width: '30px',
+                            height: '30px',
+                        }}
+                    >
+                        <Icon icon="mdi:robot" style={{ fontSize: '33px' }} />
+                    </Avatar>
+                </ListItemIcon>
+                <StyledCheckbox
+                    checked={checked}
+                    onChange={handleCheck}
+                    inputProps={{ 'aris-label': 'Select message' }}
+                />
+            </StyledHeader>
             <MessageContent>{messageParts}</MessageContent>
-            <StyledCheckbox
-                checked={checked}
-                onChange={handleCheck}
-                inputProps={{ 'aris-label': 'Select message' }}
-            />
         </BotMessageStyled>
     );
 };

@@ -1,11 +1,4 @@
 import Prism from 'prismjs';
-import prettier from 'prettier/standalone';
-import parserBabel from 'prettier/plugins/babel';
-import estreeParser from 'prettier/plugins/estree';
-import postcss from 'prettier/plugins/postcss';
-import htmlParser from 'prettier/plugins/html';
-import yamlParser from 'prettier/plugins/yaml';
-import markdownParser from 'prettier/plugins/markdown';
 import 'prismjs/components/prism-javascript.min';
 import 'prismjs/components/prism-python';
 import 'prismjs/components/prism-css';
@@ -15,20 +8,9 @@ import 'prismjs/components/prism-yaml';
 import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/themes/prism-okaidia.css';
-import { useEffect, useRef, useCallback, useContext } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import io from 'socket.io-client';
-import { ChatContext } from '../contexts/ChatContext';
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
-// map languages to their corresponding prettier plugins
-const languageToParserMap = {
-    css: { parser: 'css', plugins: [postcss] },
-    html: { parser: 'html', plugins: [htmlParser] },
-    json: { parser: 'json', plugins: [parserBabel, estreeParser] },
-    yaml: { parser: 'yaml', plugins: [yamlParser] },
-    markdown: { parser: 'markdown', plugins: [markdownParser] },
-    javascript: { parser: 'babel', plugins: [parserBabel, estreeParser] },
-};
 
 const highlightBlockCode = async (message) => {
     const regex = /```(\S*)?\s([\s\S]*?)```/g;
@@ -39,7 +21,6 @@ const highlightBlockCode = async (message) => {
     while ((match = regex.exec(message.message_content)) !== null) {
         let lang = match[1];
         const code = match[2].trim();
-        let formattedCode;
 
         // set to markdown if no language is specified
         if (!lang) {
@@ -50,18 +31,8 @@ const highlightBlockCode = async (message) => {
             lang = 'javascript';
         }
 
-        // fetch the prettier configuration for the language
-        const prettierConfig =
-            languageToParserMap[lang] || languageToParserMap.default;
-
-        if (lang === 'python' || !languageToParserMap[lang]) {
-            formattedCode = code; // if no parser is found or language is python, leave code as it is
-        } else {
-            formattedCode = await prettier.format(code, prettierConfig);
-        }
-
         const highlightedCode = Prism.highlight(
-            formattedCode,
+            code,
             Prism.languages[lang] || Prism.languages.plaintext, // if Prism does not have a highlighter for the language, default to plaintext
             lang
         );
@@ -83,17 +54,8 @@ const highlightBlockCode = async (message) => {
 };
 
 const highlightStringCode = async (code, lang) => {
-    let formattedCode;
-    if (lang === 'python' || !languageToParserMap[lang]) {
-        formattedCode = code; // if no parser is found or language is python, leave code as it is
-    } else {
-        const prettierConfig =
-            languageToParserMap[lang] || languageToParserMap.default;
-        formattedCode = await prettier.format(code, prettierConfig);
-    }
-
     const highlightedCode = Prism.highlight(
-        formattedCode,
+        code,
         Prism.languages[lang] || Prism.languages.plaintext, // if Prism does not have a highlighter for the language, default to plaintext
         lang
     );
@@ -107,7 +69,7 @@ const highlightStringCode = async (code, lang) => {
     );
 };
 
-const ProcessResponse = () => {
+const ProcessResponse = ({setMessages}) => {
     // Define the processQueue function using useCallback to avoid unnecessary re-creations.
     const queueRef = useRef([]);
     const isProcessingRef = useRef(false);
@@ -117,7 +79,7 @@ const ProcessResponse = () => {
     const langRef = useRef('markdown');
     const isLangLineRef = useRef(false);
     const tokenizedCodeRef = useRef([]);
-    const { setMessages } = useContext(ChatContext);
+
 
     const socketRef = useRef(null);
     // Set up the socket connection on mount and disconnect on unmount.
@@ -176,13 +138,12 @@ const ProcessResponse = () => {
                         ) {
                             updatedMessages.push(tokenizedCodeRef.current[i]);
                         }
-
-                        tokenizedCodeRef.current = [];
-                        isCodeBlockRef.current = false;
-                        langRef.current = 'markdown';
-                        codeRef.current = ''; // Clear the tokenizedCode array
                         return updatedMessages;
                     });
+                    tokenizedCodeRef.current = [];
+                    isCodeBlockRef.current = false;
+                    langRef.current = 'markdown';
+                    codeRef.current = ''; // Clear the tokenizedCode array
                 } else {
                     // Start of a code block.
                     isCodeBlockRef.current = true;

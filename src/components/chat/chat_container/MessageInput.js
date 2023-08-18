@@ -19,14 +19,14 @@ const InputArea = styled('div')({
     justifyContent: 'space-between',
 });
 
-const MessageInput = () => {
-    const {
-        selectedAgentId,
-        selectedAgentName,
-        uid,
-        conversationId,
-        setMessages,
-    } = useContext(ChatContext);
+const MessageInput = ({
+    chatId,
+    agentModel,
+    systemPrompt,
+    chatConstants,
+    setMessages,
+}) => {
+    const { uid } = useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
     const [input, setInput] = useState('');
     const socketRef = useRef(null);
@@ -50,7 +50,6 @@ const MessageInput = () => {
             message_content: input,
             message_from: 'user',
             user_id: uid,
-            agent_id: selectedAgentId,
             time_stamp: new Date().toISOString(),
         };
         setMessages((prevMessages) => [...prevMessages, userMessage]);
@@ -59,12 +58,11 @@ const MessageInput = () => {
         // Emit the 'message' event to the server
         socketRef.current.emit('message', {
             idToken: idToken,
-            conversationId: conversationId,
+            chatId: chatId,
             message_content: input,
             message_from: 'user',
             user_id: uid,
-            agent_id: selectedAgentId,
-            agent_name: selectedAgentName,
+            agentModel: agentModel,
         });
     };
 
@@ -93,7 +91,7 @@ const MessageInput = () => {
                             >
                                 <SendIcon />
                             </IconButton>
-                            <ProcessResponse />
+                            <ProcessResponse setMessages={setMessages} />
                         </InputAdornment>
                     ),
                 }}

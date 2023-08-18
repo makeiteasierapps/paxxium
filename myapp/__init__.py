@@ -6,10 +6,10 @@ from flask_cors import CORS
 from firebase_admin import firestore, credentials
 import firebase_admin
 from myapp.services.message_service import MessageService
-from myapp.services.master_agent_services import MasterAIService
+from myapp.services.master_agent_services import MasterAgentService
 from myapp.services.user_services import UserService
-from myapp.services.bot_service import BotService
 from myapp.services.conversation_service import ConversationService
+from myapp.services.firebase_service import FirebaseService
 
 
 # Initialize Firebase
@@ -43,9 +43,9 @@ def create_app():
     app.config['db'] = db
 
     app.message_service = MessageService(db)
-    app.master_ai_service = MasterAIService(app, app.message_service)
+    app.master_agent_service = MasterAgentService(app, app.message_service)
     app.user_service = UserService(db)
-    app.bot_service = BotService(db)
+    app.firebase_service = FirebaseService()
     app.conversation_service = ConversationService(db)
 
     # Register blueprints

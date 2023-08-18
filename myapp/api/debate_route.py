@@ -28,7 +28,7 @@ def handle_debate():
    
     # Create a new conversation if it's the start of the debate
     if turn == 0:
-        new_conversation_id = conversation_service.create_conversation(uid, '333', 'AgentDebate')
+        new_conversation_id = conversation_service.create_chat(uid, '333', 'AgentDebate')
         debate_manager = DebateManager(uid, new_conversation_id, role_1, role_2, current_app)
         debate_managers[uid] = debate_manager
     else:

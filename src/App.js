@@ -16,7 +16,7 @@ import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import { ChatContext } from './contexts/ChatContext';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from './Theme';
-import Navigation from './components/dashboard/Navigation';
+import TitleBar from './components/dashboard/AppBar';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -32,17 +32,16 @@ const UnauthenticatedRoutes = () => (
 const AuthenticatedRoutes = () => {
     const navigate = useNavigate();
     const { idToken } = useContext(AuthContext);
-    
+
     useEffect(() => {
         if (!idToken) {
             navigate('/');
-        } else
-            navigate('/home');
+        } else navigate('/dashboard');
     }, [navigate, idToken]);
-    
+
     return (
         <Routes>
-            <Route path="/home" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             {/* Other authenticated routes */}
         </Routes>
     );
@@ -62,7 +61,7 @@ const AuthenticatedApp = () => {
     // Fetches auth status from the db then loads the user into state.
     useEffect(() => {
         const fetchData = async () => {
-            if (idToken && user) { 
+            if (idToken && user) {
                 try {
                     const response = await fetch(`${backendUrl}/auth_check`, {
                         method: 'POST',
@@ -76,12 +75,12 @@ const AuthenticatedApp = () => {
                     });
 
                     const responseData = await response.json();
-                    // Checks if admin as grtanted access to the app
-                    if (responseData.auth_status) {
+                    
+                    // Checks if admin has grtanted access to the app
+                    if (responseData.auth_status) {       
                         setIsAuthorized(true);
                         setUid(user.uid);
                         const userDoc = await getDoc(doc(db, 'users', uid));
-        
                         if (!userDoc.exists()) {
                             throw new Error('No user found in Firestore');
                         }
@@ -94,13 +93,13 @@ const AuthenticatedApp = () => {
                 setIsAuthorized(false);
             }
         };
-        
+
         fetchData();
     }, [db, idToken, setUid, setUsername, user, uid]);
 
     return (
         <>
-            {isAuthorized ? <Navigation /> : null}
+            {isAuthorized ? <TitleBar /> : null}
             <GateKeeper isAuthorized={isAuthorized} />
         </>
     );
@@ -111,12 +110,12 @@ const App = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <AuthProvider>
-              <ChatProvider>
-                <DrawerProvider>
-              <Router>
-                <AuthenticatedApp />
-                </Router>
-                </DrawerProvider>
+                <ChatProvider>
+                    <DrawerProvider>
+                        <Router>
+                            <AuthenticatedApp />
+                        </Router>
+                    </DrawerProvider>
                 </ChatProvider>
             </AuthProvider>
         </ThemeProvider>
