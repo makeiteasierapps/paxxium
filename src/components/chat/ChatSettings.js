@@ -18,8 +18,8 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const SettingsContainer = styled(FormGroup)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
-    color: 'white',
     padding: theme.spacing(2),
+    width: '100%',
 }));
 
 const RowOne = styled(Box)(({ theme }) => ({
@@ -71,7 +71,7 @@ export default function ChatSettings() {
     const [useProfileData, setUseProfileData] = useState(false);
     const [chatName, setChatName] = useState('Chat Name');
 
-    const { addChat } = useContext(ChatContext);
+    const { addAgent } = useContext(ChatContext);
 
     const { idToken } = useContext(AuthContext);
 
@@ -122,8 +122,7 @@ export default function ChatSettings() {
             .then((response) => response.json())
             .then((data) => {
                 const newChat = data;
-                console.log('chat data', newChat);
-                addChat(newChat);
+                addAgent(newChat);
             })
             .catch((error) => console.error(error));
     };
@@ -150,14 +149,13 @@ export default function ChatSettings() {
             <RowOne>
                 <AgentDropdown
                     select
-                    label="Select Agent"
+                    label="Select Model"
                     value={agentModel}
                     onChange={handleAgentChange}
                     variant="standard"
                 >
                     <MenuItem value="GPT-3.5">GPT 3.5</MenuItem>
                     <MenuItem value="GPT-4">GPT 4</MenuItem>
-                    <MenuItem value="AgentDebate">Agent Debate</MenuItem>
                 </AgentDropdown>
                 <ChatName
                     label="Chat Name"

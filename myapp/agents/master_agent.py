@@ -23,7 +23,7 @@ class StreamResponse(BaseCallbackHandler):
 
 class MasterAgent:
     def __init__(self, message_service, uid, model="gpt-3.5-turbo-0613", system_prompt="You are a friendly but genuine AI Agent. Don't be annoyingly nice, but don't be rude either.", chat_constants=''):
-        langchain.debug = True
+        # langchain.debug = True
         user_service = current_app.user_service
         encrypted_openai_key, encrypted_serp_key = user_service.get_keys(uid)
         self.openai_api_key = user_service.decrypt(encrypted_openai_key)

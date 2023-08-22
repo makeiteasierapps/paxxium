@@ -9,7 +9,6 @@ import { TextField, IconButton, InputAdornment } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { styled } from '@mui/system';
 import { AuthContext } from '../../../contexts/AuthContext';
-import ProcessResponse from '../../../utils/ProcessResponse';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const InputArea = styled('div')({
@@ -22,8 +21,7 @@ const InputArea = styled('div')({
 const MessageInput = ({
     chatId,
     agentModel,
-    systemPrompt,
-    chatConstants,
+
     setMessages,
 }) => {
     const { uid } = useContext(ChatContext);
@@ -91,7 +89,6 @@ const MessageInput = ({
                             >
                                 <SendIcon />
                             </IconButton>
-                            <ProcessResponse setMessages={setMessages} />
                         </InputAdornment>
                     ),
                 }}

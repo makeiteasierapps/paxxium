@@ -4,25 +4,25 @@ export const ChatContext = createContext();
 
 export const ChatProvider = (props) => {
     const [uid, setUid] = useState(null);
-    const [chatArray, setChatArray] = useState([]);
-    const [chatId, setChatId] = useState(null);
+    const [agentArray, setAgentArray] = useState([]);
+    const [agentId, setAgentId] = useState(null);
     const [username, setUsername] = useState(null);
     const [messages, setMessages] = useState([]);
 
-    const addChat = (newChat) => {
-        setChatArray((prevChats) => [
-            newChat,
-            ...prevChats,
+    const addAgent = (newAgent) => {
+        setAgentArray((prevAgents) => [
+            newAgent,
+            ...prevAgents,
         ]);
-        setChatId(newChat.id);
+        setAgentId(newAgent.id);
     };
 
     const switchConversation = (id) => {
-        setChatId(id);
+        setAgentId(id);
     };
 
     const deleteConversationId = (id) => {
-        setChatArray((prevIds) =>
+        setAgentArray((prevIds) =>
             prevIds.filter((prevId) => prevId !== id)
         );
     };
@@ -32,11 +32,11 @@ export const ChatProvider = (props) => {
             value={{
                 uid,
                 setUid,
-                chatArray,
-                setChatArray,
-                chatId,
-                setChatId,
-                addChat,
+                agentArray,
+                setAgentArray,
+                agentId,
+                setAgentId,
+                addAgent,
                 switchConversation,
                 deleteConversationId,
                 username,

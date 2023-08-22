@@ -1,9 +1,18 @@
-import React, { useRef, useContext, useEffect, useState, useCallback } from 'react';
+import React, {
+    useRef,
+    useContext,
+    useEffect,
+    useState,
+    useCallback,
+} from 'react';
+
 import { styled } from '@mui/system';
 import { List, Box, Typography, IconButton } from '@mui/material';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import CommentsDisabledIcon from '@mui/icons-material/CommentsDisabled';
+
+import io from 'socket.io-client';
 
 import MessagesContainer from './MessagesContainer';
 import AgentMessage from './AgentMessage';
@@ -12,13 +21,12 @@ import MessageInput from './MessageInput';
 
 import { AuthContext } from '../../../contexts/AuthContext';
 import { ChatContext } from '../../../contexts/ChatContext';
-
+import { highlightStringCode } from '../../../utils/ProcessResponse';
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 // STYLED COMPONENTS
 const ChatContainerStyled = styled(Box)(({ theme }) => ({
     marginLeft: '20px',
-    marginTop: '20px',
     height: '800px',
     width: '50%',
     display: 'flex',
@@ -65,10 +73,22 @@ const MessageArea = styled(List)({
 //     </div>
 // );
 
-const Chat = ({id, chatConstants, systemPrompt, chatName, agentModel, useProfileData}) => {
-    const lastIndexProcessed = useRef(-1);
+const Chat = ({
+    id,
+    chatConstants,
+    systemPrompt,
+    chatName,
+    agentModel,
+    useProfileData,
+}) => {
+    const isCodeBlockRef = useRef(false);
+    const codeRef = useRef('');
+    const langRef = useRef('markdown');
+    const isLangLineRef = useRef(false);
+    const tokenizedCodeRef = useRef([]);
     const messagesEndRef = useRef(null);
-    const { setChatArray, chatArray } = useContext(ChatContext);
+    const socketRef = useRef(null);
+    const { setAgentArray } = useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
     const [messages, setMessages] = useState([]);
 
@@ -81,7 +101,7 @@ const Chat = ({id, chatConstants, systemPrompt, chatName, agentModel, useProfile
                 systemPrompt,
                 chatName,
                 agentModel,
-                useProfileData
+                useProfileData,
             };
             const url = `${backendUrl}/${id}/messages`;
             const messageResponse = await fetch(url, {
@@ -106,11 +126,113 @@ const Chat = ({id, chatConstants, systemPrompt, chatName, agentModel, useProfile
         } catch (error) {
             console.error(error);
         }
-    }, [id, chatConstants, systemPrompt, chatName, agentModel, useProfileData, idToken, setMessages]);
-    
+    }, [
+        id,
+        chatConstants,
+        systemPrompt,
+        chatName,
+        agentModel,
+        useProfileData,
+        idToken,
+    ]);
+
     useEffect(() => {
         fetchMessages();
     }, [fetchMessages]);
+
+    // Set up the socket connection on mount and disconnect on unmount.
+    useEffect(() => {
+        socketRef.current = io.connect(backendUrl);
+
+        return () => {
+            socketRef.current.disconnect();
+        };
+    }, []);
+
+    const processToken = useCallback(
+        async (token) => {
+            // Check if the token marks the start or end of a code block.
+            if (token.startsWith('```') || token.startsWith('``')) {
+                if (isCodeBlockRef.current) {
+                    // End of a code block, reset variables for the next code block.
+                    const highlightedCode = await highlightStringCode(
+                        codeRef.current,
+                        langRef.current
+                    );
+
+                    tokenizedCodeRef.current = highlightedCode
+                        .split(/(<[^>]*>)|\b/)
+                        .filter(Boolean);
+                    setMessages((prevMessages) => {
+                        const updatedMessages = [...prevMessages];
+                        // Loop through each element of tokenizedCode and add it to the last element of updatedMessages
+                        for (
+                            let i = 0;
+                            i < tokenizedCodeRef.current.length;
+                            i++
+                        ) {
+                            updatedMessages.push(tokenizedCodeRef.current[i]);
+                        }
+                        return updatedMessages;
+                    });
+                    tokenizedCodeRef.current = [];
+                    isCodeBlockRef.current = false;
+                    langRef.current = 'markdown';
+                    codeRef.current = ''; // Clear the tokenizedCode array
+                } else {
+                    // Start of a code block.
+                    isCodeBlockRef.current = true;
+                    isLangLineRef.current = true;
+                }
+            } else if (isCodeBlockRef.current) {
+                // Inside a code block.
+                if (isLangLineRef.current) {
+                    // The first line of the code block may specify the language.
+                    langRef.current = token.trim() || 'markdown';
+                    if (langRef.current === 'jsx') {
+                        langRef.current = 'javascript';
+                    }
+                    isLangLineRef.current = false;
+                } else {
+                    // Add the token to the code block.
+                    codeRef.current += token;
+                }
+            }
+
+            setMessages((prevMessages) => {
+                const updatedMessages = [...prevMessages];
+                const lastMessage = updatedMessages[updatedMessages.length - 1];
+                if (!isCodeBlockRef.current) {
+                    if (typeof lastMessage === 'object') {
+                        updatedMessages.push(token);
+                    }
+                    else if (typeof lastMessage === 'string') {
+                        updatedMessages[updatedMessages.length - 1] += token;
+                    }
+                } else if (token === '```') {
+                    updatedMessages.push(token);
+                }
+
+                return updatedMessages;
+            });
+        },
+        [setMessages] // Dependencies of the processQueue function.
+    );
+
+    // Set up an effect to listen to incoming tokens and process.
+    useEffect(() => {
+        const handleToken = (token) => {
+            processToken(token);
+        };
+
+        // Register the event listener for incoming tokens.
+        socketRef.current.on('token', handleToken);
+
+        // Clean up by removing the event listener when the component is unmounted.
+        return () => {
+            socketRef.current.off('token', handleToken);
+        };
+    }, [processToken]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -118,7 +240,7 @@ const Chat = ({id, chatConstants, systemPrompt, chatName, agentModel, useProfile
     useEffect(scrollToBottom, [messages]);
 
     const handleClearMessages = async () => {
-        try{
+        try {
             const response = await fetch(`${backendUrl}/${id}/messages/clear`, {
                 method: 'DELETE',
                 headers: { Authorization: idToken },
@@ -129,7 +251,6 @@ const Chat = ({id, chatConstants, systemPrompt, chatName, agentModel, useProfile
         } catch (error) {
             console.error(error);
         }
-
     };
     const handleDeleteChat = async () => {
         try {
@@ -139,9 +260,9 @@ const Chat = ({id, chatConstants, systemPrompt, chatName, agentModel, useProfile
                 credentials: 'include',
             });
             if (!response.ok) throw new Error('Failed to delete conversation');
-            setChatArray((prevChatArray) =>
-            prevChatArray.filter((chatObj) => chatObj.id !== id)
-        );
+            setAgentArray((prevChatArray) =>
+                prevChatArray.filter((chatObj) => chatObj.id !== id)
+            );
         } catch (error) {
             console.error(error);
         }
@@ -169,18 +290,12 @@ const Chat = ({id, chatConstants, systemPrompt, chatName, agentModel, useProfile
                         if (message) {
                             if (typeof message === 'string') {
                                 // This is a streaming message
-                                if (index <= lastIndexProcessed.current) {
-                                    return null;
-                                } else if (index > lastIndexProcessed.current) {
-                                    console.log('Streaming message', message);
-                                    lastIndexProcessed.current = index;
-                                    return (
-                                        <AgentMessage
-                                            key={message.time_stamp}
-                                            message={message}
-                                        />
-                                    );
-                                }
+                                return (
+                                    <AgentMessage
+                                        key={index}
+                                        message={message}
+                                    />
+                                );
                                 // These are message objects loaded from the database or on refresh.
                             } else if (message.message_from === 'chatbot') {
                                 return (

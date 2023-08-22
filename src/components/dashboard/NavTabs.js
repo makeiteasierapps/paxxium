@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Tabs, Tab, Box, } from '@mui/material';
-import ChatDashboard from '../chat/ChatDashboard'; 
+import AgentDashboard from '../AgentDashboard'; 
 
 
 function a11yProps(index) {
@@ -27,11 +27,11 @@ const NavTabs = () => {
                     
                 >
                     <Tab label="Home" {...a11yProps(0)} />
-                    <Tab label="Chat" {...a11yProps(1)} />
+                    <Tab label="Agents" {...a11yProps(1)} />
                     <Tab label="Profile" {...a11yProps(2)} />
                 </Tabs>
             </Box>
-            {value === 1 && <ChatDashboard />}
+            {value === 1 && <AgentDashboard />}
         </Box>
     );
 };

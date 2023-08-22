@@ -23,7 +23,6 @@ import ChatIcon from '@mui/icons-material/Chat';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import SearchIcon from '@mui/icons-material/Search';
-import NewChatDialog from './NewChatDialog';
 import { useDrawer } from '../../contexts/DrawerContext';
 import { AuthContext } from '../../contexts/AuthContext';
 import { ChatContext } from '../../contexts/ChatContext';
@@ -57,20 +56,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     },
 }));
 
-const StyledButton = styled(Button)(({ theme }) => ({
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    '.MuiButton-endIcon': {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    '.MuiIconButton-root': {
-        zIndex: theme.zIndex.tooltip,
-    },
-}));
 
 const Search = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -115,7 +100,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function TitleBar() {
-    const [openChat, setOpenChat] = React.useState(false);
     const navigate = useNavigate();
     const {username} = useContext(ChatContext);
     const { setIdToken, setUser } = useContext(AuthContext);
@@ -224,10 +208,6 @@ export default function TitleBar() {
 
                 {list()}
                 <Divider />
-                <NewChatDialog
-                    open={openChat}
-                    handleClose={() => setOpenChat(false)}
-                />
             </Drawer>
         </Box>
     );

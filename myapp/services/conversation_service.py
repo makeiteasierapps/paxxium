@@ -15,8 +15,8 @@ class ConversationService:
             'created_at': datetime.utcnow()
         }
         new_chat_ref = self.db.collection('users').document(user_id).collection('conversations').add(new_chat)
-        new_chat__id = new_chat_ref[1].id
-        return  new_chat__id
+        new_chat_id = new_chat_ref[1].id
+        return  new_chat_id
 
     def get_chat_ids(self, user_id):
         conversations = self.db.collection('users').document(user_id).collection('conversations').order_by('created_at', direction=firestore.Query.DESCENDING).stream()

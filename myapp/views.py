@@ -1,5 +1,5 @@
 from myapp.api.messages import messages
-from myapp.api.debate_route import debate
+from myapp.api.debate import debate
 from myapp.api.signup import signup
 from myapp.api.check_authorization import auth_check
 from myapp.api.chat import chat

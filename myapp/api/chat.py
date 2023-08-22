@@ -15,7 +15,6 @@ def authenticate_request():
 @chat.route('/chat/create', methods=['POST'])
 def create_chat():
     uid = authenticate_request()
-    print('chat.py line 18', uid)
     
     if not uid:
         return {'message': 'Invalid token'}, 403
