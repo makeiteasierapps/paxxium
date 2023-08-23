@@ -1,6 +1,5 @@
 # Paxxium
 
-
 Welcome to Paxxium - a playground for experimenting with Large Language Models (LLMs) and building innovative functionality around them. The goal of this project is to create a collaborative space where users can explore, play, and leverage the capabilities of chatbots to enhance productivity and take AI conversations to the next level.
 
 ## Project Overview
