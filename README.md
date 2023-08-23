@@ -1,10 +1,11 @@
 # Paxxium
 
+
 Welcome to Paxxium - a playground for experimenting with Large Language Models (LLMs) and building innovative functionality around them. The goal of this project is to create a collaborative space where users can explore, play, and leverage the capabilities of chatbots to enhance productivity and take AI conversations to the next level.
 
 ## Project Overview
 
-Paxxium is an ongoing development project, which means it is continually evolving and improving. To stay updated with the latest changes and enhancements, we will strive to maintain this README with relevant information. Currently, we are in the process of wrapping up streaming with code formatting, and this feature will be available soon.
+Paxxium is an ongoing development project, which means it is continually evolving and improving. To stay updated with the latest changes and enhancements, I will strive to maintain this README with relevant information. 
 
 ## Getting Started
 
@@ -57,17 +58,6 @@ To run Paxxium locally, follow these steps:
 4. **User Registration**
 
 - Sign up for an account to access all the features and be redirected to the main application.
-
-## How to Use
-
-After signing up and accessing the main application, you can explore various AI agents through Paxxium:
-
-- Click "New Chat" to initiate a conversation with one of three AI Agents:
-1. GPT 3.5
-2. GPT-4
-3. AgentDebate
-
-- AgentDebate allows users to pick a topic and set the role for two different AI Agents, making for engaging and interactive discussions.
 
 ## Contribution
 
