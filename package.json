@@ -1,5 +1,5 @@
 {
-  "name": "chatbots",
+  "name": "paxxium",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -12,6 +12,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "buffer": "^6.0.3",
     "firebase": "^9.22.2",
+    "framer-motion": "^10.16.2",
     "fs": "^0.0.1-security",
     "module": "^1.2.5",
     "path": "^0.12.7",

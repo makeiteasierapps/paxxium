@@ -2,15 +2,7 @@ import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Toolbar,
-    Button,
-    Divider,
-    Drawer,
     Box,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    ListItemButton,
     Typography,
     InputBase,
     styled,
@@ -18,43 +10,17 @@ import {
     IconButton,
     AppBar
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChatIcon from '@mui/icons-material/Chat';
 import LogoutIcon from '@mui/icons-material/Logout';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import SearchIcon from '@mui/icons-material/Search';
-import { useDrawer } from '../../contexts/DrawerContext';
 import { AuthContext } from '../../contexts/AuthContext';
 import { ChatContext } from '../../contexts/ChatContext';
 import { getAuth, signOut } from 'firebase/auth';
 
-const drawerWidth = 240;
 
-const StyledAppBar = styled(AppBar, {
-    shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-    transition: theme.transitions.create(['margin', 'width'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
-        transition: theme.transitions.create(['margin', 'width'], {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    }),
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+    position: 'fixed',
 }));
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    ...theme.mixins.toolbar,
-    '& > *': {
-        color: '#fff',
-    },
-}));
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -103,15 +69,6 @@ export default function TitleBar() {
     const navigate = useNavigate();
     const {username} = useContext(ChatContext);
     const { setIdToken, setUser } = useContext(AuthContext);
-    const { open, setOpen } = useDrawer();
-
-    const handleDrawerOpen = () => {
-        setOpen(true);
-    };
-
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
 
     const handleLogout = async () => {
         const auth = getAuth();
@@ -127,40 +84,10 @@ export default function TitleBar() {
             });
     };
 
-    const list = () => (
-        <Box>
-            <List>
-            </List>
-
-            <Divider />
-            <List>
-                <ListItem key="logout" disablePadding>
-                    <ListItemButton onClick={handleLogout}>
-                        <ListItemIcon>
-                            <LogoutIcon sx={{ color: '#fff' }} />
-                        </ListItemIcon>
-                        <ListItemText primary="LogOut" />
-                    </ListItemButton>
-                </ListItem>
-            </List>
-        </Box>
-    );
-
-
-
     return (
         <Box sx={{ display: 'flex' }}>
-            <StyledAppBar position="fixed" open={open}>
+            <StyledAppBar>
                 <Toolbar variant="dense">
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                        edge="start"
-                        sx={{ mr: 2, ...(open && { display: 'none' }) }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
                     <Typography
                         variant="h5"
                         noWrap
@@ -179,36 +106,11 @@ export default function TitleBar() {
                             inputProps={{ 'aria-label': 'search' }}
                         />
                     </Search>
+                    <IconButton onClick={handleLogout}>
+                        <LogoutIcon sx={{ color: '#fff' }} />
+                    </IconButton>
                 </Toolbar>
             </StyledAppBar>
-            <Drawer
-                sx={{
-                    width: drawerWidth,
-                    flexShrink: 0,
-                    '& .MuiDrawer-paper': {
-                        width: drawerWidth,
-                        boxSizing: 'border-box',
-                        boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.75)',
-                    },
-                }}
-                variant="temporary"
-                anchor="left"
-                open={open}
-            >
-                <DrawerHeader>
-                    <IconButton
-                        onClick={(event) => {
-                            event.stopPropagation(); // Stop the event from propagating to the parent button.
-                            handleDrawerClose();
-                        }}
-                    >
-                        <ChevronLeftIcon sx={{ color: '#fff' }} />
-                    </IconButton>
-                </DrawerHeader>
-
-                {list()}
-                <Divider />
-            </Drawer>
         </Box>
     );
 }

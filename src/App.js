@@ -11,7 +11,6 @@ import './styles/App.css';
 import Dashboard from './components/dashboard/Dashboard';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ChatProvider } from './contexts/ChatContext';
-import { DrawerProvider } from './contexts/DrawerContext';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import { ChatContext } from './contexts/ChatContext';
 import { ThemeProvider } from '@mui/material/styles';
@@ -111,11 +110,9 @@ const App = () => {
             <CssBaseline />
             <AuthProvider>
                 <ChatProvider>
-                    <DrawerProvider>
                         <Router>
                             <AuthenticatedApp />
                         </Router>
-                    </DrawerProvider>
                 </ChatProvider>
             </AuthProvider>
         </ThemeProvider>

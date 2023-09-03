@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/system';
 import NavTabs from './NavTabs';
+import AgentDashboard from '../AgentDashboard';
+import NewsCarousel from '../home/NewsCarousel';
+
+
 const DashboardWrapper = styled('div')(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
@@ -9,24 +13,23 @@ const DashboardWrapper = styled('div')(({ theme }) => ({
     overflow: 'auto',
 }));
 
-const StyledNavTabs = styled(NavTabs)(({ theme }) => ({
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: theme.zIndex.appBar, // ensures the navigation is above other content
-}));
-
 const Content = styled('div')(({ theme }) => ({
-    marginTop: theme.spacing(8), 
+    marginTop: theme.spacing(8),
 }));
 
 const Dashboard = () => {
+    const [value, setValue] = useState(0);
     return (
-        <DashboardWrapper>
-            <StyledNavTabs />
-            <Content></Content>
-        </DashboardWrapper>
+        <>
+            <NavTabs setValue={setValue} />
+            <DashboardWrapper>
+                <Content>
+                    {value === 0 && <NewsCarousel />}
+                    {value === 1 && <AgentDashboard />}
+                    {value === 2 && <h1>Profile</h1>}
+                </Content>
+            </DashboardWrapper>
+        </>
     );
 };
 

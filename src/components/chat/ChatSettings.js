@@ -18,7 +18,6 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const SettingsContainer = styled(FormGroup)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
-    padding: theme.spacing(2),
     width: '100%',
 }));
 
@@ -30,15 +29,15 @@ const RowOne = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(2),
 }));
 
-const AgentDropdown = styled(TextField)({
+const AgentDropdown = styled(TextField)(({ theme }) => ({
     flexGrow: 1,
-    paddingRight: '50px',
-});
+    paddingRight: theme.spacing(2),
+}));
 
-const ChatName = styled(TextField)({
+const ChatName = styled(TextField)(({theme}) => ({
     flexGrow: 1,
-    paddingRight: '50px',
-});
+    paddingRight: theme.spacing(2),
+}));
 
 const UseProfileCheckbox = styled(Checkbox)({
     flexGrow: 1,
@@ -52,15 +51,15 @@ const RowTwo = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(2),
 }));
 
-const SystemPrompt = styled(TextField)({
+const SystemPrompt = styled(TextField)(({theme}) => ({
     flexGrow: 1,
-    paddingRight: '30px',
-});
+    paddingRight: theme.spacing(2),
+}));
 
-const ChatConstants = styled(TextField)({
+const ChatConstants = styled(TextField)(({theme}) => ({
     flexGrow: 1,
-    paddingRight: '30px',
-});
+    paddingRight: theme.spacing(2),
+}));
 
 const StyledButton = styled(Button)({});
 
@@ -69,7 +68,7 @@ export default function ChatSettings() {
     const [systemPrompt, setSystemPrompt] = useState('');
     const [chatConstants, setChatConstants] = useState('');
     const [useProfileData, setUseProfileData] = useState(false);
-    const [chatName, setChatName] = useState('Chat Name');
+    const [chatName, setChatName] = useState('');
 
     const { addAgent } = useContext(ChatContext);
 
@@ -138,7 +137,7 @@ export default function ChatSettings() {
 
         // Clear the form
         setAgentModel('');
-        setChatName('Chat Name');
+        setChatName('');
         setUseProfileData(false);
         setSystemPrompt('');
         setChatConstants('');
@@ -158,7 +157,7 @@ export default function ChatSettings() {
                     <MenuItem value="GPT-4">GPT 4</MenuItem>
                 </AgentDropdown>
                 <ChatName
-                    label="Chat Name"
+                    label="Name"
                     variant="standard"
                     value={chatName}
                     onChange={handleChatNameChange}

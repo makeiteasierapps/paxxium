@@ -21,7 +21,7 @@ const StyledMain = styled(Box)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    height: '70vh', // adjust this as per your needs
+    height: '100vh', // adjust this as per your needs
     padding: theme.spacing(2),
     backgroundColor: theme.palette.background.default,
 }));
@@ -29,13 +29,17 @@ const StyledMain = styled(Box)(({ theme }) => ({
 const ChatsContainer = styled(Box)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: theme.spacing(2),
 }));
 
 const Settings = styled(Box)(({ theme }) => ({
     width: '50%',
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(2),
-    marginBottom: theme.spacing(2),
+    marginTop: theme.spacing(2),
+    boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.63)',
 }));
 
 const SettingsContainer = styled(Box)(({ theme }) => ({
@@ -53,13 +57,6 @@ const AgentDashboard = () => {
     const { idToken } = useContext(AuthContext);
     const [error, setError] = useState(null);
     const [settingsOpen, setSettingsOpen] = useState(false);
-
-    // useEffect(() => {
-    //     console.log('Chat is mounting');
-    //     return () => {
-    //         console.log('Chat is unmounting');
-    //     };
-    // }, []);
 
     const getChatData = useCallback(async () => {
         try {

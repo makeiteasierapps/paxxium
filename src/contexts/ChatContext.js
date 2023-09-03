@@ -21,11 +21,6 @@ export const ChatProvider = (props) => {
         setAgentId(id);
     };
 
-    const deleteConversationId = (id) => {
-        setAgentArray((prevIds) =>
-            prevIds.filter((prevId) => prevId !== id)
-        );
-    };
 
     return (
         <ChatContext.Provider
@@ -38,7 +33,6 @@ export const ChatProvider = (props) => {
                 setAgentId,
                 addAgent,
                 switchConversation,
-                deleteConversationId,
                 username,
                 setUsername,
                 messages,

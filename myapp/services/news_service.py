@@ -1,5 +1,6 @@
 # Import necessary libraries
 import os
+import random
 from dotenv import load_dotenv
 import requests
 from newspaper import Article
@@ -8,6 +9,7 @@ from langchain.schema import (
 )
 from langchain.chat_models import ChatOpenAI
 import uuid
+from flask import current_app
 
 # Load environment variables
 load_dotenv()
@@ -16,7 +18,6 @@ apikey = os.getenv('GNEWS_API_KEY')
 
 # Fetch article URLs based on query
 def get_article_urls(query):
-    print(query)
     # Construct API URL
     url = f"https://gnews.io/api/v4/search?q={query}&lang=en&country=us&max=10&apikey={apikey}"
 
@@ -31,6 +32,7 @@ def get_article_urls(query):
         return
 
     data = articles.json()
+    print(data)
     articles = data["articles"]
     article_urls = [article_data["url"] for article_data in articles]
     
@@ -51,6 +53,9 @@ def summarize_articles(article_urls):
     for article_url in article_urls:
         try:
             response = session.get(article_url, headers=headers, timeout=10)
+            article = Article(article_url)
+            article.download()
+            article.parse()
         except Exception as exception:
             print(f"Error occurred while fetching article at {article_url}: {exception}")
             continue
@@ -58,10 +63,6 @@ def summarize_articles(article_urls):
         if response.status_code != 200:
             print(f"Failed to fetch article at {article_url}")
             continue
-
-        article = Article(article_url)
-        article.download()
-        article.parse()
 
         # Extract article data
         article_title = article.title
@@ -96,6 +97,7 @@ def summarize_articles(article_urls):
             'id': unique_id,
             'title': article_title,
             'summary': summary.content,
+            'image': article.top_image,
             'url': article_url
         }
 
@@ -103,6 +105,38 @@ def summarize_articles(article_urls):
 
     return summarized_articles
 
+def upload_news_data(uid, news_data_list):
+    db = current_app.config['db']
+    news_ref = db.collection('users').document(uid).collection('news_articles')
+    
+    for news_data in news_data_list:
+        url = news_data['url']
+        
+        # Check if the URL already exists in the collection
+        query = news_ref.where('url', '==', url).limit(1).get()
+        
+        if len(query) == 0:
+            # URL does not exist, add the news_data to the collection
+            news_ref.add(news_data)
+        else:
+            # URL already exists, skip adding it
+            print(f"URL '{url}' already exists, skipping...")
 
-# Fetch article URLs for query 'AI' and print summarized articles
-print(get_article_urls('AI'))
+
+def get_random_news_articles(uid):
+    db = current_app.config['db']
+    news_ref = db.collection('users').document(uid).collection('news_articles')
+    
+    # Get all news articles
+    news_articles = news_ref.get()
+    
+    # Randomly select 7 articles
+    random_articles = random.sample(news_articles, 7)
+    
+    # Extract the article data
+    random_news = []
+    for article in random_articles:
+        article_data = article.to_dict()
+        random_news.append(article_data)
+    
+    return random_news

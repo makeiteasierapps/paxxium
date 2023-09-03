@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Tabs, Tab, Box } from '@mui/material';
-import AgentDashboard from '../AgentDashboard';
-import NewsCarousel from '../home/NewsCarousel';
+import { Tabs, Tab, Box, styled } from '@mui/material';
+
+
 
 function a11yProps(index) {
     return {
@@ -10,29 +10,35 @@ function a11yProps(index) {
     };
 }
 
-const NavTabs = () => {
-    const [value, setValue] = useState(0);
+const StyledNavTabs = styled(Tabs)(({ theme }) => ({
+    position: 'fixed',
+    top: '48px', // replace '64px' with the height of your AppBar
+    zIndex: theme.zIndex.appBar,
+    width: '100%',
+}));
 
+const NavTabs = ({setValue}) => {
+    const [value, setLocalValue] = useState(0);
     const handleChange = (event, newValue) => {
+        setLocalValue(newValue);
         setValue(newValue);
     };
 
     return (
-        <Box sx={{ width: '100%' }}>
+
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs
+                <StyledNavTabs
                     value={value}
                     onChange={handleChange}
-                    aria-label="basic tabs example"
+                    aria-label="navigation tabs"
+                    variant="fullWidth"
                 >
                     <Tab label="Home" {...a11yProps(0)} />
                     <Tab label="Agents" {...a11yProps(1)} />
                     <Tab label="Profile" {...a11yProps(2)} />
-                </Tabs>
-            </Box>
-            {value === 0 && <NewsCarousel />}
-            {value === 1 && <AgentDashboard />}
-            {value === 2 && <h1>Profile</h1>}
+                </StyledNavTabs>
+
+
         </Box>
     );
 };

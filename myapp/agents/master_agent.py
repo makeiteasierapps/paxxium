@@ -19,7 +19,7 @@ class StreamResponse(BaseCallbackHandler):
         from myapp import socketio
         socketio.emit('token', token)
         # This is needed to override batching
-        socketio.sleep(0)
+        socketio.sleep(0.05)
 
 class MasterAgent:
     def __init__(self, message_service, uid, model="gpt-3.5-turbo-0613", system_prompt="You are a friendly but genuine AI Agent. Don't be annoyingly nice, but don't be rude either.", chat_constants=''):

@@ -8,6 +8,7 @@ import React, {
 
 import { styled } from '@mui/system';
 import { List, Box, Typography, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import CommentsDisabledIcon from '@mui/icons-material/CommentsDisabled';
@@ -26,12 +27,11 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 // STYLED COMPONENTS
 const ChatContainerStyled = styled(Box)(({ theme }) => ({
-    marginLeft: '20px',
-    height: '800px',
-    width: '50%',
+    height: '80vh',
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.75)',
+    boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.63)',
     overflow: 'auto',
 }));
 
@@ -56,22 +56,6 @@ const MessageArea = styled(List)({
     overflowY: 'auto',
     width: '100%',
 });
-// -----------------------------
-
-// This is the component for "Start A New Conversation"
-// const StartNewConversation = () => (
-//     <div
-//         style={{
-//             position: 'absolute',
-//             top: '50%',
-//             left: '50%',
-//             transform: 'translate(-50%, -50%)',
-//             zIndex: 2,
-//         }}
-//     >
-//         Start A New Conversation
-//     </div>
-// );
 
 const Chat = ({
     id,
@@ -88,9 +72,14 @@ const Chat = ({
     const tokenizedCodeRef = useRef([]);
     const messagesEndRef = useRef(null);
     const socketRef = useRef(null);
+    const isProcessing = useRef(false);
+    const tokenQueue = useRef([]);
+    const ignoreNextToken = useRef(false);
+    const isQueueProcessing = useRef(false);
     const { setAgentArray } = useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
     const [messages, setMessages] = useState([]);
+    const [streamingMessageParts, setStreamingMessageParts] = useState([]);
 
     // Fetch messages from the database
     const fetchMessages = useCallback(async () => {
@@ -149,80 +138,106 @@ const Chat = ({
         };
     }, []);
 
-    const processToken = useCallback(
-        async (token) => {
-            // Check if the token marks the start or end of a code block.
-            if (token.startsWith('```') || token.startsWith('``')) {
-                if (isCodeBlockRef.current) {
-                    // End of a code block, reset variables for the next code block.
-                    const highlightedCode = await highlightStringCode(
-                        codeRef.current,
-                        langRef.current
-                    );
-
-                    tokenizedCodeRef.current = highlightedCode
-                        .split(/(<[^>]*>)|\b/)
-                        .filter(Boolean);
-                    setMessages((prevMessages) => {
-                        const updatedMessages = [...prevMessages];
-                        // Loop through each element of tokenizedCode and add it to the last element of updatedMessages
-                        for (
-                            let i = 0;
-                            i < tokenizedCodeRef.current.length;
-                            i++
-                        ) {
-                            updatedMessages.push(tokenizedCodeRef.current[i]);
-                        }
-                        return updatedMessages;
-                    });
-                    tokenizedCodeRef.current = [];
-                    isCodeBlockRef.current = false;
-                    langRef.current = 'markdown';
-                    codeRef.current = ''; // Clear the tokenizedCode array
-                } else {
-                    // Start of a code block.
-                    isCodeBlockRef.current = true;
-                    isLangLineRef.current = true;
-                }
-            } else if (isCodeBlockRef.current) {
-                // Inside a code block.
-                if (isLangLineRef.current) {
-                    // The first line of the code block may specify the language.
-                    langRef.current = token.trim() || 'markdown';
-                    if (langRef.current === 'jsx') {
-                        langRef.current = 'javascript';
-                    }
-                    isLangLineRef.current = false;
-                } else {
-                    // Add the token to the code block.
-                    codeRef.current += token;
-                }
+    const processToken = useCallback(async (token) => {
+        // Check if the token marks the start or end of a code block.
+        if (token.startsWith('```') || token.startsWith('``')) {
+            console.log('token', token);
+            if (token.startsWith('``')) {
+                ignoreNextToken.current = true;
             }
 
-            setMessages((prevMessages) => {
-                const updatedMessages = [...prevMessages];
-                const lastMessage = updatedMessages[updatedMessages.length - 1];
-                if (!isCodeBlockRef.current) {
-                    if (typeof lastMessage === 'object') {
-                        updatedMessages.push(token);
-                    }
-                    else if (typeof lastMessage === 'string') {
-                        updatedMessages[updatedMessages.length - 1] += token;
-                    }
-                } else if (token === '```') {
-                    updatedMessages.push(token);
+            if (isCodeBlockRef.current) {
+                // End of a code block, reset variables for the next code block.
+                const highlightedCode = highlightStringCode(
+                    codeRef.current,
+                    langRef.current
+                );
+
+                tokenizedCodeRef.current = highlightedCode
+                    .split(/(<[^>]*>)|\b/)
+                    .filter(Boolean);
+
+                // Wait for all code parts to be processed before moving on
+                for (
+                    let index = 0;
+                    index < tokenizedCodeRef.current.length;
+                    index++
+                ) {
+                    await new Promise((resolve) =>
+                        setTimeout(() => {
+                            setStreamingMessageParts((prevParts) => [
+                                ...prevParts,
+                                {
+                                    type: 'code',
+                                    content: tokenizedCodeRef.current[index],
+                                },
+                            ]);
+                            resolve();
+                        }, 0)
+                    );
                 }
 
-                return updatedMessages;
+                // Reset the variables and flag after the highlighting process is complete
+                tokenizedCodeRef.current = [];
+                isCodeBlockRef.current = false;
+                langRef.current = 'markdown';
+                codeRef.current = '';
+                isProcessing.current = false;
+            } else {
+                // Start of a code block.
+                isProcessing.current = true;
+                isCodeBlockRef.current = true;
+                isLangLineRef.current = true;
+            }
+        } else if (isCodeBlockRef.current) {
+            // Inside a code block.
+            if (isLangLineRef.current) {
+                // The first line of the code block may specify the language.
+                langRef.current = token.trim() || 'markdown';
+                if (langRef.current === 'jsx') {
+                    langRef.current = 'javascript';
+                }
+                isLangLineRef.current = false;
+            } else {
+                // Add the token to the code block.
+                codeRef.current += token;
+            }
+        } else {
+            if (ignoreNextToken.current) {
+                ignoreNextToken.current = false;
+                return;
+            }
+            // This is a text token, add it to the streaming message parts.
+            setStreamingMessageParts((prevParts) => {
+                const updatedParts = [...prevParts];
+                updatedParts.push({
+                    type: 'text',
+                    content: token,
+                });
+                return updatedParts;
             });
-        },
-        [setMessages] // Dependencies of the processQueue function.
-    );
+        }
+        isProcessing.current = false;
+    }, []);
 
-    // Set up an effect to listen to incoming tokens and process.
     useEffect(() => {
-        const handleToken = (token) => {
-            processToken(token);
+        const handleToken = async (token) => {
+            if (isProcessing.current || isQueueProcessing.current) {
+                tokenQueue.current.push(token);
+                console.log('queue', tokenQueue.current);
+                return;
+            }
+
+            isProcessing.current = true;
+            await processToken(token);
+            isProcessing.current = false;
+
+            if (tokenQueue.current.length > 0) {
+                isQueueProcessing.current = true;
+                const nextToken = tokenQueue.current.shift();
+                await processToken(nextToken);
+                isQueueProcessing.current = false;
+            }
         };
 
         // Register the event listener for incoming tokens.
@@ -234,11 +249,17 @@ const Chat = ({
         };
     }, [processToken]);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-    useEffect(scrollToBottom, [messages]);
+    // const scrollToBottom = () => {
+    //     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // };
+    // useEffect(scrollToBottom, [messages]);
 
+    // CHATBAR BUTTON HANDLERS
+    const handleCloseChat = () => {
+        setAgentArray((prevChatArray) =>
+            prevChatArray.filter((chatObj) => chatObj.id !== id)
+        );
+    };
     const handleClearMessages = async () => {
         try {
             const response = await fetch(`${backendUrl}/${id}/messages/clear`, {
@@ -282,22 +303,16 @@ const Chat = ({
                     <IconButton aria-label="delete" onClick={handleDeleteChat}>
                         <DeleteIcon />
                     </IconButton>
+                    <IconButton aria-label="close" onClick={handleCloseChat}>
+                        <CloseIcon />
+                    </IconButton>
                 </ChatBarIcons>
             </ChatBar>
             <MessagesContainer item xs={9}>
                 <MessageArea>
                     {messages.map((message, index) => {
                         if (message) {
-                            if (typeof message === 'string') {
-                                // This is a streaming message
-                                return (
-                                    <AgentMessage
-                                        key={index}
-                                        message={message}
-                                    />
-                                );
-                                // These are message objects loaded from the database or on refresh.
-                            } else if (message.message_from === 'chatbot') {
+                            if (message.message_from === 'chatbot') {
                                 return (
                                     <AgentMessage
                                         key={index}
@@ -315,6 +330,12 @@ const Chat = ({
                         }
                         return null; // return null when the message doesn't exist
                     })}
+                    {streamingMessageParts.length > 0 && (
+                        <AgentMessage
+                            key="agentMessage"
+                            message={streamingMessageParts}
+                        />
+                    )}
                     <div ref={messagesEndRef} />
                 </MessageArea>
                 <MessageInput

@@ -1,10 +1,9 @@
-import React, { memo, useReducer } from 'react';
+import React, { memo, useEffect, useState, useRef } from 'react';
 import { Avatar, ListItem, ListItemIcon, Checkbox } from '@mui/material';
 import { styled } from '@mui/system';
 import { Icon } from '@iconify/react';
 import { blueGrey } from '@mui/material/colors';
 import { highlightBlockCode } from '../../../utils/ProcessResponse';
-import { useEffect, useCallback } from 'react';
 
 const BotMessageStyled = styled(ListItem)({
     backgroundColor: blueGrey[700],
@@ -22,9 +21,7 @@ const MessageContent = styled('div')({
 });
 
 const StyledCheckbox = styled(Checkbox)({
-    // Specify your styles here
     color: blueGrey[700],
-    // Specify your styles for checked state
     '&.Mui-checked': {
         color: '#1C282E',
     },
@@ -37,11 +34,11 @@ const StyledHeader = styled('div')({
     justifyContent: 'space-between',
 });
 
-const TextBlock = ({ text }) => {
+const TextBlock = React.memo(({ text }) => {
     return <p>{text}</p>;
-};
+});
 
-const CodeBlock = ({ code }) => {
+const CodeBlock = React.memo(({ code }) => {
     return (
         <pre className="language-javascript">
             <code
@@ -50,154 +47,106 @@ const CodeBlock = ({ code }) => {
             />
         </pre>
     );
-};
-
-const initialState = {
-    checked: false,
-    messageParts: [],
-    isCodeBlock: false,
-    ignoreNextMessage: false,
-    isStreamActive: false,
-};
-
-function reducer(state, action) {
-    switch (action.type) {
-        case 'SET_CHECKED':
-            return { ...state, checked: action.payload };
-        case 'SET_MESSAGE_PARTS':
-            return { ...state, messageParts: action.payload };
-        case 'SET_IS_CODE_BLOCK':
-            return { ...state, isCodeBlock: action.payload };
-        case 'SET_IGNORE_NEXT_MESSAGE':
-            return { ...state, ignoreNextMessage: action.payload };
-        case 'SET_IS_STREAM_ACTIVE':
-            return { ...state, isStreamActive: action.payload };
-        default:
-            throw new Error();
-    }
-}
+});
 
 const AgentMessage = ({ message }) => {
-    const [state, dispatch] = useReducer(reducer, initialState);
-    const { checked, messageParts, isCodeBlock, ignoreNextMessage } = state;
+    const [checked, setChecked] = useState(false);
+    const [messageParts, setMessageParts] = useState([]);
+    const [stream, setStream] = useState([]);
+    const textRef = useRef('');
+    const codeRef = useRef('');
+    const lastProcessedIndex = useRef(-1);
 
-    // useEffect(() => {
-    //     console.log('AgentMessage is mounting');
-    //     return () => {
-    //         console.log('AgentMessage is unmounting');
-    //     };
-    // }, []);
+    const processDatabaseMessage = async (message) => {
+        let parts = [];
+        let i = 0;
+        let processedMessage = await highlightBlockCode(message);
+        let message_content = processedMessage.message_content;
 
-    const processToken = useCallback(
-        async (token) => {
-            if (typeof token === 'object') {
-                let parts = [];
-                let i = 0;
-                let processedMessage = await highlightBlockCode(message);
-                let message_content = processedMessage.message_content;
+        while (message_content.includes('CODEBLOCK' + i)) {
+            let splitMessage = message_content.split('CODEBLOCK' + i);
+            parts.push({ type: 'text', content: splitMessage[0] });
 
-                while (message_content.includes('CODEBLOCK' + i)) {
-                    let splitMessage = message_content.split('CODEBLOCK' + i);
-                    parts.push(
-                        <TextBlock key={`text${i}`} text={splitMessage[0]} />
-                    );
-
-                    if (
-                        processedMessage.codeBlocks &&
-                        processedMessage.codeBlocks['CODEBLOCK' + i]
-                    ) {
-                        parts.push(
-                            <CodeBlock
-                                key={`code${i}`}
-                                code={
-                                    processedMessage.codeBlocks['CODEBLOCK' + i]
-                                }
-                            />
-                        );
-                    }
-
-                    message_content = splitMessage[1] ? splitMessage[1] : '';
-                    i++;
-                }
-
-                if (message_content) {
-                    parts.push(
-                        <TextBlock key={`text${i}`} text={message_content} />
-                    );
-                }
-                dispatch({ type: 'SET_MESSAGE_PARTS', payload: parts });
-            } else if (typeof token === 'string') {
-                if (message.startsWith('```') || message.startsWith('``')) {
-                    if (message.startsWith('``')) {
-                        // Ignores next token, sometimes the ending ``` is split into two tokens
-                        dispatch({
-                            type: 'SET_IGNORE_NEXT_MESSAGE',
-                            payload: true,
-                        });
-                    }
-                    if (ignoreNextMessage) {
-                        return;
-                    }
-                    if (isCodeBlock) {
-                        // End of code block
-                        dispatch({ type: 'SET_IS_CODE_BLOCK', payload: false });
-                    } else {
-                        // Start of code block
-                        dispatch({ type: 'SET_IS_CODE_BLOCK', payload: true });
-                    }
-                } else if (isCodeBlock) {
-                    //Inside code block
-                    const part = <CodeBlock key="code" code={token} />;
-                    dispatch({ type: 'SET_MESSAGE_PARTS', payload: part });
-                } else {
-                    // Text block
-                    if (
-                        messageParts.length > 0 &&
-                        messageParts[messageParts.length - 1].type === TextBlock
-                    ) {
-                        // Update the last TextBlock component
-                        const lastPart = messageParts[messageParts.length - 1];
-                        const updatedLastPart = React.cloneElement(lastPart, {
-                            text: lastPart.props.text + token,
-                        });
-                        const updatedMessageParts = messageParts.map(
-                            (part, index) => {
-                                if (index === messageParts.length - 1) {
-                                    return updatedLastPart;
-                                } else {
-                                    return part;
-                                }
-                            }
-                        );
-                        dispatch({
-                            type: 'SET_MESSAGE_PARTS',
-                            payload: updatedMessageParts,
-                        });
-                    } else {
-                        // Create a new TextBlock component
-                        const part = (
-                            <TextBlock
-                                key={`text${messageParts.length}`}
-                                text={token}
-                            />
-                        );
-                        dispatch({
-                            type: 'SET_MESSAGE_PARTS',
-                            payload: [...messageParts, part],
-                        });
-                    }
-                }
+            if (
+                processedMessage.codeBlocks &&
+                processedMessage.codeBlocks['CODEBLOCK' + i]
+            ) {
+                parts.push({
+                    type: 'code',
+                    content: processedMessage.codeBlocks['CODEBLOCK' + i],
+                });
             }
-        },
-        [ignoreNextMessage, isCodeBlock, message, messageParts]
-    );
 
+            message_content = splitMessage[1] ? splitMessage[1] : '';
+            i++;
+        }
+
+        if (message_content) {
+            parts.push({ type: 'text', content: message_content });
+        }
+
+        return parts;
+    };
+
+    const processStreamMessage =  (message) => {
+        const lastIndex = message.length - 1;
+        if (lastIndex > lastProcessedIndex.current) {
+            const lastMessage = message[lastIndex];
+
+            if (lastMessage.type === 'text') {
+                textRef.current += lastMessage.content;
+                setStream((prev) => {
+                    const updatedParts = [...prev];
+                    const lastPart = updatedParts[updatedParts.length - 1];
+
+                    if (lastPart && lastPart.type === TextBlock) {
+                        updatedParts[updatedParts.length - 1] = (
+                            <TextBlock text={textRef.current} />
+                        );
+                    } else {
+                        updatedParts.push(
+                            <TextBlock text={textRef.current} />
+                        );
+                    }
+
+                    return updatedParts;
+                });
+            } else {
+                textRef.current = '';
+                codeRef.current += lastMessage.content;
+                setStream((prev) => {
+                    const updatedParts = [...prev];
+                    const lastPart = updatedParts[updatedParts.length - 1];
+
+                    if (lastPart && lastPart.type === CodeBlock) {
+                        updatedParts[updatedParts.length - 1] = (
+                            <CodeBlock code={codeRef.current} />
+                        );
+                    } else {
+
+                        updatedParts.push(
+                            <CodeBlock code={codeRef.current} />
+                        );
+                    }
+
+                    return updatedParts;
+                });
+            }
+
+            lastProcessedIndex.current = lastIndex;
+        }
+    };
+    
     useEffect(() => {
-        processToken(message);
+        if (Array.isArray(message)) {
+            processStreamMessage(message);
+        } else if (typeof message === 'object') {
+            processDatabaseMessage(message).then(setMessageParts);
+        }
     }, [message]);
 
     const handleCheck = (event) => {
-        dispatch({ type: 'SET_CHECKED', payload: event.target.checked });
+        setChecked(event.target.checked);
     };
 
     return (
@@ -221,7 +170,26 @@ const AgentMessage = ({ message }) => {
                     inputProps={{ 'aris-label': 'Select message' }}
                 />
             </StyledHeader>
-            <MessageContent>{messageParts}</MessageContent>
+            <MessageContent>
+                {messageParts.map((part, index) => {
+                    if (part.type === 'text') {
+                        return (
+                            <TextBlock
+                                key={`text${index}`}
+                                text={part.content}
+                            />
+                        );
+                    } else if (part.type === 'code') {
+                        return (
+                            <CodeBlock
+                                key={`code${index}`}
+                                code={part.content}
+                            />
+                        );
+                    }
+                })}
+                {stream}
+            </MessageContent>
         </BotMessageStyled>
     );
 };

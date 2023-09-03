@@ -50,13 +50,13 @@ export const highlightBlockCode = async (message) => {
     return message;
 };
 
-export const highlightStringCode = async (code, lang) => {
+export const highlightStringCode = (code, lang) => {
     const highlightedCode = Prism.highlight(
         code,
         Prism.languages[lang] || Prism.languages.plaintext, // if Prism does not have a highlighter for the language, default to plaintext
         lang
     );
-
+    
     return (
         '<pre><code class="language-' +
         lang +
@@ -65,4 +65,3 @@ export const highlightStringCode = async (code, lang) => {
         '</code></pre>'
     );
 };
-
