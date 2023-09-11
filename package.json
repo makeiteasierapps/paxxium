@@ -11,6 +11,8 @@
     "@mui/system": "^5.13.5",
     "@testing-library/jest-dom": "^5.16.5",
     "buffer": "^6.0.3",
+    "d3": "^7.8.5",
+    "d3-cloud": "^1.2.7",
     "firebase": "^9.22.2",
     "framer-motion": "^10.16.2",
     "fs": "^0.0.1-security",

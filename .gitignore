@@ -22,6 +22,7 @@
 paxxium-firebase-adminsdk-2l9cl-3bb25d079e.json
 paxxium-7194e2941e9f.json
 /unused
+/venv
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

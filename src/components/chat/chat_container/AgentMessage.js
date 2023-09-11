@@ -14,6 +14,7 @@ const BotMessageStyled = styled(ListItem)({
 
 const MessageContent = styled('div')({
     maxHeight: '100%',
+    padding: '0px 31px',
     overflowY: 'auto',
     overflowX: 'hidden',
     width: '100%',

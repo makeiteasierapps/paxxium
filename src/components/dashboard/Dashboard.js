@@ -3,6 +3,7 @@ import { styled } from '@mui/system';
 import NavTabs from './NavTabs';
 import AgentDashboard from '../AgentDashboard';
 import NewsCarousel from '../home/NewsCarousel';
+import Clouds from '../profile/Clouds';
 
 
 const DashboardWrapper = styled('div')(({ theme }) => ({
@@ -26,7 +27,7 @@ const Dashboard = () => {
                 <Content>
                     {value === 0 && <NewsCarousel />}
                     {value === 1 && <AgentDashboard />}
-                    {value === 2 && <h1>Profile</h1>}
+                    {value === 2 && <Clouds />}
                 </Content>
             </DashboardWrapper>
         </>

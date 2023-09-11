@@ -15,8 +15,8 @@ class DebateManager:
         
 
         # Initialize two agents
-        self.agent1 = MasterAgent(message_service, self.uid, system_prompt=self.role1)
-        self.agent2 = MasterAgent(message_service, self.uid, system_prompt=self.role2)
+        self.agent1 = MasterAgent(message_service, self.uid, self.conversation_id, system_prompt=self.role1)
+        self.agent2 = MasterAgent(message_service, self.uid, self.conversation_id, system_prompt=self.role2)
 
     @staticmethod
     def create_debate(user_id):

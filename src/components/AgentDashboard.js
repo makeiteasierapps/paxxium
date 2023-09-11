@@ -30,8 +30,9 @@ const ChatsContainer = styled(Box)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     gap: theme.spacing(2),
+    alignItems: 'c',
 }));
 
 const Settings = styled(Box)(({ theme }) => ({

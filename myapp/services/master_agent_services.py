@@ -8,10 +8,10 @@ class MasterAgentService:
         self.message_service = message_service
         self.max_agent_instances = 1000
 
-    def check_and_set_agent_instance(self, uid, conversation_id, system_prompt, chat_constants, agent_model):
+    def check_and_set_agent_instance(self, uid, chat_id, system_prompt, chat_constants, agent_model):
 
         # Create a unique key based on user ID and conversation ID
-        key = (uid, conversation_id)
+        key = (uid, chat_id)
 
         if agent_model == 'GPT-4':
             agent_model = 'gpt-4-0613'
@@ -26,7 +26,7 @@ class MasterAgentService:
                 self.master_agents.popitem(last=False)
 
             # Create a new MasterAgent instance and add it to the master_agents dictionary
-            self.master_agents[key] = MasterAgent(self.message_service, uid, model=agent_model, system_prompt=system_prompt, chat_constants=chat_constants)
+            self.master_agents[key] = MasterAgent(self.message_service, uid, chat_id=chat_id, model=agent_model, system_prompt=system_prompt, chat_constants=chat_constants,)
         else:
             # If an AI instance for the key already exists, update its model
             self.master_agents[key].model = agent_model

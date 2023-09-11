@@ -15,24 +15,28 @@ from myapp.agents.tools.tools import SaveMessageTool
 
 
 class StreamResponse(BaseCallbackHandler):
+    def __init__(self, chat_id: str):
+        self.chat_id = chat_id
+
     def on_llm_new_token(self, token: str, **kwargs) -> None:
         from myapp import socketio
-        socketio.emit('token', token)
+        socketio.emit('token', {'token': token, 'chat_id': self.chat_id})
         # This is needed to override batching
-        socketio.sleep(0.05)
+        socketio.sleep(0)
 
 class MasterAgent:
-    def __init__(self, message_service, uid, model="gpt-3.5-turbo-0613", system_prompt="You are a friendly but genuine AI Agent. Don't be annoyingly nice, but don't be rude either.", chat_constants=''):
+    def __init__(self, message_service, uid, chat_id, model="gpt-3.5-turbo-0613", system_prompt="You are a friendly but genuine AI Agent. Don't be annoyingly nice, but don't be rude either.", chat_constants=''):
         # langchain.debug = True
         user_service = current_app.user_service
         encrypted_openai_key, encrypted_serp_key = user_service.get_keys(uid)
         self.openai_api_key = user_service.decrypt(encrypted_openai_key)
         self.serp_key = user_service.decrypt(encrypted_serp_key)
         self.uid = uid
+        self.chat_id = chat_id
         self.system_prompt = system_prompt
         self.chat_constants = chat_constants
         self.search = SerpAPIWrapper(serpapi_api_key=self.serp_key)
-        self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse()], temperature=0, model=model, openai_api_key=self.openai_api_key)
+        self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse(self.chat_id)], temperature=0, model=model, openai_api_key=self.openai_api_key)
         self.llm_math_chain = LLMMathChain.from_llm(llm=self.llm, verbose=True)
         self.memory=ConversationBufferWindowMemory(memory_key='memory', return_messages=True, k=3)
         self.save_message = SaveMessageTool(memory=self.memory)

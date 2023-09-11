@@ -15,6 +15,8 @@ const StyledNavTabs = styled(Tabs)(({ theme }) => ({
     top: '48px', // replace '64px' with the height of your AppBar
     zIndex: theme.zIndex.appBar,
     width: '100%',
+    backgroundColor: theme.palette.background.default,
+    
 }));
 
 const NavTabs = ({setValue}) => {
@@ -30,8 +32,16 @@ const NavTabs = ({setValue}) => {
                 <StyledNavTabs
                     value={value}
                     onChange={handleChange}
+                    sx={{
+                        // Remove the tab indicator
+                        '& .MuiTabs-indicator': {
+                          display: 'none',
+                        },
+                      }}
                     aria-label="navigation tabs"
                     variant="fullWidth"
+                    textColor="secondary"
+
                 >
                     <Tab label="Home" {...a11yProps(0)} />
                     <Tab label="Agents" {...a11yProps(1)} />

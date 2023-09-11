@@ -94,10 +94,11 @@ export default function TitleBar() {
                         fontFamily={'Montserrat'}
                         component="div"
                         flexGrow={1}
+                        align="center"
                     >
                         Welcome {username}
                     </Typography>
-                    <Search>
+                    {/* <Search>
                         <SearchIconWrapper>
                             <SearchIcon />
                         </SearchIconWrapper>
@@ -105,10 +106,10 @@ export default function TitleBar() {
                             placeholder="Search…"
                             inputProps={{ 'aria-label': 'search' }}
                         />
-                    </Search>
-                    <IconButton onClick={handleLogout}>
+                    </Search> */}
+                    {/* <IconButton onClick={handleLogout}>
                         <LogoutIcon sx={{ color: '#fff' }} />
-                    </IconButton>
+                    </IconButton> */}
                 </Toolbar>
             </StyledAppBar>
         </Box>

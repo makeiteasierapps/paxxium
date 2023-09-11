@@ -33,7 +33,7 @@ def get_messages(conversation_id):
         return jsonify(conversation_data), 200
     
     # Check if there is an instance in memory, if not create one and add memory
-    agent, key = current_app.master_agent_service.check_and_set_agent_instance(uid=uid, conversation_id=conversation_id, agent_model=agent_model, system_prompt=chat_data['systemPrompt'], chat_constants=chat_data['chatConstants'])
+    agent, key = current_app.master_agent_service.check_and_set_agent_instance(uid=uid, chat_id=conversation_id, agent_model=agent_model, system_prompt=chat_data['systemPrompt'], chat_constants=chat_data['chatConstants'])
     agent.load_history_to_memory(conversation_data)
     return jsonify(conversation_data), 200
 

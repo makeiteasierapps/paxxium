@@ -28,11 +28,13 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 // STYLED COMPONENTS
 const ChatContainerStyled = styled(Box)(({ theme }) => ({
     height: '80vh',
-    width: '100%',
+    width: '70%',
     display: 'flex',
     flexDirection: 'column',
     boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.63)',
     overflow: 'auto',
+    borderRadius: '5px',
+    
 }));
 
 const ChatBar = styled(Box)(({ theme }) => ({
@@ -220,23 +222,44 @@ const Chat = ({
         isProcessing.current = false;
     }, []);
 
+    // Update the message state with the streamed message.
+    useEffect(() => {
+        const socket = io.connect(backendUrl);
+        const handleMessage = async (message) => {
+            setTimeout(() => {
+                setMessages((prevMessages) => [...prevMessages, message]);
+                setStreamingMessageParts([]);
+            }, 100);
+        };
+
+        socket.on('message', (message) => {
+            handleMessage(message);
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, []);
+
     useEffect(() => {
         const handleToken = async (token) => {
-            if (isProcessing.current || isQueueProcessing.current) {
-                tokenQueue.current.push(token);
-                console.log('queue', tokenQueue.current);
-                return;
-            }
+            if (id === token.chat_id) {
+                if (isProcessing.current || isQueueProcessing.current) {
+                    tokenQueue.current.push(token.token);
+                    console.log('queue', tokenQueue.current);
+                    return;
+                }
 
-            isProcessing.current = true;
-            await processToken(token);
-            isProcessing.current = false;
+                isProcessing.current = true;
+                await processToken(token.token);
+                isProcessing.current = false;
 
-            if (tokenQueue.current.length > 0) {
-                isQueueProcessing.current = true;
-                const nextToken = tokenQueue.current.shift();
-                await processToken(nextToken);
-                isQueueProcessing.current = false;
+                if (tokenQueue.current.length > 0) {
+                    isQueueProcessing.current = true;
+                    const nextToken = tokenQueue.current.shift();
+                    await processToken(nextToken);
+                    isQueueProcessing.current = false;
+                }
             }
         };
 
@@ -247,7 +270,7 @@ const Chat = ({
         return () => {
             socketRef.current.off('token', handleToken);
         };
-    }, [processToken]);
+    }, [id, processToken]);
 
     // const scrollToBottom = () => {
     //     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -332,7 +355,7 @@ const Chat = ({
                     })}
                     {streamingMessageParts.length > 0 && (
                         <AgentMessage
-                            key="agentMessage"
+                            key={`agentMessage${id}`}
                             message={streamingMessageParts}
                         />
                     )}

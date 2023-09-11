@@ -10,7 +10,7 @@ export const theme = createTheme({
             main: '#FF4500', // or any color you want for secondary
         },
         background: {
-            default: blueGrey[900], // color for background
+            default: '#344249', // color for background
             paper: '#1C282E', // color for elements with a paper background
         },
         text: {
@@ -22,7 +22,7 @@ export const theme = createTheme({
         MuiAppBar: {
             styleOverrides: {
                 root: {
-                    backgroundColor: '#1C282E',
+                    backgroundColor: '#344249',
                     color: '#fff', // replace with your desired color
                 },
             },
