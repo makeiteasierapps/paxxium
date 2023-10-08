@@ -18,6 +18,7 @@ apikey = os.getenv('GNEWS_API_KEY')
 
 # Fetch article URLs based on query
 def get_article_urls(query):
+    print(f"Fetching articles for query: {query}")
     # Construct API URL
     url = f"https://gnews.io/api/v4/search?q={query}&lang=en&country=us&max=10&apikey={apikey}"
 

@@ -7,11 +7,14 @@ export const theme = createTheme({
             main: '#ffffff', // or any color you want for primary
         },
         secondary: {
-            main: '#FF4500', // or any color you want for secondary
+            main: '#e33d00', // or any color you want for secondary
+            light: '#FF4500', // lighter shade of secondary color
+            dark: '#5c1c08', // darker shade of secondary color
         },
+
         background: {
             default: '#344249', // color for background
-            paper: '#1C282E', // color for elements with a paper background
+            paper: blueGrey[700], // color for elements with a paper background
         },
         text: {
             primary: '#ffffff', // or any color you want for primary text

@@ -3,6 +3,13 @@ import base64
 from dotenv import load_dotenv
 from google.cloud import kms
 
+from langchain.chains import LLMChain
+from langchain.output_parsers import StructuredOutputParser, ResponseSchema
+from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
+from langchain.chat_models import ChatOpenAI
+
+from myapp.services.profile_services import ProfileService as ps
+
 class UserService:
     def __init__(self, db):
         self.db = db
@@ -10,11 +17,13 @@ class UserService:
 
     def check_authorization(self, user_id):
         user_doc = self.db.collection('users').document(user_id).get()
+        
         return user_doc.to_dict()['authorized']
 
 
     def get_keys(self, user_id):
         user_doc = self.db.collection('users').document(user_id).get()
+        
         return user_doc.to_dict()['open_key'], user_doc.to_dict()['serp_key']
 
 
@@ -33,11 +42,10 @@ class UserService:
         import six  # type: ignore
 
         crc32c_fun = crcmod.predefined.mkPredefinedCrcFun("crc-32c")
+        
         return crc32c_fun(six.ensure_binary(data))
 
-
-    @staticmethod
-    def encrypt(input_str):
+    def encrypt(self, input_str):
         load_dotenv()
         os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
 
@@ -63,8 +71,7 @@ class UserService:
         return ciphertext_str
 
 
-    @staticmethod
-    def decrypt(key):
+    def decrypt(self, key):
         load_dotenv()
         os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
         
@@ -75,5 +82,59 @@ class UserService:
 
         return decrypted_key.plaintext
 
+    def update_profile(self, uid, updates):
+        self.db.collection('users').document(uid).set(updates, merge=True)
+        
+        return {'message': 'User updated successfully'}, 200
 
 
+    def get_profile(self, uid):
+        user_doc = self.db.collection('users').document(uid).get(['first_name', 'last_name', 'username'])
+        
+        return user_doc.to_dict()
+
+    @staticmethod
+    def extract_data_for_prompt(answers):
+        """ 
+        Extracts the data from the answers dictionary and formats it for the prompt
+        """
+        prompt = ''
+        for category, questions in answers.items():
+            for question, answer in questions.items():
+                prompt += f'{category}: {question} - Answer: {answer}\n'
+        
+        return prompt
+    
+    @staticmethod
+    def analyze_profile(uid):
+        """
+        Generates an analysis of the user's profile
+        """
+        
+        q_a = ps.load_profile_questions(uid)
+        prompt = UserService.extract_data_for_prompt(q_a)
+
+
+        model = ChatOpenAI(temperature=0.7, model='gpt-4-0613')
+        response_schemas = [
+            ResponseSchema(name="analysis", description="provide a personality analysis of the user based on their answers to the questions. Do not simply summarize the answers, but provide a unique analysis of the user."),
+            ResponseSchema(name="news_topics", description="Should be a list of queries that are one or two words and be a good query parameter for calling a news API. Your topics should be derived from your analyis. Example formats: 2 words - Rock climbing - 1 word -AI"),
+            # ResponseSchema(name="skills_assessment", description="Based on the user's answers around things they are learning, provide a list of 10 questions to gauge their skill level in the topic. Example: If the user says they are learning *Skill*, ask them to rate their skill level from 1-10.")
+        ]
+        output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+
+        format_instructions = output_parser.get_format_instructions()
+
+        chat_prompt_template = ChatPromptTemplate(
+            messages=[HumanMessagePromptTemplate.from_template("Here are the users answers to the questions:\n{format_instructions}\n{q_a}")],
+            partial_variables={"format_instructions": format_instructions},
+            output_parser=output_parser,
+        )
+
+        llm_chain = LLMChain(llm=model, prompt=chat_prompt_template, output_parser=output_parser)
+
+        response = llm_chain({"q_a": prompt, "format_instructions": format_instructions})
+
+        parsed_response = response['text']
+        print(parsed_response)
+        return parsed_response
