@@ -1,5 +1,4 @@
-from flask import Blueprint, request, current_app
-
+from flask import Blueprint, request, current_app, jsonify
 
 chat = Blueprint('chat', __name__)
 
@@ -15,7 +14,6 @@ def authenticate_request():
 @chat.route('/chat/create', methods=['POST'])
 def create_chat():
     uid = authenticate_request()
-    
     if not uid:
         return {'message': 'Invalid token'}, 403
 
@@ -26,8 +24,8 @@ def create_chat():
     chat_constants = data['chatConstants']
     use_profile_data = data['useProfileData']
     
-    conversation_service = current_app.conversation_service
-    new_chat_id = conversation_service.create_chat(uid, chat_name, agent_model, system_prompt, chat_constants, use_profile_data)
+    chat_service = current_app.chat_service
+    new_chat_id = chat_service.create_chat(uid, chat_name, agent_model, system_prompt, chat_constants, use_profile_data)
     
     master_agent_service = current_app.master_agent_service
     master_agent_service.check_and_set_agent_instance(uid, new_chat_id, agent_model, system_prompt, chat_constants)
@@ -43,20 +41,16 @@ def create_chat():
 
 @chat.route('/chat', methods=['GET'])
 def get_chat_data():
+    """
+    Fetches all chat data for a given user
+    """
     uid = authenticate_request()
 
     if not uid:
         return {'message': 'Invalid token'}, 403
 
-    conversation_service = current_app.conversation_service
-    conversations = conversation_service.get_chat_ids(uid)
-    chat_data_list = []
-    
-    for conversation in conversations:
-        chat_id = conversation['id']
-        chat_data = conversation_service.chat_data(uid, chat_id)
-        chat_data['id'] = chat_id
-        chat_data_list.append(chat_data)
+    chat_service = current_app.chat_service
+    chat_data_list = chat_service.get_all_chats(uid)
     
     return chat_data_list, 200
 
@@ -67,8 +61,37 @@ def delete_chat(chat_id):
     if not uid:
         return {'message': 'Invalid token'}, 403
 
-    conversation_service = current_app.conversation_service
-    conversation_service.delete_conversation(uid, chat_id)
+    chat_service = current_app.chat_service
+    chat_service.delete_conversation(uid, chat_id)
     
     return {'message': 'Conversation deleted'}, 200
 
+@chat.route('/chat/update_visibility', methods=['POST'])
+def update_visibility():
+    uid = authenticate_request()
+    
+    if not uid:
+        return {'message': 'Invalid token'}, 403
+
+    data = request.get_json()
+    chat_id = data.get('id')
+    is_open = data.get('is_open')
+
+    chat_service = current_app.chat_service
+    chat_service.update_visibility(uid, chat_id, is_open)
+    
+    return jsonify({'message': 'Conversation updated'}), 200
+
+@chat.route('/chat/update_settings', methods=['POST'])
+def update_settings():
+    uid = authenticate_request()
+
+    if not uid:
+        return {'message': 'Invalid token'}, 403
+    
+    data = request.get_json()
+    chat_id = data.get('id')
+    chat_service = current_app.chat_service
+    chat_service.update_settings(uid, chat_id, data.get('chatName'), data.get('agentModel'), data.get('systemPrompt'), data.get('chatConstants'), data.get('useProfileData'))
+
+    return jsonify({'message': 'Conversation updated'}), 200

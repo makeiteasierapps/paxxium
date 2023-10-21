@@ -1,7 +1,5 @@
 from flask import current_app
 
-
-
 class ProfileService:
     
     @staticmethod

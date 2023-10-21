@@ -4,11 +4,11 @@ import io from 'socket.io-client';
 import 'prismjs/components/prism-javascript.min';
 import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism-okaidia.css';
-import { ChatContext } from '../../../contexts/ChatContext';
+import { ChatContext } from '../../../../contexts/ChatContext';
 import { TextField, IconButton, InputAdornment } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { styled } from '@mui/system';
-import { AuthContext } from '../../../contexts/AuthContext';
+import { AuthContext } from '../../../../contexts/AuthContext';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const InputArea = styled('div')({
@@ -18,12 +18,7 @@ const InputArea = styled('div')({
     justifyContent: 'space-between',
 });
 
-const MessageInput = ({
-    chatId,
-    agentModel,
-
-    setMessages,
-}) => {
+const MessageInput = ({ chatId, agentModel, setMessages }) => {
     const { uid } = useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
     const [input, setInput] = useState('');
@@ -73,7 +68,6 @@ const MessageInput = ({
     return (
         <InputArea>
             <TextField
-                id="outlined-basic-email"
                 label="Type Something"
                 fullWidth
                 value={input}

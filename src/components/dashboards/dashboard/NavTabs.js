@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Tabs, Tab, Box, styled } from '@mui/material';
 
-
-
 function a11yProps(index) {
     return {
         id: `simple-tab-${index}`,

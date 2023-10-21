@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from myapp.services.profile_services import ProfileService as ps
+from myapp.services.user_services import UserService as us
 
 profile = Blueprint('profile', __name__)
 
@@ -20,7 +21,7 @@ def update_questions():
     # Get the request data
     uid = authenticate_request()
     ps.update_profile_questions(uid, request.get_json())
-    parsed_analysis = ps.analyze_profile(uid)
+    parsed_analysis = us.analyze_profile(uid)
 
     return jsonify(parsed_analysis), 200
 

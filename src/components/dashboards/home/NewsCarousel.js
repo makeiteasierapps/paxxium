@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react';
 import Carousel from 'react-spring-3d-carousel';
-import { AuthContext } from '../../contexts/AuthContext';
+import { AuthContext } from '../../../contexts/AuthContext';
 import NewsCard from './NewsCard';
 import { styled, Box } from '@mui/system';
 import Button from '@mui/material/Button';
@@ -109,7 +109,7 @@ const NewsCarousel = () => {
                 ) : (
                     <p>No news data available</p>
                 )}
-                <SearchDial
+                {/* <SearchDial
                     ariaLabel="SpeedDial openIcon example"
                     icon={<SearchIcon />}
                     onClose={() => setOpen(false)}
@@ -136,7 +136,7 @@ const NewsCarousel = () => {
                             </>
                         }
                     />
-                </SearchDial>
+                </SearchDial> */}
             </CarouselContainer>
         </MainContainer>
     );
