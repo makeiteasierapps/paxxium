@@ -9,6 +9,7 @@
         "editor.defaultFormatter": "ms-python.python"
     },
     "python.formatting.provider": "none",
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "prettier.tabWidth": 4
 }
 
