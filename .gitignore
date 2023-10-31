@@ -26,3 +26,5 @@ paxxium-7194e2941e9f.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+/myapp/__pycache__
