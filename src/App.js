@@ -4,28 +4,24 @@ import {
     Route,
     Routes,
     useNavigate,
+    Navigate,
 } from 'react-router-dom';
-import LoginPage from './components/LoginPage';
-import SignUpPage from './components/SignUpPage';
+import LoginPage from './components/account/LoginPage';
+import SignUpPage from './components/account/SignUpPage';
 import './styles/App.css';
-import Dashboard from './components/dashboard/Dashboard';
+import Dashboard from './components/dashboards/dashboard/Dashboard';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ChatProvider } from './contexts/ChatContext';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 import { ChatContext } from './contexts/ChatContext';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from './Theme';
-import TitleBar from './components/dashboard/AppBar';
+import TitleBar from './components/dashboards/dashboard/AppBar';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-const UnauthenticatedRoutes = () => (
-    <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-    </Routes>
-);
 // If user is authenticated redirect to home
 // If user is not authenticated redirect to login
 const AuthenticatedRoutes = () => {
@@ -38,17 +34,35 @@ const AuthenticatedRoutes = () => {
         } else navigate('/dashboard');
     }, [navigate, idToken]);
 
-    return (
-        <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            {/* Other authenticated routes */}
-        </Routes>
-    );
+    return <Dashboard />;
 };
 
 // Helper function to render the correct routes
 const GateKeeper = ({ isAuthorized }) => {
-    return isAuthorized ? <AuthenticatedRoutes /> : <UnauthenticatedRoutes />;
+    return (
+        <Routes>
+            {isAuthorized ? (
+                // Authenticated routes
+                <>
+                    <Route
+                        path="/dashboard"
+                        element={<AuthenticatedRoutes />}
+                    />
+                    <Route
+                        path="*"
+                        element={<Navigate replace to="/dashboard" />}
+                    />
+                </>
+            ) : (
+                // Unauthenticated routes
+                <>
+                    <Route path="/" element={<LoginPage />} />
+                    <Route path="/signup" element={<SignUpPage />} />
+                    <Route path="*" element={<Navigate replace to="/" />} />
+                </>
+            )}
+        </Routes>
+    );
 };
 
 const AuthenticatedApp = () => {
@@ -74,9 +88,9 @@ const AuthenticatedApp = () => {
                     });
 
                     const responseData = await response.json();
-                    
+
                     // Checks if admin has grtanted access to the app
-                    if (responseData.auth_status) {       
+                    if (responseData.auth_status) {
                         setIsAuthorized(true);
                         setUid(user.uid);
                         const userDoc = await getDoc(doc(db, 'users', uid));
@@ -110,9 +124,11 @@ const App = () => {
             <CssBaseline />
             <AuthProvider>
                 <ChatProvider>
-                        <Router>
-                            <AuthenticatedApp />
-                        </Router>
+                    <SettingsProvider>
+                    <Router>
+                        <AuthenticatedApp />
+                    </Router>
+                    </SettingsProvider>
                 </ChatProvider>
             </AuthProvider>
         </ThemeProvider>

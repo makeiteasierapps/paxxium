@@ -2,7 +2,7 @@ import React, { useState, createContext } from 'react';
 
 export const ChatContext = createContext();
 
-export const ChatProvider = (props) => {
+export const ChatProvider = ({children}) => {
     const [uid, setUid] = useState(null);
     const [agentArray, setAgentArray] = useState([]);
     const [agentId, setAgentId] = useState(null);
@@ -39,7 +39,7 @@ export const ChatProvider = (props) => {
                 setMessages,
             }}
         >
-            {props.children}
+            {children}
         </ChatContext.Provider>
     );
 };

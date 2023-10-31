@@ -18,9 +18,9 @@ const firebaseConfig = {
 
 // Get a reference to the Firebase auth service
 const auth = getAuth();
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
-const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
     const [idToken, setIdToken] = useState(null);
     const [uid, setUid] = useState(null);
     const [user, setUser] = useState(null);
@@ -44,5 +44,3 @@ const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-
-export { AuthContext, AuthProvider };

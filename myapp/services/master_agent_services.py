@@ -9,8 +9,6 @@ class MasterAgentService:
         self.max_agent_instances = 1000
 
     def check_and_set_agent_instance(self, uid, chat_id, system_prompt, chat_constants, agent_model):
-
-        # Create a unique key based on user ID and conversation ID
         key = (uid, chat_id)
 
         if agent_model == 'GPT-4':

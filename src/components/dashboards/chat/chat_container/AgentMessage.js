@@ -3,7 +3,7 @@ import { Avatar, ListItem, ListItemIcon, Checkbox } from '@mui/material';
 import { styled } from '@mui/system';
 import { Icon } from '@iconify/react';
 import { blueGrey } from '@mui/material/colors';
-import { highlightBlockCode } from '../../../utils/ProcessResponse';
+import { highlightBlockCode } from '../../../../utils/CodeHighLighter';
 
 const BotMessageStyled = styled(ListItem)({
     backgroundColor: blueGrey[700],
@@ -89,7 +89,7 @@ const AgentMessage = ({ message }) => {
         return parts;
     };
 
-    const processStreamMessage =  (message) => {
+    const processStreamMessage = (message) => {
         const lastIndex = message.length - 1;
         if (lastIndex > lastProcessedIndex.current) {
             const lastMessage = message[lastIndex];
@@ -105,9 +105,7 @@ const AgentMessage = ({ message }) => {
                             <TextBlock text={textRef.current} />
                         );
                     } else {
-                        updatedParts.push(
-                            <TextBlock text={textRef.current} />
-                        );
+                        updatedParts.push(<TextBlock text={textRef.current} />);
                     }
 
                     return updatedParts;
@@ -124,10 +122,7 @@ const AgentMessage = ({ message }) => {
                             <CodeBlock code={codeRef.current} />
                         );
                     } else {
-
-                        updatedParts.push(
-                            <CodeBlock code={codeRef.current} />
-                        );
+                        updatedParts.push(<CodeBlock code={codeRef.current} />);
                     }
 
                     return updatedParts;
@@ -137,7 +132,7 @@ const AgentMessage = ({ message }) => {
             lastProcessedIndex.current = lastIndex;
         }
     };
-    
+
     useEffect(() => {
         if (Array.isArray(message)) {
             processStreamMessage(message);

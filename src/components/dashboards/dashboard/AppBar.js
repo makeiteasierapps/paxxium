@@ -12,8 +12,8 @@ import {
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SearchIcon from '@mui/icons-material/Search';
-import { AuthContext } from '../../contexts/AuthContext';
-import { ChatContext } from '../../contexts/ChatContext';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { ChatContext } from '../../../contexts/ChatContext';
 import { getAuth, signOut } from 'firebase/auth';
 
 

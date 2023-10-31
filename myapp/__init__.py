@@ -8,7 +8,7 @@ import firebase_admin
 from myapp.services.message_service import MessageService
 from myapp.services.master_agent_services import MasterAgentService
 from myapp.services.user_services import UserService
-from myapp.services.conversation_service import ConversationService
+from myapp.services.chat_services import ChatService
 from myapp.services.firebase_service import FirebaseService
 
 
@@ -46,11 +46,11 @@ def create_app():
     app.master_agent_service = MasterAgentService(app, app.message_service)
     app.user_service = UserService(db)
     app.firebase_service = FirebaseService()
-    app.conversation_service = ConversationService(db)
+    app.chat_service = ChatService(db)
 
     # Register blueprints
     from myapp import views
     views.register_blueprints(app)
-    socketio.init_app(app, cors_allowed_origins=frontend_url)
+    socketio.init_app(app, cors_allowed_origins=frontend_url,)
 
     return app

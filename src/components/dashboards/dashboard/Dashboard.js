@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { styled } from '@mui/system';
 import NavTabs from './NavTabs';
-import AgentDashboard from '../AgentDashboard';
-import NewsCarousel from '../home/NewsCarousel';
+import ChatDashboard from '../chat/ChatDashboard';
+import NewsCarousel from '../../dashboards/home/NewsCarousel';
 import Questions from '../profile/Questions';
 import Profile from '../profile/Profile';
 
@@ -26,7 +26,7 @@ const Dashboard = () => {
             <DashboardWrapper>
                 <Content>
                     {value === 0 && <NewsCarousel />}
-                    {value === 1 && <AgentDashboard />}
+                    {value === 1 && <ChatDashboard />}
                     {value === 2 && <Profile />}
                 </Content>
             </DashboardWrapper>
