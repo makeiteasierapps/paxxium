@@ -60,8 +60,7 @@ export default function SignUp() {
 
     const isValid = {
         // username must be between 5 and 10 characters long and can only contain alphanumeric characters and underscores
-        username: (username) =>
-            /^[a-zA-Z0-9_]{5,}[a-zA-Z]+[0-9]*$/.test(username),
+        username: (username) => /^\w{5,}$/.test(username),
         // Email must be a valid email address
         email: (email) =>
             /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email),
