@@ -3,7 +3,6 @@ import { styled } from '@mui/system';
 import NavTabs from './NavTabs';
 import ChatDashboard from '../chat/ChatDashboard';
 import NewsCarousel from '../../dashboards/home/NewsCarousel';
-import Questions from '../profile/Questions';
 import Profile from '../profile/Profile';
 
 const DashboardWrapper = styled('div')(({ theme }) => ({

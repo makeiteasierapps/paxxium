@@ -53,10 +53,6 @@ export default function SignUp() {
     const navigate = useNavigate();
     const auth = getAuth();
     const { idToken } = useContext(AuthContext);
-    const handleClose = () => {
-        setOpen(false);
-        navigate('/');
-    };
 
     const isValid = {
         // username must be between 5 and 10 characters long and can only contain alphanumeric characters and underscores
@@ -76,7 +72,7 @@ export default function SignUp() {
 
     const errorMessages = {
         username:
-            'Username should be 5 or more characters, and can contain alphanumeric characters and underscore.',
+            'Username should be 6 or more characters, and can contain alphanumeric characters and underscore.',
         email: 'Invalid email address.',
         password:
             'Password should be 8 or more characters, and must contain at least one uppercase, one lowercase letter and a digit.',
@@ -272,7 +268,10 @@ export default function SignUp() {
 
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={() => {
+                    setOpen(false);
+                    navigate('/');
+                }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
@@ -286,7 +285,14 @@ export default function SignUp() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary" autoFocus>
+                    <Button
+                        onClick={() => {
+                            setOpen(false);
+                            navigate('/');
+                        }}
+                        color="primary"
+                        autoFocus
+                    >
                         Ok
                     </Button>
                 </DialogActions>

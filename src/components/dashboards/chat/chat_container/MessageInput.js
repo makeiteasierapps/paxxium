@@ -9,6 +9,7 @@ import { TextField, IconButton, InputAdornment } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { styled } from '@mui/system';
 import { AuthContext } from '../../../../contexts/AuthContext';
+import { sendMessage, keyDown } from './handlers/messageInputHandlers';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const InputArea = styled('div')({
@@ -33,53 +34,33 @@ const MessageInput = ({ chatId, agentModel, setMessages }) => {
         };
     }, []);
 
-    const handleInputChange = (event) => {
-        setInput(event.target.value);
-    };
-
-    const sendMessage = () => {
-        // Optomistic update
-        const userMessage = {
-            message_content: input,
-            message_from: 'user',
-            user_id: uid,
-            time_stamp: new Date().toISOString(),
-        };
-        setMessages((prevMessages) => [...prevMessages, userMessage]);
-        setInput(''); // clear the input field
-
-        // Emit the 'message' event to the server
-        socketRef.current.emit('message', {
-            idToken: idToken,
-            chatId: chatId,
-            message_content: input,
-            message_from: 'user',
-            user_id: uid,
-            agentModel: agentModel,
-        });
-    };
-
-    const handleKeyPress = (event) => {
-        if (event.key === 'Enter' && input.trim() !== '') {
-            sendMessage();
-        }
-    };
-
     return (
         <InputArea>
             <TextField
                 label="Type Something"
                 fullWidth
+                multiline
                 value={input}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyPress}
+                onChange={(event) => setInput(event.target.value)}
+                onKeyDown={(event) => keyDown(event, input, uid, setMessages, socketRef, idToken, chatId, agentModel, setInput)}
                 InputProps={{
                     endAdornment: (
                         <InputAdornment position="end">
                             <IconButton
                                 color="primary"
                                 aria-label="send message"
-                                onClick={sendMessage}
+                                onClick={() => {
+                                    sendMessage(
+                                        input,
+                                        uid,
+                                        setMessages,
+                                        socketRef,
+                                        idToken,
+                                        chatId,
+                                        agentModel
+                                    );
+                                    setInput('');
+                                }}
                             >
                                 <SendIcon />
                             </IconButton>

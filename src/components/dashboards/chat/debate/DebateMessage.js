@@ -10,6 +10,7 @@ import {
 import { styled } from '@mui/system';
 import { blueGrey, green, red } from '@mui/material/colors';
 
+//styled Components
 const AgentMessageStyled = styled(ListItem)({
     backgroundColor: blueGrey[800],
     wordBreak: 'break-word',
@@ -38,9 +39,6 @@ const StyledHeader = styled('div')({
 const DebateMessage = ({ message, agent }) => {
     const [checked, setChecked] = React.useState(false);
 
-    const handleCheck = (event) => {
-        setChecked(event.target.checked);
-    };
 
     const getAvatarColor = (agent) => {
         switch(agent) {
@@ -70,7 +68,7 @@ const DebateMessage = ({ message, agent }) => {
             </ListItemIcon>
             <StyledCheckbox
                 checked={checked}
-                onChange={handleCheck}
+                onChange={(event) => setChecked(event.target.checked)}
                 inputProps={{ 'aris-label': 'Select message' }}
             />
             </StyledHeader>

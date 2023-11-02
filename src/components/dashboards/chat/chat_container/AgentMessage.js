@@ -3,7 +3,11 @@ import { Avatar, ListItem, ListItemIcon, Checkbox } from '@mui/material';
 import { styled } from '@mui/system';
 import { Icon } from '@iconify/react';
 import { blueGrey } from '@mui/material/colors';
-import { highlightBlockCode } from '../../../../utils/CodeHighLighter';
+
+import {
+    processDatabaseMessage,
+    processStreamMessage,
+} from '../utils/messageUtils';
 
 const BotMessageStyled = styled(ListItem)({
     backgroundColor: blueGrey[700],
@@ -35,11 +39,11 @@ const StyledHeader = styled('div')({
     justifyContent: 'space-between',
 });
 
-const TextBlock = React.memo(({ text }) => {
+export const TextBlock = React.memo(({ text }) => {
     return <p>{text}</p>;
 });
 
-const CodeBlock = React.memo(({ code }) => {
+export const CodeBlock = React.memo(({ code }) => {
     return (
         <pre className="language-javascript">
             <code
@@ -51,99 +55,28 @@ const CodeBlock = React.memo(({ code }) => {
 });
 
 const AgentMessage = ({ message }) => {
+    // State for checkbox and processed messages
     const [checked, setChecked] = useState(false);
     const [messageParts, setMessageParts] = useState([]);
     const [stream, setStream] = useState([]);
+
+    // Refs for accumulating text and code content
     const textRef = useRef('');
     const codeRef = useRef('');
-    const lastProcessedIndex = useRef(-1);
 
-    const processDatabaseMessage = async (message) => {
-        let parts = [];
-        let i = 0;
-        let processedMessage = await highlightBlockCode(message);
-        let message_content = processedMessage.message_content;
-
-        while (message_content.includes('CODEBLOCK' + i)) {
-            let splitMessage = message_content.split('CODEBLOCK' + i);
-            parts.push({ type: 'text', content: splitMessage[0] });
-
-            if (
-                processedMessage.codeBlocks &&
-                processedMessage.codeBlocks['CODEBLOCK' + i]
-            ) {
-                parts.push({
-                    type: 'code',
-                    content: processedMessage.codeBlocks['CODEBLOCK' + i],
-                });
-            }
-
-            message_content = splitMessage[1] ? splitMessage[1] : '';
-            i++;
-        }
-
-        if (message_content) {
-            parts.push({ type: 'text', content: message_content });
-        }
-
-        return parts;
-    };
-
-    const processStreamMessage = (message) => {
-        const lastIndex = message.length - 1;
-        if (lastIndex > lastProcessedIndex.current) {
-            const lastMessage = message[lastIndex];
-
-            if (lastMessage.type === 'text') {
-                textRef.current += lastMessage.content;
-                setStream((prev) => {
-                    const updatedParts = [...prev];
-                    const lastPart = updatedParts[updatedParts.length - 1];
-
-                    if (lastPart && lastPart.type === TextBlock) {
-                        updatedParts[updatedParts.length - 1] = (
-                            <TextBlock text={textRef.current} />
-                        );
-                    } else {
-                        updatedParts.push(<TextBlock text={textRef.current} />);
-                    }
-
-                    return updatedParts;
-                });
-            } else {
-                textRef.current = '';
-                codeRef.current += lastMessage.content;
-                setStream((prev) => {
-                    const updatedParts = [...prev];
-                    const lastPart = updatedParts[updatedParts.length - 1];
-
-                    if (lastPart && lastPart.type === CodeBlock) {
-                        updatedParts[updatedParts.length - 1] = (
-                            <CodeBlock code={codeRef.current} />
-                        );
-                    } else {
-                        updatedParts.push(<CodeBlock code={codeRef.current} />);
-                    }
-
-                    return updatedParts;
-                });
-            }
-
-            lastProcessedIndex.current = lastIndex;
-        }
-    };
-
+    // Effect hook to process messages when they arrive
     useEffect(() => {
+        // If message is an array, it's a stream of new messages
         if (Array.isArray(message)) {
-            processStreamMessage(message);
-        } else if (typeof message === 'object') {
+            // Slice the message array to get only the new messages
+            // This works because stream.length is the number of messages already processed
+            processStreamMessage(message, textRef, codeRef, setStream);
+        }
+        // If message is an object, it's a single message from the database
+        else if (typeof message === 'object') {
             processDatabaseMessage(message).then(setMessageParts);
         }
     }, [message]);
-
-    const handleCheck = (event) => {
-        setChecked(event.target.checked);
-    };
 
     return (
         <BotMessageStyled>
@@ -162,7 +95,7 @@ const AgentMessage = ({ message }) => {
                 </ListItemIcon>
                 <StyledCheckbox
                     checked={checked}
-                    onChange={handleCheck}
+                    onChange={(event) => setChecked(event.target.checked)}
                     inputProps={{ 'aris-label': 'Select message' }}
                 />
             </StyledHeader>

@@ -5,13 +5,9 @@ import React, {
   useState,
   useCallback,
 } from "react";
-
 import { styled } from "@mui/system";
 import { List, Box } from "@mui/material";
-
 import io from "socket.io-client";
-
-import MessagesContainer from "./MessagesContainer";
 import AgentMessage from "./AgentMessage";
 import UserMessage from "./UserMessage";
 import MessageInput from "./MessageInput";
@@ -20,7 +16,7 @@ import ChatBar from "./ChatBar";
 import { AuthContext } from "../../../../contexts/AuthContext";
 import { ChatContext } from "../../../../contexts/ChatContext";
 import { SettingsContext } from "../../../../contexts/SettingsContext";
-import { processToken } from "../../../../utils/ProcessToken";
+import { processToken } from "../utils/tokenUtils";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 // STYLED COMPONENTS
@@ -38,6 +34,14 @@ const MessageArea = styled(List)({
   flexGrow: 1,
   overflowY: "auto",
   width: "100%",
+});
+
+const MessagesContainer = styled('div')({
+  flexGrow: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden',
+  whiteSpace: 'pre-line',
 });
 
 const Chat = ({
@@ -199,7 +203,6 @@ const Chat = ({
           useProfileData,
           chatName,
         });
-        console.log(`${chatName} clicked`);
       }}
     >
       <ChatBar

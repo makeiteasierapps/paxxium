@@ -16,6 +16,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 export default function LoginPage() {
     const auth = getAuth();
     const { setUser } = useContext(AuthContext);
+    
     const handleLogin = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);

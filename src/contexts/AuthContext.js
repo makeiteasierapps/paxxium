@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
@@ -10,11 +10,10 @@ const firebaseConfig = {
     messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
     measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
-  };
-  
-  // Initialize Firebase
-  initializeApp(firebaseConfig);
-  
+};
+
+// Initialize Firebase
+initializeApp(firebaseConfig);
 
 // Get a reference to the Firebase auth service
 const auth = getAuth();
@@ -39,7 +38,9 @@ export const AuthProvider = ({ children }) => {
         });
     }, []);
     return (
-        <AuthContext.Provider value={{ idToken, setIdToken, uid, setUid, setUser, user }}>
+        <AuthContext.Provider
+            value={{ idToken, setIdToken, uid, setUid, setUser, user }}
+        >
             {children}
         </AuthContext.Provider>
     );

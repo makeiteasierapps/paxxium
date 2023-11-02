@@ -5,11 +5,10 @@ import NewsCard from './NewsCard';
 import { styled, Box } from '@mui/system';
 import Button from '@mui/material/Button';
 import { TextField } from '@mui/material';
-import SpeedDial from '@mui/material/SpeedDial';
-import SpeedDialAction from '@mui/material/SpeedDialAction';
-import SearchIcon from '@mui/icons-material/Search';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+// Styled Components
 const MainContainer = styled(Box)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
@@ -18,12 +17,6 @@ const MainContainer = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.background.default,
     alignItems: 'center', // center the content horizontally
     justifyContent: 'center',
-}));
-
-const SearchDial = styled(SpeedDial)(({ theme }) => ({
-    position: 'absolute',
-    bottom: theme.spacing(2),
-    right: theme.spacing(2),
 }));
 
 const SearchField = styled(TextField)(({ theme }) => ({
@@ -48,7 +41,6 @@ const NewsCarousel = () => {
     const [query, setQuery] = useState('');
     const { idToken } = useContext(AuthContext);
     const [slideIndex, setSlideIndex] = useState(0);
-    const [open, setOpen] = useState(false);
 
     const loadNewsData = useCallback(async () => {
         try {
@@ -65,6 +57,7 @@ const NewsCarousel = () => {
             setNewsData(data);
         } catch (error) {}
     }, [idToken]);
+
     const fetchNewsData = async () => {
         try {
             const response = await fetch(`${backendUrl}/news`, {
@@ -86,10 +79,6 @@ const NewsCarousel = () => {
         }
     };
 
-    const handleQuerySubmit = (e) => {
-        e.preventDefault();
-        fetchNewsData();
-    };
     const newsSlides = newsData.map((news, index) => ({
         key: news.id,
         content: (
@@ -109,35 +98,19 @@ const NewsCarousel = () => {
                 ) : (
                     <p>No news data available</p>
                 )}
-                {/* <SearchDial
-                    ariaLabel="SpeedDial openIcon example"
-                    icon={<SearchIcon />}
-                    onClose={() => setOpen(false)}
-                    onOpen={() => setOpen(true)}
-                    open={open}
-                    direction="up"
-                >
-                    <SpeedDialAction
-                        key="Search"
-                        icon={
-                            <>
-                                <SearchField
-                                    label="Search"
-                                    variant="outlined"
-                                    value={query}
-                                    onChange={(e) => setQuery(e.target.value)}
-                                />
-                                <SearchButton
-                                    onClick={handleQuerySubmit}
-                                    variant="contained"
-                                >
-                                    Submit
-                                </SearchButton>
-                            </>
-                        }
-                    />
-                </SearchDial> */}
             </CarouselContainer>
+            <SearchField
+                label="Search"
+                variant="outlined"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+            />
+            <SearchButton onClick={(event) => {
+                event.preventDefault();
+                fetchNewsData();
+            }} variant="contained">
+                Submit
+            </SearchButton>
         </MainContainer>
     );
 };

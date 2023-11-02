@@ -11,12 +11,13 @@ import { AuthContext } from "../../../contexts/AuthContext";
 import { styled, Box } from "@mui/system";
 import { Button } from "@mui/material";
 import Chat from "./chat_container/Chat";
-import Debate from "../../debate/Debate";
+import Debate from "../chat/debate/Debate";
 
 import AgentMenu from "./AgentMenu";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
+// Styled components
 const StyledMain = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -69,10 +70,10 @@ const ChatDashboard = () => {
 
       if (!response.ok) throw new Error("Failed to load user conversations");
 
-      let data = await response.json();
+      const repsonse = await response.json();
       // data is an array of objects
       // Filter the data for is_open before setting the agent array
-      data = data.filter((agent) => agent.is_open);
+      const data = repsonse.filter((agent) => agent.is_open);
       setAgentArray(data);
 
       if (data.length > 0) {
