@@ -2,18 +2,13 @@ import React, { useState, createContext } from 'react';
 
 export const ChatContext = createContext();
 
-export const ChatProvider = ({children}) => {
-    const [uid, setUid] = useState(null);
+export const ChatProvider = ({ children }) => {
     const [agentArray, setAgentArray] = useState([]);
     const [agentId, setAgentId] = useState(null);
-    const [username, setUsername] = useState(null);
     const [messages, setMessages] = useState([]);
 
     const addAgent = (newAgent) => {
-        setAgentArray((prevAgents) => [
-            newAgent,
-            ...prevAgents,
-        ]);
+        setAgentArray((prevAgents) => [newAgent, ...prevAgents]);
         setAgentId(newAgent.id);
     };
 
@@ -21,20 +16,15 @@ export const ChatProvider = ({children}) => {
         setAgentId(id);
     };
 
-
     return (
         <ChatContext.Provider
             value={{
-                uid,
-                setUid,
                 agentArray,
                 setAgentArray,
                 agentId,
                 setAgentId,
                 addAgent,
                 switchConversation,
-                username,
-                setUsername,
                 messages,
                 setMessages,
             }}

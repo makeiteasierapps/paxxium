@@ -10,7 +10,6 @@ import {
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AuthContext } from '../../../contexts/AuthContext';
-import { ChatContext } from '../../../contexts/ChatContext';
 import { getAuth, signOut } from 'firebase/auth';
 
 
@@ -22,7 +21,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 
 const TitleBar = () => {
     const navigate = useNavigate();
-    const {username} = useContext(ChatContext);
+    const {username} = useContext(AuthContext);
     const { setIdToken, setUser } = useContext(AuthContext);
 
     const handleLogout = async () => {

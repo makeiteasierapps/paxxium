@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
     BrowserRouter as Router,
     Route,
@@ -11,10 +11,8 @@ import SignUpPage from './components/account/SignUpPage';
 import './styles/App.css';
 import Dashboard from './components/dashboards/dashboard/Dashboard';
 import CssBaseline from '@mui/material/CssBaseline';
-import { ChatProvider } from './contexts/ChatContext';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import { SettingsProvider } from './contexts/SettingsContext';
-import { ChatContext } from './contexts/ChatContext';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from './Theme';
 import TitleBar from './components/dashboards/dashboard/AppBar';
@@ -67,7 +65,7 @@ const GateKeeper = ({ isAuthorized }) => {
 
 const AuthenticatedApp = () => {
     const { idToken, uid, user, setUid } = useContext(AuthContext);
-    const { setUsername } = useContext(ChatContext);
+    const { setUsername } = useContext(AuthContext);
     const [isAuthorized, setIsAuthorized] = useState(false);
     const db = getFirestore();
 
@@ -123,13 +121,11 @@ const App = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <AuthProvider>
-                <ChatProvider>
-                    <SettingsProvider>
+                <SettingsProvider>
                     <Router>
                         <AuthenticatedApp />
                     </Router>
-                    </SettingsProvider>
-                </ChatProvider>
+                </SettingsProvider>
             </AuthProvider>
         </ThemeProvider>
     );

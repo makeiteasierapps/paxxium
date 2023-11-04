@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }) => {
     const [idToken, setIdToken] = useState(null);
     const [uid, setUid] = useState(null);
     const [user, setUser] = useState(null);
+    const [username, setUsername] = useState(null);
 
     useEffect(() => {
         auth.onAuthStateChanged(function (user) {
@@ -39,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
     return (
         <AuthContext.Provider
-            value={{ idToken, setIdToken, uid, setUid, setUser, user }}
+            value={{ idToken, setIdToken, uid, setUid, setUser, user, username, setUsername }}
         >
             {children}
         </AuthContext.Provider>

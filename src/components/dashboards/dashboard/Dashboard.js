@@ -4,6 +4,7 @@ import NavTabs from './NavTabs';
 import ChatDashboard from '../chat/ChatDashboard';
 import NewsCarousel from '../../dashboards/home/NewsCarousel';
 import Profile from '../profile/Profile';
+import { ChatProvider } from '../../../contexts/ChatContext';
 
 const DashboardWrapper = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -25,7 +26,11 @@ const Dashboard = () => {
             <DashboardWrapper>
                 <Content>
                     {value === 0 && <NewsCarousel />}
-                    {value === 1 && <ChatDashboard />}
+                    {value === 1 && (
+                        <ChatProvider>
+                            <ChatDashboard />
+                        </ChatProvider>
+                    )}
                     {value === 2 && <Profile />}
                 </Content>
             </DashboardWrapper>
