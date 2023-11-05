@@ -20,7 +20,8 @@ class StreamResponse(BaseCallbackHandler):
 
     def on_llm_new_token(self, token: str, **kwargs) -> None:
         from myapp import socketio
-        socketio.emit('token', {'token': token, 'chat_id': self.chat_id})
+        print(f'sending token: {token}' )
+        socketio.emit('token', {'message_from': 'agent', 'message_content': token, 'chat_id': self.chat_id, 'type': 'stream'})
         # This is needed to override batching
         socketio.sleep(0)
 
@@ -75,7 +76,7 @@ class MasterAgent:
         data = message_obj['message_content']
         message_content = 'CHAT DETAILS: \n' + self.chat_constants + '\n' + data
         response = self.master_ai.run(message_content)                                 
-        response_obj = self.message_service.create_message(conversation_id=conversation_id, message_from='chatbot', user_id=user_id, message_content=response)
+        response_obj = self.message_service.create_message(conversation_id=conversation_id, message_from='agent', user_id=user_id, message_content=response)
         
         return response_obj
     

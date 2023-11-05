@@ -6,6 +6,7 @@ export const ChatProvider = ({ children }) => {
     const [agentArray, setAgentArray] = useState([]);
     const [agentId, setAgentId] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [messageParts, setMessageParts] = useState([]);
 
     const addAgent = (newAgent) => {
         setAgentArray((prevAgents) => [newAgent, ...prevAgents]);
@@ -27,6 +28,8 @@ export const ChatProvider = ({ children }) => {
                 switchConversation,
                 messages,
                 setMessages,
+                messageParts,
+                setMessageParts,
             }}
         >
             {children}

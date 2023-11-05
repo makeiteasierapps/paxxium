@@ -4,11 +4,11 @@ import io from 'socket.io-client';
 import 'prismjs/components/prism-javascript.min';
 import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism-okaidia.css';
-import { ChatContext } from '../../../../contexts/ChatContext';
 import { TextField, IconButton, InputAdornment } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { styled } from '@mui/system';
 import { AuthContext } from '../../../../contexts/AuthContext';
+import { ChatContext } from '../../../../contexts/ChatContext';
 import { sendMessage, keyDown } from './handlers/messageInputHandlers';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -19,9 +19,9 @@ const InputArea = styled('div')({
     justifyContent: 'space-between',
 });
 
-const MessageInput = ({ chatId, agentModel, setMessages }) => {
-    const { uid } = useContext(ChatContext);
-    const { idToken } = useContext(AuthContext);
+const MessageInput = ({ chatId, agentModel }) => {
+    const { uid, idToken } = useContext(AuthContext);
+    const { setMessageParts } = useContext(ChatContext);
     const [input, setInput] = useState('');
     const socketRef = useRef(null);
 
@@ -42,7 +42,19 @@ const MessageInput = ({ chatId, agentModel, setMessages }) => {
                 multiline
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
-                onKeyDown={(event) => keyDown(event, input, uid, setMessages, socketRef, idToken, chatId, agentModel, setInput)}
+                onKeyDown={(event) =>
+                    keyDown(
+                        event,
+                        input,
+                        uid,
+                        setMessageParts,
+                        socketRef,
+                        idToken,
+                        chatId,
+                        agentModel,
+                        setInput
+                    )
+                }
                 InputProps={{
                     endAdornment: (
                         <InputAdornment position="end">
@@ -53,7 +65,7 @@ const MessageInput = ({ chatId, agentModel, setMessages }) => {
                                     sendMessage(
                                         input,
                                         uid,
-                                        setMessages,
+                                        setMessageParts,
                                         socketRef,
                                         idToken,
                                         chatId,

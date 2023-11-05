@@ -1,7 +1,7 @@
 export const sendMessage = (
     input,
     uid,
-    setMessages,
+    setMessageParts,
     socketRef,
     idToken,
     chatId,
@@ -13,8 +13,10 @@ export const sendMessage = (
         message_from: 'user',
         user_id: uid,
         time_stamp: new Date().toISOString(),
+        type: 'database',
     };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    
+    setMessageParts((prevMessages) => [...prevMessages, userMessage]);
 
     // Emit the 'message' event to the server
     socketRef.current.emit('message', {

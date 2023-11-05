@@ -1,4 +1,4 @@
-import { TextBlock, CodeBlock } from '../chat_container/AgentMessage'
+import { TextBlock, CodeBlock } from '../chat_container/AgentMessage';
 import { highlightBlockCode } from './codeHighLighter';
 
 // Function to process messages from the database
@@ -33,47 +33,16 @@ export const processDatabaseMessage = async (message) => {
     return parts;
 };
 
-// Function to process new messages from the stream
-export const processStreamMessage = (
-    newMessages,
-    textRef,
-    codeRef,
-    setStream
-) => {
-    newMessages.forEach((message) => {
-        if (message.type === 'text') {
-            textRef.current += message.content;
-            setStream((prev) => {
-                const updatedParts = [...prev];
-                const lastPart = updatedParts[updatedParts.length - 1];
-
-                if (lastPart && lastPart.type === TextBlock) {
-                    updatedParts[updatedParts.length - 1] = (
-                        <TextBlock text={textRef.current} />
-                    );
-                } else {
-                    updatedParts.push(<TextBlock text={textRef.current} />);
-                }
-
-                return updatedParts;
-            });
-        } else {
-            textRef.current = '';
-            codeRef.current += message.content;
-            setStream((prev) => {
-                const updatedParts = [...prev];
-                const lastPart = updatedParts[updatedParts.length - 1];
-
-                if (lastPart && lastPart.type === CodeBlock) {
-                    updatedParts[updatedParts.length - 1] = (
-                        <CodeBlock code={codeRef.current} />
-                    );
-                } else {
-                    updatedParts.push(<CodeBlock code={codeRef.current} />);
-                }
-
-                return updatedParts;
-            });
-        }
-    });
+export const processStreamMessage = (prevMessage, token) => {
+    const lastMessage = prevMessage[prevMessage.length - 1];
+    if (lastMessage.message_from === 'user') {
+        return [...prevMessage, token];
+    } else {
+        const newLastMessage = {
+            ...lastMessage,
+            message_content:
+                lastMessage.message_content + token.message_content,
+        };
+        return [...prevMessage.slice(0, -1), newLastMessage];
+    }
 };
