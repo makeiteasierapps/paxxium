@@ -1,10 +1,8 @@
 from flask import current_app
 import langchain
-from langchain import (
-    LLMMathChain,
-    SerpAPIWrapper,
-)
-from langchain.prompts import MessagesPlaceholder, ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+from langchain.chains import LLMMathChain
+from langchain.utilities import SerpAPIWrapper
+from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
 from langchain.chat_models import ChatOpenAI
 from langchain.callbacks.base import BaseCallbackHandler 
