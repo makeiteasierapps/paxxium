@@ -1,4 +1,6 @@
 from flask import current_app
+from flask_socketio import join_room
+
 import langchain
 from langchain import (
     LLMMathChain,
@@ -21,7 +23,9 @@ class StreamResponse(BaseCallbackHandler):
     def on_llm_new_token(self, token: str, **kwargs) -> None:
         from myapp import socketio
         print(f'sending token: {token}' )
-        socketio.emit('token', {'message_from': 'agent', 'message_content': token, 'chat_id': self.chat_id, 'type': 'stream'})
+        print(self.chat_id)
+        join_room(self.chat_id)
+        socketio.emit('token', {'message_from': 'agent', 'message_content': token, 'chat_id': self.chat_id, 'type': 'stream'}, room=self.chat_id)
         # This is needed to override batching
         socketio.sleep(0)
 

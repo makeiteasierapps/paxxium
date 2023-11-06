@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, join_room
 from flask_cors import CORS
 from firebase_admin import firestore, credentials
 import firebase_admin
@@ -32,6 +32,12 @@ def create_app():
     @socketio.on('disconnect')
     def test_disconnect():
         print('Client disconnected')
+
+    @socketio.on('join')
+    def on_join(data):
+        room = data['room']
+        join_room(room)
+        print(f'Joined room {room}')
 
     # Configure CORS
     CORS(app, origins=[frontend_url], supports_credentials=True, allow_headers=['Content-Type', 'Authorization'], methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
