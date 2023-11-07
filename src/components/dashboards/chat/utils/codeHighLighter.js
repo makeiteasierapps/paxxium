@@ -9,7 +9,7 @@ import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/themes/prism-okaidia.css';
 
-export const highlightBlockCode = async (message) => {
+export const highlightDatabaseCode = async (message) => {
     const regex = /```(\S*)?\s([\s\S]*?)```/g;
     let match;
     let highlightedStr = message.message_content;
@@ -50,13 +50,13 @@ export const highlightBlockCode = async (message) => {
     return message;
 };
 
-export const highlightStringCode = (code, lang) => {
+export const highlightStreamCode = (code, lang) => {
     const highlightedCode = Prism.highlight(
         code,
         Prism.languages[lang] || Prism.languages.plaintext, // if Prism does not have a highlighter for the language, default to plaintext
         lang
     );
-    
+
     return (
         '<pre><code class="language-' +
         lang +

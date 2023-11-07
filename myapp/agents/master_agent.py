@@ -15,15 +15,12 @@ from langchain.agents import initialize_agent, AgentType, Tool
 from myapp.agents.tools.tools import SaveMessageTool
 
 
-
 class StreamResponse(BaseCallbackHandler):
     def __init__(self, chat_id: str):
         self.chat_id = chat_id
 
     def on_llm_new_token(self, token: str, **kwargs) -> None:
         from myapp import socketio
-        print(f'sending token: {token}' )
-        print(self.chat_id)
         join_room(self.chat_id)
         socketio.emit('token', {'message_from': 'agent', 'message_content': token, 'chat_id': self.chat_id, 'type': 'stream'}, room=self.chat_id)
         # This is needed to override batching
