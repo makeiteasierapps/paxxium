@@ -2,11 +2,10 @@ from flask import current_app
 from flask_socketio import join_room
 
 import langchain
-from langchain import (
-    LLMMathChain,
-    SerpAPIWrapper,
-)
-from langchain.prompts import MessagesPlaceholder, ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+
+from langchain.utilities.serpapi import SerpAPIWrapper
+
+from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
 from langchain.chat_models import ChatOpenAI
 from langchain.callbacks.base import BaseCallbackHandler 
@@ -22,7 +21,7 @@ class StreamResponse(BaseCallbackHandler):
     def on_llm_new_token(self, token: str, **kwargs) -> None:
         from myapp import socketio
         join_room(self.chat_id)
-        socketio.emit('token', {'message_from': 'agent', 'message_content': token, 'chat_id': self.chat_id, 'type': 'stream'}, room=self.chat_id)
+        socketio.emit('token', {'message_from': 'agent', 'message_content': token, 'chat_id': self.chat_id, 'type': 'stream',}, room=self.chat_id)
         # This is needed to override batching
         socketio.sleep(0)
 
@@ -39,7 +38,6 @@ class MasterAgent:
         self.chat_constants = chat_constants
         self.search = SerpAPIWrapper(serpapi_api_key=self.serp_key)
         self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse(self.chat_id)], temperature=0, model=model, openai_api_key=self.openai_api_key)
-        self.llm_math_chain = LLMMathChain.from_llm(llm=self.llm, verbose=True)
         self.memory=ConversationBufferWindowMemory(memory_key='memory', return_messages=True, k=3)
         self.save_message = SaveMessageTool(memory=self.memory)
         
@@ -48,11 +46,6 @@ class MasterAgent:
                 name="Search",
                 func=self.search.run,
                 description="useful for when you need to answer questions about current events. You should ask targeted questions",
-            ),
-            Tool(
-                name="Calculator",
-                func=self.llm_math_chain.run,
-                description="useful for when you need to answer questions about math",
             ),
         ]
         self.tools.append(self.save_message)

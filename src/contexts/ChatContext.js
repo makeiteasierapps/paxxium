@@ -6,6 +6,7 @@ export const ChatProvider = ({ children }) => {
     const [agentArray, setAgentArray] = useState([]);
     const [agentId, setAgentId] = useState(null);
     const [messageParts, setMessageParts] = useState({});
+    const [insideCodeBlock, setInsideCodeBlock] = useState(false);
 
     const addAgent = (newAgent) => {
         setAgentArray((prevAgents) => [newAgent, ...prevAgents]);
@@ -39,6 +40,8 @@ export const ChatProvider = ({ children }) => {
                 messageParts,
                 setMessageParts,
                 addMessage,
+                insideCodeBlock,
+                setInsideCodeBlock,
             }}
         >
             {children}

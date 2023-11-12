@@ -1,10 +1,4 @@
-import React, {
-    useRef,
-    useContext,
-    useEffect,
-    useState,
-    useCallback,
-} from 'react';
+import React, { useRef, useContext, useEffect, useCallback, memo, useState } from 'react';
 import { styled } from '@mui/system';
 import { List, Box } from '@mui/material';
 import io from 'socket.io-client';
@@ -16,8 +10,7 @@ import { AuthContext } from '../../../../contexts/AuthContext';
 import { ChatContext } from '../../../../contexts/ChatContext';
 import { SettingsContext } from '../../../../contexts/SettingsContext';
 
-import { processStreamMessage } from '../utils/messageUtils';
-import { set } from 'react-hook-form';
+import { handleIncomingMessageStream } from '../chat_container/handlers/handleIncomingMessageStream';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -54,13 +47,13 @@ const Chat = ({
     agentModel,
     useProfileData,
 }) => {
-    const [isCodeBlock, setIsCodeBlock] = useState(false);
-    const [codeBlock, setCodeBlock] = useState('');
     const socketRef = useRef(null);
-    const { setAgentArray, messageParts, setMessageParts } =
+    const { setAgentArray, messageParts, setMessageParts, setInsideCodeBlock } =
         useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
     const { setSettings } = useContext(SettingsContext);
+
+    const [backtickCount, setBacktickCount] = useState(0);
 
     // Fetch messages from the database
     const fetchMessages = useCallback(async () => {
@@ -93,11 +86,6 @@ const Chat = ({
                     ...prevMessageParts,
                     [id]: messageData.messages,
                 }));
-            } else {
-                setMessageParts((prevMessageParts) => ({
-                    ...prevMessageParts,
-                    [id]: [],
-                }));
             }
         } catch (error) {
             console.error(error);
@@ -119,19 +107,19 @@ const Chat = ({
 
     const handleToken = useCallback(
         (token) => {
-            setMessageParts((prevMessage) =>
-                processStreamMessage(
+            setMessageParts((prevMessage) => {
+                const newMessageParts = handleIncomingMessageStream(
                     prevMessage,
                     id,
                     token,
-                    isCodeBlock,
-                    setIsCodeBlock,
-                    setCodeBlock,
-                    codeBlock
-                )
-            );
+                    setInsideCodeBlock,
+                    backtickCount,
+                    setBacktickCount
+                );
+                return newMessageParts;
+            });
         },
-        [setMessageParts, id, isCodeBlock, codeBlock]
+        [setMessageParts, id, setInsideCodeBlock, backtickCount]
     );
 
     useEffect(() => {
@@ -207,4 +195,4 @@ const Chat = ({
     );
 };
 
-export default Chat;
+export default memo(Chat);
