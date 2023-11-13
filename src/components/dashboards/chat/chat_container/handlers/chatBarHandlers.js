@@ -26,7 +26,7 @@ export const handleCloseChat = async (
 export const handleClearMessages = async (
     id,
     idToken,
-    setMessageParts,
+    setMessages,
     backendUrl
 ) => {
     try {
@@ -36,7 +36,7 @@ export const handleClearMessages = async (
             credentials: 'include',
         });
         if (!response.ok) throw new Error('Failed to clear messages');
-        setMessageParts((prevMessageParts) => ({
+        setMessages((prevMessageParts) => ({
             ...prevMessageParts,
             [id]: [],
         }));

@@ -1,4 +1,10 @@
-import React, { useRef, useContext, useEffect, useCallback, memo, useState } from 'react';
+import React, {
+    useRef,
+    useContext,
+    useEffect,
+    useCallback,
+    memo,
+} from 'react';
 import { styled } from '@mui/system';
 import { List, Box } from '@mui/material';
 import io from 'socket.io-client';
@@ -48,12 +54,15 @@ const Chat = ({
     useProfileData,
 }) => {
     const socketRef = useRef(null);
-    const { setAgentArray, messageParts, setMessageParts, setInsideCodeBlock } =
-        useContext(ChatContext);
+    const {
+        setAgentArray,
+        messages,
+        setMessages,
+        setInsideCodeBlock,
+        insideCodeBlock,
+    } = useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
     const { setSettings } = useContext(SettingsContext);
-
-    const [backtickCount, setBacktickCount] = useState(0);
 
     // Fetch messages from the database
     const fetchMessages = useCallback(async () => {
@@ -66,23 +75,27 @@ const Chat = ({
                 agentModel,
                 useProfileData,
             };
-            const url = `${backendUrl}/${id}/messages`;
-            const messageResponse = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: idToken,
-                },
-                credentials: 'include',
-                body: JSON.stringify(requestData),
-            });
+
+            const messageResponse = await fetch(
+                `${backendUrl}/${id}/messages`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: idToken,
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(requestData),
+                }
+            );
+
             if (!messageResponse.ok) {
                 throw new Error('Failed to load messages');
             }
 
             const messageData = await messageResponse.json();
             if (messageData && messageData.messages.length > 0) {
-                setMessageParts((prevMessageParts) => ({
+                setMessages((prevMessageParts) => ({
                     ...prevMessageParts,
                     [id]: messageData.messages,
                 }));
@@ -98,31 +111,27 @@ const Chat = ({
         agentModel,
         useProfileData,
         idToken,
-        setMessageParts,
+        setMessages,
     ]);
 
     useEffect(() => {
         fetchMessages();
     }, [fetchMessages]);
 
-    const handleToken = useCallback(
-        (token) => {
-            setMessageParts((prevMessage) => {
+    useEffect(() => {
+        const handleToken = (token) => {
+            setMessages((prevMessage) => {
                 const newMessageParts = handleIncomingMessageStream(
                     prevMessage,
                     id,
                     token,
                     setInsideCodeBlock,
-                    backtickCount,
-                    setBacktickCount
+                    insideCodeBlock
                 );
                 return newMessageParts;
             });
-        },
-        [setMessageParts, id, setInsideCodeBlock, backtickCount]
-    );
+        };
 
-    useEffect(() => {
         socketRef.current = io.connect(backendUrl);
         // Join the room after connection.
         socketRef.current.emit('join', { room: id });
@@ -133,7 +142,7 @@ const Chat = ({
         return () => {
             socketRef.current.off('token', handleToken);
         };
-    }, [handleToken, id]);
+    }, [id, setMessages, setInsideCodeBlock, insideCodeBlock]);
 
     return (
         <ChatContainerStyled
@@ -157,7 +166,7 @@ const Chat = ({
             />
             <MessagesContainer item xs={9}>
                 <MessageArea>
-                    {messageParts[id]?.map((message, index) => {
+                    {messages[id]?.map((message, index) => {
                         if (message.type === 'database') {
                             if (message.message_from === 'agent') {
                                 return (

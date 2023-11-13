@@ -4,7 +4,7 @@ import { styled } from '@mui/system';
 import { Icon } from '@iconify/react';
 import { blueGrey } from '@mui/material/colors';
 import {
-    formatDatabaseMessage,
+    formatBlockMessage,
     formatStreamMessage,
 } from '../utils/messageFormatter';
 import { ChatContext } from '../../../../contexts/ChatContext';
@@ -45,11 +45,23 @@ const AgentMessage = ({ message }) => {
     const [processedMessages, setProcessedMessages] = useState([]);
     const { insideCodeBlock } = useContext(ChatContext);
 
+    // AgentMessage.js
     useEffect(() => {
         const fetchProcessedMessages = async () => {
-            formatStreamMessage(message, insideCodeBlock, setProcessedMessages);
-            // const result = await formatDatabaseMessage(message, insideCodeBlock);
-            // setProcessedMessages(result);
+            try {
+                if (message.type === 'database') {
+                    const result = formatBlockMessage(message);
+                    setProcessedMessages(result);
+                } else if (message.type === 'stream') {
+                    formatStreamMessage(
+                        message,
+                        insideCodeBlock,
+                        setProcessedMessages
+                    );
+                }
+            } catch (error) {
+                console.error(error);
+            }
         };
 
         fetchProcessedMessages();

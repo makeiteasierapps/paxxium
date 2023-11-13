@@ -9,72 +9,12 @@ import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/themes/prism-okaidia.css';
 
-// This function processes a message from the database, highlighting any code blocks within it.
-export const formatDatabaseMessage = async (message, insideCodeBlock) => {
-    // Initialize an array to hold the parts of the processed message.
-    let parts = [];
-
-    // Initialize a counter for the code blocks.
-    let i = 0;
-
-    // Call the highlightBlockCode function to process the message and highlight any code blocks.
-    let processedMessage = await formatStreamMessage(message, insideCodeBlock);
-
-    // Extract the content of the processed message.
-    let message_content = processedMessage.message_content;
-
-    // Loop through the message content, splitting it at each code block.
-    while (message_content.includes('CODEBLOCK' + i)) {
-        // Split the message content at the current code block.
-        let splitMessage = message_content.split('CODEBLOCK' + i);
-
-        // Add the text before the code block to the parts array.
-        parts.push({ type: 'text', content: splitMessage[0] });
-
-        // If the processed message contains the current code block, add it to the parts array.
-        if (
-            processedMessage.codeBlocks &&
-            processedMessage.codeBlocks['CODEBLOCK' + i]
-        ) {
-            parts.push({
-                type: 'code',
-                content: processedMessage.codeBlocks['CODEBLOCK' + i].code,
-                language: processedMessage.codeBlocks['CODEBLOCK' + i].language,
-            });
-        }
-
-        // Update the message content to be the text after the current code block.
-        message_content = splitMessage[1] ? splitMessage[1] : '';
-
-        // Increment the code block counter.
-        i++;
-    }
-
-    // If the message contains code that isn't in a code block, add it to the parts array.
-    if (message.code && !message_content.includes('CODEBLOCK')) {
-        parts.push({ type: 'text', content: message_content });
-        parts.push({
-            type: 'code',
-            content: message.code,
-            language: 'bash',
-        });
-    }
-    // If there's any remaining message content, add it to the parts array.
-    else if (message_content) {
-        parts.push({ type: 'text', content: message_content });
-    }
-
-    // Return the parts array, which now contains the processed message.
-    return parts;
-};
-
-const highlightBlockCode = async (message) => {
-    // Processes each code block in the message
-    // Initialize codeBlocks object and codeBlockCount
+export const formatBlockMessage = (message) => {
     const codeblock = /```(\S*)?\s([\s\S]*?)```/g;
-    message.codeBlocks = message.codeBlocks || {};
+    let parts = [];
     let match;
-    message.codeBlockCount = message.codeBlockCount || 0;
+    let lastIndex = 0;
+
     while ((match = codeblock.exec(message.message_content)) !== null) {
         let lang = match[1] || 'markdown'; // set to markdown if no language is specified
         const code = match[2].trim();
@@ -89,23 +29,36 @@ const highlightBlockCode = async (message) => {
             lang
         );
 
-        // Store the highlighted code block in the message.codeBlocks object
-        const codeBlockKey = 'CODEBLOCK' + message.codeBlockCount;
-        message.codeBlocks[codeBlockKey] = {
+        // Add the text before the code block to the parts array.
+        if (match.index > lastIndex) {
+            parts.push({
+                type: 'text',
+                content: message.message_content.substring(
+                    lastIndex,
+                    match.index
+                ),
+            });
+        }
+
+        // Add the highlighted code block to the parts array.
+        parts.push({
+            type: 'code',
+            content: highlightedCode,
             language: lang,
-            code: highlightedCode,
-        };
+        });
 
-        // Replace the original code block with the placeholder in the message content
-        message.message_content = message.message_content.replace(
-            match[0],
-            codeBlockKey
-        );
-
-        message.codeBlockCount++;
+        lastIndex = codeblock.lastIndex;
     }
 
-    return message;
+    // If there's any remaining message content, add it to the parts array.
+    if (lastIndex < message.message_content.length) {
+        parts.push({
+            type: 'text',
+            content: message.message_content.substring(lastIndex),
+        });
+    }
+
+    return parts;
 };
 
 export const formatStreamMessage = (
@@ -113,53 +66,33 @@ export const formatStreamMessage = (
     insideCodeBlock,
     setProcessedMessages
 ) => {
+    // If the message ends with two backticks, ignore it
+    // This is needed because the api sends the closing backticks as a separate message
+    if (message.message_content.endsWith('``')) {
+        return message;
+    }
+
     const splitMessage = message.message_content.split('```');
+    const setMessages = (type, content, language) => {
+        setProcessedMessages((prevMsgs) => {
+            if (
+                prevMsgs.length === 0 ||
+                prevMsgs[prevMsgs.length - 1].type !== type
+            ) {
+                return [...prevMsgs, { type, content, language }];
+            } else {
+                let newMsgs = [...prevMsgs];
+                newMsgs[newMsgs.length - 1] = { type, content, language };
+                return newMsgs;
+            }
+        });
+    };
+
     for (let i = 0; i < splitMessage.length; i++) {
         if (insideCodeBlock) {
-            // code block
-            setProcessedMessages((prevMsgs) => {
-                if (
-                    prevMsgs.length > 0 &&
-                    prevMsgs[prevMsgs.length - 1].type === 'text'
-                ) {
-                    return [
-                        ...prevMsgs,
-                        {
-                            type: 'code',
-                            content: splitMessage[i],
-                            language: 'bash',
-                        },
-                    ];
-                } else {
-                    let newMsgs = [...prevMsgs];
-                    newMsgs[newMsgs.length - 1] = {
-                        type: 'code',
-                        content: splitMessage[i],
-                        language: 'bash',
-                    };
-                    return newMsgs;
-                }
-            });
+            setMessages('code', splitMessage[i], 'bash');
         } else {
-            // text block
-            setProcessedMessages((prevMsgs) => {
-                if (
-                    prevMsgs.length === 0 ||
-                    prevMsgs[prevMsgs.length - 1].type === 'code'
-                ) {
-                    return [
-                        ...prevMsgs,
-                        { type: 'text', content: splitMessage[i] },
-                    ];
-                } else {
-                    let newMsgs = [...prevMsgs];
-                    newMsgs[newMsgs.length - 1] = {
-                        type: 'text',
-                        content: splitMessage[i],
-                    };
-                    return newMsgs;
-                }
-            });
+            setMessages('text', splitMessage[i]);
         }
     }
 

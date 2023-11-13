@@ -5,7 +5,7 @@ export const handleIncomingMessageStream = (
     prevMessage,
     id,
     tokenObj,
-    setInsideCodeBlock,
+    setInsideCodeBlock
 ) => {
     const lastMessage = prevMessage[id][prevMessage[id].length - 1];
     const codeStartIndicator = /```/g;

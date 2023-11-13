@@ -29,7 +29,7 @@ const ChatBarIcons = styled(Box)(({ theme }) => ({
 }));
 
 const ChatBar = ({ chatName, id, idToken, setAgentArray, backendUrl }) => {
-    const { setMessageParts } = useContext(ChatContext);
+    const { setMessages } = useContext(ChatContext);
     return (
         <Bar>
             <Typography variant="h6">{chatName}</Typography>
@@ -40,7 +40,7 @@ const ChatBar = ({ chatName, id, idToken, setAgentArray, backendUrl }) => {
                         handleClearMessages(
                             id,
                             idToken,
-                            setMessageParts,
+                            setMessages,
                             backendUrl
                         )
                     }

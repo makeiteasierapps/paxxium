@@ -21,6 +21,7 @@ class StreamResponse(BaseCallbackHandler):
     def on_llm_new_token(self, token: str, **kwargs) -> None:
         from myapp import socketio
         join_room(self.chat_id)
+        print(token)
         socketio.emit('token', {'message_from': 'agent', 'message_content': token, 'chat_id': self.chat_id, 'type': 'stream',}, room=self.chat_id)
         # This is needed to override batching
         socketio.sleep(0)

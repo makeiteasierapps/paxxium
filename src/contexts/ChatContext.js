@@ -5,20 +5,21 @@ export const ChatContext = createContext();
 export const ChatProvider = ({ children }) => {
     const [agentArray, setAgentArray] = useState([]);
     const [agentId, setAgentId] = useState(null);
-    const [messageParts, setMessageParts] = useState({});
+    const [messages, setMessages] = useState({});
     const [insideCodeBlock, setInsideCodeBlock] = useState(false);
 
     const addAgent = (newAgent) => {
         setAgentArray((prevAgents) => [newAgent, ...prevAgents]);
         setAgentId(newAgent.id);
-        setMessageParts((prevMessageParts) => ({
-            ...prevMessageParts,
+        setMessages((prevMessages) => ({
+            ...prevMessages,
             [newAgent.id]: [],
         }));
     };
 
+    // Used to add a new user message to the messages state
     const addMessage = (agentId, newMessage) => {
-        setMessageParts((prevMessageParts) => ({
+        setMessages((prevMessageParts) => ({
             ...prevMessageParts,
             [agentId]: [...prevMessageParts[agentId], newMessage],
         }));
@@ -37,8 +38,8 @@ export const ChatProvider = ({ children }) => {
                 setAgentId,
                 addAgent,
                 switchConversation,
-                messageParts,
-                setMessageParts,
+                messages,
+                setMessages,
                 addMessage,
                 insideCodeBlock,
                 setInsideCodeBlock,
