@@ -28,6 +28,7 @@ class MessageService:
         new_message = {
             'message_from': message_from,
             'message_content': message_content,
+            'type': 'database',
             'time_stamp': datetime.utcnow()
         }
         self.db.collection('users').document(user_id).collection('conversations').document(conversation_id).collection('messages').add(new_message)

@@ -36,7 +36,10 @@ export const handleClearMessages = async (
             credentials: 'include',
         });
         if (!response.ok) throw new Error('Failed to clear messages');
-        setMessages([]);
+        setMessages((prevMessageParts) => ({
+            ...prevMessageParts,
+            [id]: [],
+        }));
     } catch (error) {
         console.error(error);
     }

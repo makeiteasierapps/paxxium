@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { styled } from '@mui/system';
 import NavTabs from './NavTabs';
 import ChatDashboard from '../chat/ChatDashboard';
-import NewsCarousel from '../../dashboards/home/NewsCarousel';
+import NewsCarousel from '../home/NewsCarousel';
 import Profile from '../profile/Profile';
 import { ChatProvider } from '../../../contexts/ChatContext';
 
@@ -18,7 +18,7 @@ const Content = styled('div')(({ theme }) => ({
     marginTop: theme.spacing(8),
 }));
 
-const Dashboard = () => {
+const MainDash = () => {
     const [value, setValue] = useState(0);
     return (
         <>
@@ -38,4 +38,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default MainDash;

@@ -1,9 +1,10 @@
-import React from 'react';
+import { useContext } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CommentsDisabledIcon from '@mui/icons-material/CommentsDisabled';
 import { styled } from '@mui/system';
+import { ChatContext } from '../../../../contexts/ChatContext';
 
 import {
     handleClearMessages,
@@ -27,14 +28,8 @@ const ChatBarIcons = styled(Box)(({ theme }) => ({
     alignItems: 'center',
 }));
 
-const ChatBar = ({
-    chatName,
-    id,
-    idToken,
-    setAgentArray,
-    setMessages,
-    backendUrl,
-}) => {
+const ChatBar = ({ chatName, id, idToken, setAgentArray, backendUrl }) => {
+    const { setMessages } = useContext(ChatContext);
     return (
         <Bar>
             <Typography variant="h6">{chatName}</Typography>

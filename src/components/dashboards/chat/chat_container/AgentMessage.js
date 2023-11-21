@@ -1,15 +1,15 @@
-import React, { memo, useEffect, useState, useRef } from 'react';
+import { memo, useEffect, useState, useContext } from 'react';
 import { Avatar, ListItem, ListItemIcon, Checkbox } from '@mui/material';
 import { styled } from '@mui/system';
 import { Icon } from '@iconify/react';
 import { blueGrey } from '@mui/material/colors';
-
 import {
-    processDatabaseMessage,
-    processStreamMessage,
-} from '../utils/messageUtils';
+    formatBlockMessage,
+    formatStreamMessage,
+} from '../utils/messageFormatter';
+import { ChatContext } from '../../../../contexts/ChatContext';
 
-const BotMessageStyled = styled(ListItem)({
+const AgentMessageContainer = styled(ListItem)({
     backgroundColor: blueGrey[700],
     wordBreak: 'break-word',
     alignItems: 'flex-start',
@@ -39,47 +39,35 @@ const StyledHeader = styled('div')({
     justifyContent: 'space-between',
 });
 
-export const TextBlock = React.memo(({ text }) => {
-    return <p>{text}</p>;
-});
-
-export const CodeBlock = React.memo(({ code }) => {
-    return (
-        <pre className="language-javascript">
-            <code
-                className="language-javascript"
-                dangerouslySetInnerHTML={{ __html: code }}
-            />
-        </pre>
-    );
-});
-
 const AgentMessage = ({ message }) => {
     // State for checkbox and processed messages
     const [checked, setChecked] = useState(false);
-    const [messageParts, setMessageParts] = useState([]);
-    const [stream, setStream] = useState([]);
+    const [processedMessages, setProcessedMessages] = useState([]);
+    const { insideCodeBlock } = useContext(ChatContext);
 
-    // Refs for accumulating text and code content
-    const textRef = useRef('');
-    const codeRef = useRef('');
-
-    // Effect hook to process messages when they arrive
     useEffect(() => {
-        // If message is an array, it's a stream of new messages
-        if (Array.isArray(message)) {
-            // Slice the message array to get only the new messages
-            // This works because stream.length is the number of messages already processed
-            processStreamMessage(message, textRef, codeRef, setStream);
-        }
-        // If message is an object, it's a single message from the database
-        else if (typeof message === 'object') {
-            processDatabaseMessage(message).then(setMessageParts);
-        }
-    }, [message]);
+        const fetchProcessedMessages = async () => {
+            try {
+                if (message.type === 'database') {
+                    const result = formatBlockMessage(message);
+                    setProcessedMessages(result);
+                } else if (message.type === 'stream') {
+                    formatStreamMessage(
+                        message,
+                        insideCodeBlock,
+                        setProcessedMessages
+                    );
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchProcessedMessages();
+    }, [insideCodeBlock, message]);
 
     return (
-        <BotMessageStyled>
+        <AgentMessageContainer>
             <StyledHeader>
                 <ListItemIcon>
                     <Avatar
@@ -100,26 +88,27 @@ const AgentMessage = ({ message }) => {
                 />
             </StyledHeader>
             <MessageContent>
-                {messageParts.map((part, index) => {
-                    if (part.type === 'text') {
+                {processedMessages.map((msg, index) => {
+                    if (msg.type === 'text') {
+                        return <p key={`text${index}`}>{msg.content}</p>;
+                    } else if (msg.type === 'code') {
                         return (
-                            <TextBlock
-                                key={`text${index}`}
-                                text={part.content}
-                            />
-                        );
-                    } else if (part.type === 'code') {
-                        return (
-                            <CodeBlock
+                            <pre
                                 key={`code${index}`}
-                                code={part.content}
-                            />
+                                className={`language-${msg.language}`}
+                            >
+                                <code
+                                    dangerouslySetInnerHTML={{
+                                        __html: msg.content,
+                                    }}
+                                />
+                            </pre>
                         );
                     }
+                    return null;
                 })}
-                {stream}
             </MessageContent>
-        </BotMessageStyled>
+        </AgentMessageContainer>
     );
 };
 
