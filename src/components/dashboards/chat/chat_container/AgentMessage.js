@@ -45,7 +45,6 @@ const AgentMessage = ({ message }) => {
     const [processedMessages, setProcessedMessages] = useState([]);
     const { insideCodeBlock } = useContext(ChatContext);
 
-    // AgentMessage.js
     useEffect(() => {
         const fetchProcessedMessages = async () => {
             try {

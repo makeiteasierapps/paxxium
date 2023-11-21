@@ -16,7 +16,7 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 
 // Get a reference to the Firebase auth service
-const auth = getAuth();
+export const auth = getAuth();
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -24,15 +24,15 @@ export const AuthProvider = ({ children }) => {
     const [uid, setUid] = useState(null);
     const [user, setUser] = useState(null);
     const [username, setUsername] = useState(null);
+    const [isAuthorized, setIsAuthorized] = useState(false);
 
     useEffect(() => {
-        auth.onAuthStateChanged(function (user) {
+        auth.onAuthStateChanged(async function (user) {
             if (user) {
-                user.getIdToken().then(function (token) {
-                    setIdToken(token);
-                    setUid(user.uid);
-                    setUser(user);
-                });
+                const token = await user.getIdToken();
+                setIdToken(token);
+                setUid(user.uid);
+                setUser(user);
             } else {
                 console.log('No user is signed in.');
             }
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
     return (
         <AuthContext.Provider
-            value={{ idToken, setIdToken, uid, setUid, setUser, user, username, setUsername }}
+            value={{ idToken, setIdToken, uid, setUid, setUser, user, username, setUsername, isAuthorized, setIsAuthorized }}
         >
             {children}
         </AuthContext.Provider>

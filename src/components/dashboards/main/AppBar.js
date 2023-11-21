@@ -6,36 +6,33 @@ import {
     Typography,
     styled,
     IconButton,
-    AppBar
+    AppBar,
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AuthContext } from '../../../contexts/AuthContext';
-import { getAuth, signOut } from 'firebase/auth';
-
+import { signOut } from 'firebase/auth';
+import { auth } from '../../../contexts/AuthContext';
 
 // Styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
     position: 'fixed',
 }));
 
-
 const TitleBar = () => {
     const navigate = useNavigate();
-    const {username} = useContext(AuthContext);
-    const { setIdToken, setUser } = useContext(AuthContext);
+    const { setIdToken, setUser, username, setIsAuthorized } =
+        useContext(AuthContext);
 
     const handleLogout = async () => {
-        const auth = getAuth();
-        signOut(auth)
-            .then(function () {
-                setIdToken(null);
-                setUser(null);
-                navigate('/');
-            })
-            .catch(function (error) {
-                // An error happened.
-                console.log(error);
-            });
+        try {
+            await signOut(auth);
+            setIdToken(null);
+            setUser(null);
+            setIsAuthorized(false);
+            navigate('/');
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return (
@@ -59,6 +56,6 @@ const TitleBar = () => {
             </StyledAppBar>
         </Box>
     );
-}
+};
 
 export default TitleBar;
