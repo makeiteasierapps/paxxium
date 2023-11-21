@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
     BrowserRouter as Router,
     Route,
@@ -6,70 +6,33 @@ import {
     useNavigate,
     Navigate,
 } from 'react-router-dom';
-import LoginPage from './components/account/LoginPage';
-import SignUpPage from './components/account/SignUpPage';
+import LoginPage from './components/auth/LoginPage';
+import SignUpPage from './components/auth/SignUpPage';
 import './styles/App.css';
-import Dashboard from './components/dashboards/dashboard/Dashboard';
+import MainDash from './components/dashboards/main/MainDash';
 import CssBaseline from '@mui/material/CssBaseline';
-import { ChatProvider } from './contexts/ChatContext';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import { SettingsProvider } from './contexts/SettingsContext';
-import { ChatContext } from './contexts/ChatContext';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from './Theme';
-import TitleBar from './components/dashboards/dashboard/AppBar';
+import TitleBar from './components/dashboards/main/AppBar';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-// If user is authenticated redirect to home
-// If user is not authenticated redirect to login
-const AuthenticatedRoutes = () => {
+const AuthenticatedApp = () => {
+    const { idToken, uid, user, setUid, setUsername, isAuthorized, setIsAuthorized } = useContext(AuthContext);
+    
+    const db = getFirestore();
     const navigate = useNavigate();
-    const { idToken } = useContext(AuthContext);
 
     useEffect(() => {
         if (!idToken) {
             navigate('/');
-        } else navigate('/dashboard');
-    }, [navigate, idToken]);
-
-    return <Dashboard />;
-};
-
-// Helper function to render the correct routes
-const GateKeeper = ({ isAuthorized }) => {
-    return (
-        <Routes>
-            {isAuthorized ? (
-                // Authenticated routes
-                <>
-                    <Route
-                        path="/dashboard"
-                        element={<AuthenticatedRoutes />}
-                    />
-                    <Route
-                        path="*"
-                        element={<Navigate replace to="/dashboard" />}
-                    />
-                </>
-            ) : (
-                // Unauthenticated routes
-                <>
-                    <Route path="/" element={<LoginPage />} />
-                    <Route path="/signup" element={<SignUpPage />} />
-                    <Route path="*" element={<Navigate replace to="/" />} />
-                </>
-            )}
-        </Routes>
-    );
-};
-
-const AuthenticatedApp = () => {
-    const { idToken, uid, user, setUid } = useContext(AuthContext);
-    const { setUsername } = useContext(ChatContext);
-    const [isAuthorized, setIsAuthorized] = useState(false);
-    const db = getFirestore();
+        } else if (isAuthorized) {
+            navigate('/dashboard');
+        }
+    }, [idToken, isAuthorized, navigate]);
 
     // Fetches auth status from the db then loads the user into state.
     useEffect(() => {
@@ -102,18 +65,32 @@ const AuthenticatedApp = () => {
                 } catch (error) {
                     console.error('Failed to fetch:', error);
                 }
-            } else if (!idToken && !user) {
-                setIsAuthorized(false);
             }
         };
 
         fetchData();
-    }, [db, idToken, setUid, setUsername, user, uid]);
+    }, [db, idToken, setUid, setUsername, user, uid, setIsAuthorized]);
 
     return (
         <>
-            {isAuthorized ? <TitleBar /> : null}
-            <GateKeeper isAuthorized={isAuthorized} />
+            {isAuthorized && <TitleBar />}
+            <Routes>
+                {isAuthorized ? (
+                    <>
+                        <Route path="/dashboard" element={<MainDash />} />
+                        <Route
+                            path="*"
+                            element={<Navigate replace to="/dashboard" />}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <Route path="/" element={<LoginPage />} />
+                        <Route path="/signup" element={<SignUpPage />} />
+                        <Route path="*" element={<Navigate replace to="/" />} />
+                    </>
+                )}
+            </Routes>
         </>
     );
 };
@@ -123,13 +100,11 @@ const App = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <AuthProvider>
-                <ChatProvider>
-                    <SettingsProvider>
+                <SettingsProvider>
                     <Router>
                         <AuthenticatedApp />
                     </Router>
-                    </SettingsProvider>
-                </ChatProvider>
+                </SettingsProvider>
             </AuthProvider>
         </ThemeProvider>
     );

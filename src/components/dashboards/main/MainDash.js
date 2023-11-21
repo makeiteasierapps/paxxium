@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { styled } from '@mui/system';
 import NavTabs from './NavTabs';
 import ChatDashboard from '../chat/ChatDashboard';
-import NewsCarousel from '../../dashboards/home/NewsCarousel';
-import Questions from '../profile/Questions';
+import NewsCarousel from '../home/NewsCarousel';
 import Profile from '../profile/Profile';
+import { ChatProvider } from '../../../contexts/ChatContext';
 
 const DashboardWrapper = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -18,7 +18,7 @@ const Content = styled('div')(({ theme }) => ({
     marginTop: theme.spacing(8),
 }));
 
-const Dashboard = () => {
+const MainDash = () => {
     const [value, setValue] = useState(0);
     return (
         <>
@@ -26,7 +26,11 @@ const Dashboard = () => {
             <DashboardWrapper>
                 <Content>
                     {value === 0 && <NewsCarousel />}
-                    {value === 1 && <ChatDashboard />}
+                    {value === 1 && (
+                        <ChatProvider>
+                            <ChatDashboard />
+                        </ChatProvider>
+                    )}
                     {value === 2 && <Profile />}
                 </Content>
             </DashboardWrapper>
@@ -34,4 +38,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default MainDash;

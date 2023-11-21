@@ -1,10 +1,11 @@
 import React, { useContext, useState } from 'react';
 import { styled } from '@mui/system';
-import { TextField, Button, Box, FormGroup } from '@mui/material';
-import { AuthContext } from '../../contexts/AuthContext';
-import { ChatContext } from '../../contexts/ChatContext';
+import { TextField, Button, FormGroup } from '@mui/material';
+import { AuthContext } from '../../../../contexts/AuthContext';
+import { ChatContext } from '../../../../contexts/ChatContext';
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
+// Styled components
 const FormContainer = styled(FormGroup)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
@@ -18,14 +19,6 @@ function DebateSettings() {
     const [role2Description, setRole2Description] = useState('');
     const { idToken } = useContext(AuthContext);
     const { addAgent } = useContext(ChatContext);
-
-    const handleTopicChange = (event) => setTopic(event.target.value);
-
-    const handleRole1DescriptionChange = (event) =>
-        setRole1Description(event.target.value);
-
-    const handleRole2DescriptionChange = (event) =>
-        setRole2Description(event.target.value);
 
     const createDebate = async () => {
         try {
@@ -45,15 +38,9 @@ function DebateSettings() {
             const data = await response.json();
             const newDebate = data;
             addAgent(newDebate);
-            
         } catch (error) {
             console.error('Failed to start debate:', error);
         }
-    };
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        createDebate();
     };
 
     return (
@@ -66,7 +53,7 @@ function DebateSettings() {
                 multiline
                 rows={2}
                 value={topic}
-                onChange={handleTopicChange}
+                onChange={(event) => setTopic(event.target.value)}
             />
             <TextField
                 sx={{ paddingBottom: '1rem' }}
@@ -76,7 +63,7 @@ function DebateSettings() {
                 multiline
                 rows={2}
                 value={role1Description}
-                onChange={handleRole1DescriptionChange}
+                onChange={(event) => setRole1Description(event.target.value)}
             />
             <TextField
                 sx={{ paddingBottom: '1rem' }}
@@ -86,9 +73,16 @@ function DebateSettings() {
                 multiline
                 rows={2}
                 value={role2Description}
-                onChange={handleRole2DescriptionChange}
+                onChange={(event) => setRole2Description(event.target.value)}
             />
-            <Button type="submit" variant="contained" onClick={handleSubmit}>
+            <Button
+                type="submit"
+                variant="contained"
+                onClick={(event) => {
+                    event.preventDefault();
+                    createDebate();
+                }}
+            >
                 Start Debate
             </Button>
         </FormContainer>

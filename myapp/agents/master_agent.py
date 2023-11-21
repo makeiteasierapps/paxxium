@@ -1,7 +1,10 @@
 from flask import current_app
+from flask_socketio import join_room
+
 import langchain
-from langchain.chains import LLMMathChain
-from langchain.utilities import SerpAPIWrapper
+
+from langchain.utilities.serpapi import SerpAPIWrapper
+
 from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
 from langchain.chat_models import ChatOpenAI
@@ -11,14 +14,15 @@ from langchain.agents import initialize_agent, AgentType, Tool
 from myapp.agents.tools.tools import SaveMessageTool
 
 
-
 class StreamResponse(BaseCallbackHandler):
     def __init__(self, chat_id: str):
         self.chat_id = chat_id
 
     def on_llm_new_token(self, token: str, **kwargs) -> None:
         from myapp import socketio
-        socketio.emit('token', {'token': token, 'chat_id': self.chat_id})
+        join_room(self.chat_id)
+        print(token)
+        socketio.emit('token', {'message_from': 'agent', 'message_content': token, 'chat_id': self.chat_id, 'type': 'stream',}, room=self.chat_id)
         # This is needed to override batching
         socketio.sleep(0)
 
@@ -35,7 +39,6 @@ class MasterAgent:
         self.chat_constants = chat_constants
         self.search = SerpAPIWrapper(serpapi_api_key=self.serp_key)
         self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse(self.chat_id)], temperature=0, model=model, openai_api_key=self.openai_api_key)
-        self.llm_math_chain = LLMMathChain.from_llm(llm=self.llm, verbose=True)
         self.memory=ConversationBufferWindowMemory(memory_key='memory', return_messages=True, k=3)
         self.save_message = SaveMessageTool(memory=self.memory)
         
@@ -44,11 +47,6 @@ class MasterAgent:
                 name="Search",
                 func=self.search.run,
                 description="useful for when you need to answer questions about current events. You should ask targeted questions",
-            ),
-            Tool(
-                name="Calculator",
-                func=self.llm_math_chain.run,
-                description="useful for when you need to answer questions about math",
             ),
         ]
         self.tools.append(self.save_message)
@@ -73,7 +71,7 @@ class MasterAgent:
         data = message_obj['message_content']
         message_content = 'CHAT DETAILS: \n' + self.chat_constants + '\n' + data
         response = self.master_ai.run(message_content)                                 
-        response_obj = self.message_service.create_message(conversation_id=conversation_id, message_from='chatbot', user_id=user_id, message_content=response)
+        response_obj = self.message_service.create_message(conversation_id=conversation_id, message_from='agent', user_id=user_id, message_content=response)
         
         return response_obj
     

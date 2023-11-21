@@ -1,15 +1,14 @@
 import { useState, useContext, useEffect, useCallback } from "react";
 import { styled } from "@mui/system";
 import { TextField, MenuItem, FormGroup, Box } from "@mui/material";
-
 import ChatSettings from "./ChatSettings";
-import DebateSettings from "../../debate/DebateSettings";
-
+import DebateSettings from "../chat/debate/DebateSettings";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { ChatContext } from "../../../contexts/ChatContext";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
+// Styled components
 const SettingsContainer = styled(FormGroup)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -64,10 +63,7 @@ const AgentMenu = () => {
     }
   };
 
-  const handleAgentChange = (event) => {
-    setSelectedAgent(event.target.value);
-  };
-
+  // Loads chats into the load chat dropdown
   const fetchChats = useCallback(async () => {
     try {
       const response = await fetch(`${backendUrl}/chat`, {
@@ -94,7 +90,7 @@ const AgentMenu = () => {
           select
           label="Select Agent"
           value={selectedAgent}
-          onChange={handleAgentChange}
+          onChange={(event) => setSelectedAgent(event.target.value)}
           variant="standard"
         >
           <MenuItem value="Chat">Chat</MenuItem>

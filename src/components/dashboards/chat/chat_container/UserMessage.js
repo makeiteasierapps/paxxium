@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import {
     Avatar,
     ListItem,
@@ -9,6 +9,7 @@ import {
 import { styled } from '@mui/system';
 import { blueGrey } from '@mui/material/colors';
 
+// Styled components
 const UserMessageStyled = styled(ListItem)({
     backgroundColor: blueGrey[800],
     wordBreak: 'break-word',
@@ -21,9 +22,9 @@ const MessageText = styled(ListItemText)({
 });
 
 const StyledCheckbox = styled(Checkbox)({
-    color: blueGrey[800], // Specify your styles here
+    color: blueGrey[800],
     '&.Mui-checked': {
-        color: '#1C282E', // Specify your styles for checked state
+        color: '#1C282E',
     },
 });
 
@@ -35,34 +36,30 @@ const StyledHeader = styled('div')({
 });
 
 const UserMessage = ({ message }) => {
-    const [checked, setChecked] = React.useState(false);
+    const [checked, setChecked] = useState(false);
 
-    const handleCheck = (event) => {
-        setChecked(event.target.checked);
-    };
     return (
         <UserMessageStyled>
             <StyledHeader>
-            <ListItemIcon>
-                <Avatar
-                    variant="square"
-                    sx={{
-                        width: '30px',
-                        height: '30px',
-                        bgcolor: '#1C282E',
-                        color: blueGrey[700],
-                        fontSize: '33px',
-                    }}
+                <ListItemIcon>
+                    <Avatar
+                        variant="square"
+                        sx={{
+                            width: '30px',
+                            height: '30px',
+                            bgcolor: '#1C282E',
+                            color: blueGrey[700],
+                            fontSize: '33px',
+                        }}
+                    />
+                </ListItemIcon>
+                <StyledCheckbox
+                    checked={checked}
+                    onChange={(event) => setChecked(event.target.checked)}
+                    inputProps={{ 'aris-label': 'Select message' }}
                 />
-            </ListItemIcon>
-            <StyledCheckbox
-                checked={checked}
-                onChange={handleCheck}
-                inputProps={{ 'aris-label': 'Select message' }}
-            />
             </StyledHeader>
             <MessageText primary={message.message_content} />
-
         </UserMessageStyled>
     );
 };

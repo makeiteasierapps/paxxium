@@ -2,41 +2,47 @@ import React, { useState, createContext } from 'react';
 
 export const ChatContext = createContext();
 
-export const ChatProvider = ({children}) => {
-    const [uid, setUid] = useState(null);
+export const ChatProvider = ({ children }) => {
     const [agentArray, setAgentArray] = useState([]);
     const [agentId, setAgentId] = useState(null);
-    const [username, setUsername] = useState(null);
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState({});
+    const [insideCodeBlock, setInsideCodeBlock] = useState(false);
 
     const addAgent = (newAgent) => {
-        setAgentArray((prevAgents) => [
-            newAgent,
-            ...prevAgents,
-        ]);
+        setAgentArray((prevAgents) => [newAgent, ...prevAgents]);
         setAgentId(newAgent.id);
+        setMessages((prevMessages) => ({
+            ...prevMessages,
+            [newAgent.id]: [],
+        }));
+    };
+
+    // Used to add a new user message to the messages state
+    const addMessage = (agentId, newMessage) => {
+        setMessages((prevMessageParts) => ({
+            ...prevMessageParts,
+            [agentId]: [...prevMessageParts[agentId], newMessage],
+        }));
     };
 
     const switchConversation = (id) => {
         setAgentId(id);
     };
 
-
     return (
         <ChatContext.Provider
             value={{
-                uid,
-                setUid,
                 agentArray,
                 setAgentArray,
                 agentId,
                 setAgentId,
                 addAgent,
                 switchConversation,
-                username,
-                setUsername,
                 messages,
                 setMessages,
+                addMessage,
+                insideCodeBlock,
+                setInsideCodeBlock,
             }}
         >
             {children}
