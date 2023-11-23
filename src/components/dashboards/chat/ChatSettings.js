@@ -83,7 +83,7 @@ const ChatSettings = () => {
         settings.useProfileData
     );
     const [chatName, setChatName] = useState(settings.chatName);
-    const { addAgent } = useContext(ChatContext);
+    const { addAgent, setAgentArray, agentArray } = useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
 
     // START CHAT
