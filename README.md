@@ -29,3 +29,18 @@
 
 ## General Refactoring:
 - The styled components could be moved into their own files to reduce the size of the main files.
+
+## Error handling/Spinners:
+- Display loading spinners and error messages
+
+- ## Notes
+- Settings Bug
+
+I think I can get rid of SettingsContext.js
+
+Instead of using a separate state variable I can simply load the settings from the agentArray. Then all I would need to do is pass in the ID to the Chat component. 
+
+Chat component can pull the settings from the agentArray via the ID. 
+
+When settings are updated the agentArray would be updated
+
