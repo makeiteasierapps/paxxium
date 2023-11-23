@@ -33,7 +33,7 @@
 ## Error handling/Spinners:
 - Display loading spinners and error messages
 
-- ## Notes
+## Notes
 - Settings Bug
 
 I think I can get rid of SettingsContext.js
