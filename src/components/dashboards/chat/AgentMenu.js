@@ -44,6 +44,8 @@ const AgentMenu = () => {
 
   const handleLoadChat = async (event) => {
     const selectedId = event.target.value;
+    
+    // This is done so that the chat visibility persists even after the page is refreshed
     try {
       const response = await fetch(`${backendUrl}/chat/update_visibility`, {
         method: "POST",
@@ -54,13 +56,17 @@ const AgentMenu = () => {
         body: JSON.stringify({ id: selectedId, is_open: true }),
         credentials: "include",
       });
+      
       if (!response.ok) throw new Error("Failed to update chat");
+      
       // Update the local state only after the database has been updated successfully
       const selectedChat = chatArray.find((chat) => chat.id === selectedId);
       addAgent(selectedChat);
+    
     } catch (error) {
       console.log(error);
     }
+  
   };
 
   // Loads chats into the load chat dropdown
