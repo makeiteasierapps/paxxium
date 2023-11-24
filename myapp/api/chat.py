@@ -35,7 +35,8 @@ def create_chat():
         'agent_model': agent_model,
         'system_prompt': system_prompt,
         'chat_constants': chat_constants,
-        'use_profile_data': use_profile_data
+        'use_profile_data': use_profile_data,
+        'is_open': True
     }
     return chat_data, 200
 

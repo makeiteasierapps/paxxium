@@ -15,8 +15,11 @@ export const handleCloseChat = async (
             credentials: 'include',
         });
         if (!response.ok) throw new Error('Failed to update chat');
+        // Update the local state only after the database has been updated successfully
         setAgentArray((prevChatArray) =>
-            prevChatArray.filter((chatObj) => chatObj.id !== id)
+            prevChatArray.map((chatObj) =>
+                chatObj.id === id ? { ...chatObj, is_open: false } : chatObj
+            )
         );
     } catch (error) {
         console.log(error);

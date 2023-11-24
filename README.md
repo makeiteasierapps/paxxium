@@ -1,6 +1,5 @@
 ## Bug Fixes:
 - Add visual indication to show selected chat box. This could be a change in color, a border, or any other visual cue that clearly indicates the active chat box.
-- Resolve issue of chat data being fetched twice. Identify why both AgentMenu.js(fetchChats) and ChatDashboard.js(getChatData) are fetching the same data and consolidate this into a single fetch stored in a state variable in ChatContext.js.
 
 ## Feature Enhancements:
 - Implement automatic news article search based on answered profile questions. This will involve connecting the user's profile data to the news API query system.

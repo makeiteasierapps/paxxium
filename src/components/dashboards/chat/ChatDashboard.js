@@ -1,10 +1,4 @@
-import React, {
-    memo,
-    useState,
-    useContext,
-    useEffect,
-    useCallback,
-} from 'react';
+import React, { memo, useState, useContext, useEffect } from 'react';
 import { ChatContext } from '../../../contexts/ChatContext';
 
 import { AuthContext } from '../../../contexts/AuthContext';
@@ -33,11 +27,11 @@ const ChatsContainer = styled(Box)(({ theme }) => ({
     flexWrap: 'wrap',
     justifyContent: 'center',
     gap: theme.spacing(2),
-    alignItems: 'c',
+    
 }));
 
 const Settings = styled(Box)(({ theme }) => ({
-    width: '50%',
+    width: '69%',
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(2),
     marginTop: theme.spacing(2),
@@ -73,16 +67,13 @@ const ChatDashboard = () => {
                 if (!response.ok)
                     throw new Error('Failed to load user conversations');
 
-                const repsonse = await response.json();
+                const data = await response.json();
                 // data is an array of objects
-                // Filter the data for is_open before setting the agent array
-                const data = repsonse.filter((agent) => agent.is_open);
                 setAgentArray(data);
 
                 if (data.length > 0) {
                     setSelectedAgent(data[0]);
                 }
-
             } catch (error) {
                 console.error(error);
                 setError(error.message);
@@ -110,30 +101,32 @@ const ChatDashboard = () => {
             </SettingsContainer>
             <StyledMain>
                 <ChatsContainer>
-                    {agentArray.map((agent) => {
-                        if (agent.agent_model === 'AgentDebate') {
-                            return (
-                                <Debate
-                                    key={agent.id}
-                                    id={agent.id}
-                                    chatName={agent.chat_name}
-                                    topic={agent.topic}
-                                />
-                            );
-                        } else {
-                            return (
-                                <Chat
-                                    key={agent.id}
-                                    id={agent.id}
-                                    chatConstants={agent.chat_constants}
-                                    systemPrompt={agent.system_prompt}
-                                    chatName={agent.chat_name}
-                                    agentModel={agent.agent_model}
-                                    useProfileData={agent.use_profile_data}
-                                />
-                            );
-                        }
-                    })}
+                    {agentArray
+                        .filter((agent) => agent.is_open)
+                        .map((agent) => {
+                            if (agent.agent_model === 'AgentDebate') {
+                                return (
+                                    <Debate
+                                        key={agent.id}
+                                        id={agent.id}
+                                        chatName={agent.chat_name}
+                                        topic={agent.topic}
+                                    />
+                                );
+                            } else {
+                                return (
+                                    <Chat
+                                        key={agent.id}
+                                        id={agent.id}
+                                        chatConstants={agent.chat_constants}
+                                        systemPrompt={agent.system_prompt}
+                                        chatName={agent.chat_name}
+                                        agentModel={agent.agent_model}
+                                        useProfileData={agent.use_profile_data}
+                                    />
+                                );
+                            }
+                        })}
                 </ChatsContainer>
             </StyledMain>
         </>

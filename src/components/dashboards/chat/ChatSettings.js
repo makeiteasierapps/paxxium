@@ -75,10 +75,8 @@ const StyledButton = styled(Button)({
 
 const ChatSettings = () => {
     const {
-        addAgent,
         setSelectedAgent,
         selectedAgent,
-        agentArray,
         setAgentArray,
     } = useContext(ChatContext);
 
@@ -123,7 +121,12 @@ const ChatSettings = () => {
                 }),
             });
             const data = await response.json();
-            addAgent(data);
+            // Update the agentArray directly here
+            setAgentArray((prevAgents) => [data, ...prevAgents]);
+
+            // Set the new agent as the selectedAgent
+            setSelectedAgent(data);
+
         } catch (error) {
             console.error(error);
         }
@@ -170,7 +173,6 @@ const ChatSettings = () => {
                 agent.id === id ? { ...agent, ...newAgentSettings } : agent
             )
         );
-        console.log(newAgentSettings);
         // Update the selected agent in the ChatContext
         setSelectedAgent(newAgentSettings);
     };
