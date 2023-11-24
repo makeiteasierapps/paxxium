@@ -1,5 +1,4 @@
 ## Bug Fixes:
-- Ensure state updates correctly when chat box settings are changed. Investigate the current state management system and identify why the state isn't updating immediately. After settings are updated and the chat gets clicked the old settings get loaded.
 - Add visual indication to show selected chat box. This could be a change in color, a border, or any other visual cue that clearly indicates the active chat box.
 - Resolve issue of chat data being fetched twice. Identify why both AgentMenu.js(fetchChats) and ChatDashboard.js(getChatData) are fetching the same data and consolidate this into a single fetch stored in a state variable in ChatContext.js.
 
@@ -33,14 +32,4 @@
 ## Error handling/Spinners:
 - Display loading spinners and error messages
 
-## Notes
-- Settings Bug
-
-I think I can get rid of SettingsContext.js
-
-Instead of using a separate state variable I can simply load the settings from the agentArray. Then all I would need to do is pass in the ID to the Chat component. 
-
-Chat component can pull the settings from the agentArray via the ID. 
-
-When settings are updated the agentArray would be updated
 

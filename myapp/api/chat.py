@@ -90,8 +90,12 @@ def update_settings():
         return {'message': 'Invalid token'}, 403
     
     data = request.get_json()
-    chat_id = data.get('id')
+    # Update the database
     chat_service = current_app.chat_service
-    chat_service.update_settings(uid, chat_id, data.get('chatName'), data.get('agentModel'), data.get('systemPrompt'), data.get('chatConstants'), data.get('useProfileData'))
+    chat_service.update_settings(uid, data.get('id'), data.get('chat_name'), data.get('agent_model'), data.get('system_prompt'), data.get('chat_constants'), data.get('use_profile_data'))
+
+    # Update the agent instance
+    master_agent_service = current_app.master_agent_service
+    master_agent_service.check_and_set_agent_instance(uid, data.get('id'), data.get('system_prompt'), data.get('chat_constants'), data.get('agent_model'), )
 
     return jsonify({'message': 'Conversation updated'}), 200

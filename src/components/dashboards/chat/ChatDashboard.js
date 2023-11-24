@@ -53,7 +53,8 @@ const SettingsContainer = styled(Box)(({ theme }) => ({
 }));
 
 const ChatDashboard = () => {
-    const { setAgentId, agentArray, setAgentArray } = useContext(ChatContext);
+    const { setSelectedAgent, agentArray, setAgentArray } =
+        useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
     const [error, setError] = useState(null);
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -79,8 +80,9 @@ const ChatDashboard = () => {
                 setAgentArray(data);
 
                 if (data.length > 0) {
-                    setAgentId(data[0]);
+                    setSelectedAgent(data[0]);
                 }
+
             } catch (error) {
                 console.error(error);
                 setError(error.message);
@@ -88,7 +90,7 @@ const ChatDashboard = () => {
         };
 
         getChatData();
-    }, [idToken, setAgentArray, setAgentId, setError]);
+    }, [idToken, setAgentArray, setSelectedAgent, setError]);
 
     if (error) {
         return <p>Error: {error}</p>;

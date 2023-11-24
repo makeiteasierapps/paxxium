@@ -12,7 +12,6 @@ import './styles/App.css';
 import MainDash from './components/dashboards/main/MainDash';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
-import { SettingsProvider } from './contexts/SettingsContext';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from './Theme';
 import TitleBar from './components/dashboards/main/AppBar';
@@ -100,11 +99,9 @@ const App = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <AuthProvider>
-                <SettingsProvider>
                     <Router>
                         <AuthenticatedApp />
                     </Router>
-                </SettingsProvider>
             </AuthProvider>
         </ThemeProvider>
     );

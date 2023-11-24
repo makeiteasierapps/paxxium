@@ -28,6 +28,8 @@ class MasterAgentService:
         else:
             # If an AI instance for the key already exists, update its model
             self.master_agents[key].model = agent_model
+            self.master_agents[key].system_prompt = system_prompt
+            self.master_agents[key].chat_constants = chat_constants
             
             # Move the key to the end of the dictionary to indicate it was most recently used
             self.master_agents.move_to_end(key)

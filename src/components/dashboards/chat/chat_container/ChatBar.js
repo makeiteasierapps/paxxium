@@ -28,8 +28,8 @@ const ChatBarIcons = styled(Box)(({ theme }) => ({
     alignItems: 'center',
 }));
 
-const ChatBar = ({ chatName, id, idToken, setAgentArray, backendUrl }) => {
-    const { setMessages } = useContext(ChatContext);
+const ChatBar = ({ chatName, id, idToken, backendUrl }) => {
+    const { setMessages, setAgentArray } = useContext(ChatContext);
     return (
         <Bar>
             <Typography variant="h6">{chatName}</Typography>

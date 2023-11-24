@@ -28,7 +28,7 @@ class StreamResponse(BaseCallbackHandler):
 
 class MasterAgent:
     def __init__(self, message_service, uid, chat_id, model="gpt-3.5-turbo-0613", system_prompt="You are a friendly but genuine AI Agent. Don't be annoyingly nice, but don't be rude either.", chat_constants=''):
-        # langchain.debug = True
+        langchain.debug = True
         user_service = current_app.user_service
         encrypted_openai_key, encrypted_serp_key = user_service.get_keys(uid)
         self.openai_api_key = user_service.decrypt(encrypted_openai_key)
@@ -41,7 +41,6 @@ class MasterAgent:
         self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse(self.chat_id)], temperature=0, model=model, openai_api_key=self.openai_api_key)
         self.memory=ConversationBufferWindowMemory(memory_key='memory', return_messages=True, k=3)
         self.save_message = SaveMessageTool(memory=self.memory)
-        
         self.tools = [
             Tool(
                 name="Search",

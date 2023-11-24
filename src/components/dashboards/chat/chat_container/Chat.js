@@ -1,10 +1,4 @@
-import React, {
-    useRef,
-    useContext,
-    useEffect,
-    useCallback,
-    memo,
-} from 'react';
+import React, { useRef, useContext, useEffect, useCallback, memo } from 'react';
 import { styled } from '@mui/system';
 import { List, Box } from '@mui/material';
 import io from 'socket.io-client';
@@ -14,7 +8,6 @@ import MessageInput from './MessageInput';
 import ChatBar from './ChatBar';
 import { AuthContext } from '../../../../contexts/AuthContext';
 import { ChatContext } from '../../../../contexts/ChatContext';
-import { SettingsContext } from '../../../../contexts/SettingsContext';
 
 import { handleIncomingMessageStream } from '../chat_container/handlers/handleIncomingMessageStream';
 
@@ -55,14 +48,14 @@ const Chat = ({
 }) => {
     const socketRef = useRef(null);
     const {
-        setAgentArray,
         messages,
         setMessages,
         setInsideCodeBlock,
         insideCodeBlock,
+        setSelectedAgent,
+        agentArray,
     } = useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
-    const { setSettings } = useContext(SettingsContext);
 
     // Fetch messages from the database
     const fetchMessages = useCallback(async () => {
@@ -147,21 +140,16 @@ const Chat = ({
     return (
         <ChatContainerStyled
             onClick={() => {
-                setSettings({
-                    id,
-                    agentModel,
-                    systemPrompt,
-                    chatConstants,
-                    useProfileData,
-                    chatName,
-                });
+                const selectedAgent = agentArray.find(
+                    (agent) => agent.id === id
+                );
+                setSelectedAgent(selectedAgent);
             }}
         >
             <ChatBar
                 chatName={chatName}
                 id={id}
                 idToken={idToken}
-                setAgentArray={setAgentArray}
                 backendUrl={backendUrl}
             />
             <MessagesContainer item xs={9}>

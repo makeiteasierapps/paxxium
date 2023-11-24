@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { styled } from '@mui/system';
 import {
     TextField,
@@ -10,7 +10,6 @@ import {
     FormControlLabel,
 } from '@mui/material';
 
-import { SettingsContext } from '../../../contexts/SettingsContext';
 import { ChatContext } from '../../../contexts/ChatContext';
 import { AuthContext } from '../../../contexts/AuthContext';
 
@@ -75,16 +74,29 @@ const StyledButton = styled(Button)({
 });
 
 const ChatSettings = () => {
-    const { settings, setSettings } = useContext(SettingsContext);
-    const [agentModel, setAgentModel] = useState(settings.agentModel);
-    const [systemPrompt, setSystemPrompt] = useState(settings.systemPrompt);
-    const [chatConstants, setChatConstants] = useState(settings.chatConstants);
-    const [useProfileData, setUseProfileData] = useState(
-        settings.useProfileData
-    );
-    const [chatName, setChatName] = useState(settings.chatName);
-    const { addAgent, setAgentArray, agentArray } = useContext(ChatContext);
+    const {
+        addAgent,
+        setSelectedAgent,
+        selectedAgent,
+        agentArray,
+        setAgentArray,
+    } = useContext(ChatContext);
+
+    const [agentModel, setAgentModel] = useState('');
+    const [systemPrompt, setSystemPrompt] = useState('');
+    const [chatConstants, setChatConstants] = useState('');
+    const [useProfileData, setUseProfileData] = useState(false);
+    const [chatName, setChatName] = useState('');
+
     const { idToken } = useContext(AuthContext);
+
+    useEffect(() => {
+        setAgentModel(selectedAgent?.agent_model || '');
+        setSystemPrompt(selectedAgent?.system_prompt || '');
+        setChatConstants(selectedAgent?.chat_constants || '');
+        setUseProfileData(selectedAgent?.use_profile_data || false);
+        setChatName(selectedAgent?.chat_name || '');
+    }, [selectedAgent]);
 
     // START CHAT
     const startChat = async (
@@ -125,23 +137,16 @@ const ChatSettings = () => {
             useProfileData,
             chatName
         );
-
-        // Clear the form
-        setAgentModel('');
-        setChatName('');
-        setUseProfileData(false);
-        setSystemPrompt('');
-        setChatConstants('');
     };
 
     const updateSettings = async (id) => {
-        const newSettings = {
-            id,
-            agentModel,
-            systemPrompt,
-            chatConstants,
-            useProfileData,
-            chatName,
+        const newAgentSettings = {
+            id: id,
+            agent_model: agentModel,
+            system_prompt: systemPrompt,
+            chat_constants: chatConstants,
+            use_profile_data: useProfileData,
+            chat_name: chatName,
         };
 
         // Update the settings in the database
@@ -153,13 +158,21 @@ const ChatSettings = () => {
                     Authorization: idToken,
                 },
                 credentials: 'include',
-                body: JSON.stringify(newSettings),
+                body: JSON.stringify(newAgentSettings),
             });
         } catch (error) {
             console.error(error);
         }
+
         // Update the local settings state
-        setSettings(newSettings);
+        setAgentArray((prevAgentArray) =>
+            prevAgentArray.map((agent) =>
+                agent.id === id ? { ...agent, ...newAgentSettings } : agent
+            )
+        );
+        console.log(newAgentSettings);
+        // Update the selected agent in the ChatContext
+        setSelectedAgent(newAgentSettings);
     };
 
     return (
@@ -213,7 +226,7 @@ const ChatSettings = () => {
                 </StyledButton>
                 <StyledButton
                     variant="contained"
-                    onClick={() => updateSettings(settings.id)}
+                    onClick={() => updateSettings(selectedAgent.id)}
                 >
                     Update
                 </StyledButton>
