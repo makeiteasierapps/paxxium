@@ -4,13 +4,13 @@ export const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
     const [agentArray, setAgentArray] = useState([]);
-    const [agentId, setAgentId] = useState(null);
+    const [selectedAgentId, setSelectedAgentId] = useState(null);
     const [messages, setMessages] = useState({});
     const [insideCodeBlock, setInsideCodeBlock] = useState(false);
 
     const addAgent = (newAgent) => {
         setAgentArray((prevAgents) => [newAgent, ...prevAgents]);
-        setAgentId(newAgent.id);
+        setSelectedAgentId(newAgent.id);
         setMessages((prevMessages) => ({
             ...prevMessages,
             [newAgent.id]: [],
@@ -25,19 +25,15 @@ export const ChatProvider = ({ children }) => {
         }));
     };
 
-    const switchConversation = (id) => {
-        setAgentId(id);
-    };
 
     return (
         <ChatContext.Provider
             value={{
                 agentArray,
                 setAgentArray,
-                agentId,
-                setAgentId,
+                selectedAgentId,
+                setSelectedAgentId,
                 addAgent,
-                switchConversation,
                 messages,
                 setMessages,
                 addMessage,
