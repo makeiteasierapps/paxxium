@@ -18,7 +18,6 @@ apikey = os.getenv('GNEWS_API_KEY')
 
 # Fetch article URLs based on query
 def get_article_urls(query):
-    print(f"Fetching articles for query: {query}")
     # Construct API URL
     url = f"https://gnews.io/api/v4/search?q={query}&lang=en&country=us&max=10&apikey={apikey}"
 
@@ -33,7 +32,6 @@ def get_article_urls(query):
         return
 
     data = articles.json()
-    print(data)
     articles = data["articles"]
     article_urls = [article_data["url"] for article_data in articles]
     
@@ -131,8 +129,8 @@ def get_random_news_articles(uid):
     # Get all news articles
     news_articles = news_ref.get()
     
-    # Randomly select 7 articles
-    random_articles = random.sample(news_articles, 7)
+    # Randomly select 12 articles
+    random_articles = random.sample(news_articles, 12)
     
     # Extract the article data
     random_news = []
@@ -141,3 +139,12 @@ def get_random_news_articles(uid):
         random_news.append(article_data)
     
     return random_news
+
+def get_user_news_topics(uid):
+    db = current_app.config['db']
+    user_ref = db.collection('users').document(uid)
+    user = user_ref.get()
+    if user.exists:
+        return user.to_dict().get('news_topics', [])
+    
+    return []

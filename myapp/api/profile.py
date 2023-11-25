@@ -22,6 +22,8 @@ def update_questions():
     uid = authenticate_request()
     ps.update_profile_questions(uid, request.get_json())
     parsed_analysis = us.analyze_profile(uid)
+    user_service = current_app.user_service
+    user_service.update_news_topics(uid, parsed_analysis['news_topics'])
 
     return jsonify(parsed_analysis), 200
 
@@ -52,10 +54,8 @@ def update_profile():
     """
     Update profile data in the users collection
     """
-    print('update profile')
     user_service = current_app.user_service
     uid = authenticate_request()
-    print(request.get_json())
     user_service.update_profile(uid, request.get_json())
     
     return jsonify({'message': 'Profile updated successfully'}), 200

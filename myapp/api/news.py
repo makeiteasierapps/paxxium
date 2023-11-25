@@ -1,5 +1,5 @@
 from flask import Blueprint, request, current_app
-from myapp.services.news_service import get_article_urls, summarize_articles, upload_news_data, get_random_news_articles
+from myapp.services.news_service import *
 
 news = Blueprint('news', __name__)
 
@@ -37,3 +37,13 @@ def load_news():
 
     return news_data, 200
 
+@news.route('/user/<user_id>/news_topics', methods=['GET'])
+def get_news_topics(user_id):
+    uid = authenticate_request()
+    
+    if not uid or uid != user_id:
+        return {'message': 'Invalid token'}, 403
+    
+    news_topics = get_user_news_topics(uid)
+
+    return {'news_topics': news_topics}, 200

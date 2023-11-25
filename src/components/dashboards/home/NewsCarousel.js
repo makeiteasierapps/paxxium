@@ -39,7 +39,7 @@ const CarouselContainer = styled(Box)(({ theme }) => ({
 const NewsCarousel = () => {
     const [newsData, setNewsData] = useState([]);
     const [query, setQuery] = useState('');
-    const { idToken } = useContext(AuthContext);
+    const { idToken, uid } = useContext(AuthContext);
     const [slideIndex, setSlideIndex] = useState(0);
 
     const loadNewsData = useCallback(async () => {
@@ -58,26 +58,29 @@ const NewsCarousel = () => {
         } catch (error) {}
     }, [idToken]);
 
-    const fetchNewsData = async () => {
-        try {
-            const response = await fetch(`${backendUrl}/news`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: idToken,
-                },
-                body: JSON.stringify({
-                    query: query,
-                }),
-            });
-            if (!response.ok) throw new Error('Failed to fetch news data');
-            const data = await response.json();
-            console.log(data);
-            setNewsData(data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    // Takes the query from the search field
+    const fetchNewsData = useCallback(
+        async (queryParam = query) => {
+            try {
+                const response = await fetch(`${backendUrl}/news`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: idToken,
+                    },
+                    body: JSON.stringify({
+                        query: queryParam,
+                    }),
+                });
+                if (!response.ok) throw new Error('Failed to fetch news data');
+                const data = await response.json();
+                setNewsData(data);
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        [idToken, query]
+    );
 
     const newsSlides = newsData.map((news, index) => ({
         key: news.id,
@@ -86,12 +89,39 @@ const NewsCarousel = () => {
         ),
     }));
 
+    const fetchUserNewsTopics = useCallback(async () => {
+        try {
+            const response = await fetch(
+                `${backendUrl}/user/${uid}/news_topics`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: idToken,
+                    },
+                }
+            );
+
+            if (!response.ok)
+                throw new Error('Failed to fetch user news topics');
+            const data = await response.json();
+            const randIdx = Math.floor(Math.random() * data.news_topics.length);
+            setQuery(data.news_topics[randIdx]);
+            fetchNewsData(data.news_topics[randIdx]);
+        } catch (error) {
+            console.error(error);
+        }
+    }, [fetchNewsData, idToken, uid]);
+
     useEffect(() => {
         loadNewsData();
     }, [loadNewsData]);
 
     return (
         <MainContainer>
+            <Button onClick={fetchUserNewsTopics} variant="contained">
+                Let AI pick your news
+            </Button>
             <CarouselContainer>
                 {newsData.length > 0 ? (
                     <Carousel slides={newsSlides} goToSlide={slideIndex} />
@@ -105,10 +135,13 @@ const NewsCarousel = () => {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
             />
-            <SearchButton onClick={(event) => {
-                event.preventDefault();
-                fetchNewsData();
-            }} variant="contained">
+            <SearchButton
+                onClick={(event) => {
+                    event.preventDefault();
+                    fetchNewsData();
+                }}
+                variant="contained"
+            >
                 Submit
             </SearchButton>
         </MainContainer>

@@ -2,7 +2,7 @@ import os
 import base64
 from dotenv import load_dotenv
 from google.cloud import kms
-
+from google.cloud import firestore
 from langchain.chains import LLMChain
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
@@ -136,5 +136,14 @@ class UserService:
         response = llm_chain({"q_a": prompt, "format_instructions": format_instructions})
 
         parsed_response = response['text']
-        print(parsed_response)
         return parsed_response
+    
+    def update_news_topics(self, user_id, news_topics):
+        # Convert comma-separated string to list and trim spaces and convert to lower case
+        news_topics_list = [topic.lower().strip() for topic in news_topics.split(',')]
+
+        # Update the user's document
+        user_ref = self.db.collection('users').document(user_id)
+        user_ref.update({
+            'news_topics': firestore.ArrayUnion(news_topics_list)
+        })
