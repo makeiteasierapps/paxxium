@@ -2,7 +2,6 @@
 - Add visual indication to show selected chat box. This could be a change in color, a border, or any other visual cue that clearly indicates the active chat box.
 
 ## Feature Enhancements:
-- Implement automatic news article search based on answered profile questions. This will involve connecting the user's profile data to the news API query system.
 - Add features to carousel allowing deletion of news article or marking it as read. This will require updates to both the front-end display and the back-end database management.
 - Make avatar specific to user and add feature to change avatar. This will involve adding a new field to the user's profile data and creating a new interface for avatar selection.
 - Add form validation to agent menu. Name and model should be required
