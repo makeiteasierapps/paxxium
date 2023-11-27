@@ -11,7 +11,8 @@ from langchain.chat_models import ChatOpenAI
 import uuid
 from flask import current_app
 
-# Load environment variables
+
+#TODO: Turn this into a class
 load_dotenv()
 os.getenv('OPENAI_API_KEY')
 apikey = os.getenv('GNEWS_API_KEY')
@@ -146,5 +147,36 @@ def get_user_news_topics(uid):
     user = user_ref.get()
     if user.exists:
         return user.to_dict().get('news_topics', [])
-    
+
     return []
+
+def mark_is_read(uid, doc_id):
+    db = current_app.config['db']
+    articles_ref = db.collection('users').document(uid).collection('news_articles')
+
+    try:
+        # Query for the document with the matching 'id' field
+        articles = articles_ref.where('id', '==', doc_id).get()
+
+        if not articles:
+            return "No matching document found"
+
+        # There should only be one matching document, so get the first one
+        article_ref = articles[0].reference
+
+        # Update or create the 'is_read' field
+        article_ref.set({'is_read': True}, merge=True)
+        return "Update successful"
+    except Exception as e:
+        return f"Update failed: {str(e)}"
+
+def delete_news_article(uid, doc_id):
+    db = current_app.config['db']
+    article_ref = db.collection('users').document(uid).collection('news_articles').document(doc_id)
+    
+    try:
+        # Delete the document
+        article_ref.delete()
+        return "Deletion successful"
+    except Exception as e:
+        return f"Deletion failed: {str(e)}"

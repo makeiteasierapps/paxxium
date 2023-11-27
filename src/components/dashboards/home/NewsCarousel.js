@@ -27,10 +27,17 @@ const SearchButton = styled(Button)(({ theme }) => ({
     margin: theme.spacing(1),
 }));
 
+const SearchContainer = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: theme.spacing(2),
+}));
+
 const CarouselContainer = styled(Box)(({ theme }) => ({
     display: 'flex',
-    width: '90%', // take up 90% of parent's width
-    flex: 1,
+    width: '90%',
+    height: '70%',
     [`@media (max-width: ${theme.breakpoints.values.sm}px)`]: {
         width: '100%', // take up 100% of parent's width on small screens
     },
@@ -89,10 +96,10 @@ const NewsCarousel = () => {
         ),
     }));
 
-    const fetchUserNewsTopics = useCallback(async () => {
+    const aiNewsFetch = useCallback(async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/user/${uid}/news_topics`,
+                `${backendUrl}/news_topics`,
                 {
                     method: 'GET',
                     headers: {
@@ -106,12 +113,11 @@ const NewsCarousel = () => {
                 throw new Error('Failed to fetch user news topics');
             const data = await response.json();
             const randIdx = Math.floor(Math.random() * data.news_topics.length);
-            setQuery(data.news_topics[randIdx]);
             fetchNewsData(data.news_topics[randIdx]);
         } catch (error) {
             console.error(error);
         }
-    }, [fetchNewsData, idToken, uid]);
+    }, [fetchNewsData, idToken]);
 
     useEffect(() => {
         loadNewsData();
@@ -119,7 +125,7 @@ const NewsCarousel = () => {
 
     return (
         <MainContainer>
-            <Button onClick={fetchUserNewsTopics} variant="contained">
+            <Button onClick={aiNewsFetch} variant="contained">
                 Let AI pick your news
             </Button>
             <CarouselContainer>
@@ -129,21 +135,23 @@ const NewsCarousel = () => {
                     <p>No news data available</p>
                 )}
             </CarouselContainer>
-            <SearchField
-                label="Search"
-                variant="outlined"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-            />
-            <SearchButton
-                onClick={(event) => {
-                    event.preventDefault();
-                    fetchNewsData();
-                }}
-                variant="contained"
-            >
-                Submit
-            </SearchButton>
+            <SearchContainer>
+                <SearchField
+                    label="Search"
+                    variant="outlined"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                />
+                <SearchButton
+                    onClick={(event) => {
+                        event.preventDefault();
+                        fetchNewsData(query);
+                    }}
+                    variant="contained"
+                >
+                    Submit
+                </SearchButton>
+            </SearchContainer>
         </MainContainer>
     );
 };

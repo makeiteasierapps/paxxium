@@ -23,7 +23,6 @@
 - Add a secondary check for when the chat clear or trash buttons are clicked. This could be a confirmation dialog that prevents accidental deletion of chats.
 - Resolve bug related to code formatting in the response of streaming. This will involve investigating the current formatting system and identifying why it fails with multiple code blocks in a single response.
 
-
 ## General Refactoring:
 - The styled components could be moved into their own files to reduce the size of the main files.
 

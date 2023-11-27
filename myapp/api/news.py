@@ -14,6 +14,11 @@ def authenticate_request():
 
 @news.route('/news', methods=['POST'])
 def get_news():
+    """
+        Takes a news query from an AI generated list or from the user. 
+        Returns a list of summarized articles.
+    """
+    #TODO: allow for mulitple word queries, split then add hyphens? Check docs
     uid = authenticate_request()
     
     if not uid:
@@ -37,13 +42,32 @@ def load_news():
 
     return news_data, 200
 
-@news.route('/user/<user_id>/news_topics', methods=['GET'])
-def get_news_topics(user_id):
+@news.route('/news_topics', methods=['GET'])
+def get_news_topics():
     uid = authenticate_request()
     
-    if not uid or uid != user_id:
+    if not uid:
         return {'message': 'Invalid token'}, 403
     
     news_topics = get_user_news_topics(uid)
 
     return {'news_topics': news_topics}, 200
+
+@news.route('/news_articles', methods=['PUT', 'DELETE'])
+def update_or_delete_news_topics():
+    uid = authenticate_request()
+    
+    if not uid:
+        return {'message': 'Invalid token'}, 403
+
+    data = request.get_json()
+    doc_id = data['articleId']
+    if request.method == 'PUT':
+        # Update the document
+        mark_is_read(uid, doc_id)
+        return {'response': 'Updated successfully'}, 200
+    
+    if request.method == 'DELETE':
+        # Delete the document
+        delete_news_article(uid, doc_id)
+        return {'response': 'Deleted successfully'}, 200
