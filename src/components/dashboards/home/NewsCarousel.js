@@ -1,23 +1,14 @@
-import React, { useState, useContext, useEffect, useCallback } from 'react';
+import React, { useContext, useEffect } from 'react';
 import Carousel from 'react-spring-3d-carousel';
-import { AuthContext } from '../../../contexts/AuthContext';
+import { NewsContext } from '../../../contexts/NewsContext';
 import NewsCard from './NewsCard';
 import { styled, Box } from '@mui/system';
 import Button from '@mui/material/Button';
 import { TextField } from '@mui/material';
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 // Styled Components
-const MainContainer = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.background.default,
-    alignItems: 'center', // center the content horizontally
-    justifyContent: 'center',
-}));
 
 const SearchField = styled(TextField)(({ theme }) => ({
     marginRight: theme.spacing(1),
@@ -44,87 +35,30 @@ const CarouselContainer = styled(Box)(({ theme }) => ({
 }));
 
 const NewsCarousel = () => {
-    const [newsData, setNewsData] = useState([]);
-    const [query, setQuery] = useState('');
-    const { idToken, uid } = useContext(AuthContext);
-    const [slideIndex, setSlideIndex] = useState(0);
-
-    const loadNewsData = useCallback(async () => {
-        try {
-            const response = await fetch(`${backendUrl}/news/load`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: idToken,
-                },
-            });
-
-            if (!response.ok) throw new Error('Failed to load news data');
-            const data = await response.json();
-            setNewsData(data);
-        } catch (error) {}
-    }, [idToken]);
-
-    // Takes the query from the search field
-    const fetchNewsData = useCallback(
-        async (queryParam = query) => {
-            try {
-                const response = await fetch(`${backendUrl}/news`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: idToken,
-                    },
-                    body: JSON.stringify({
-                        query: queryParam,
-                    }),
-                });
-                if (!response.ok) throw new Error('Failed to fetch news data');
-                const data = await response.json();
-                setNewsData(data);
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        [idToken, query]
-    );
-
-    const newsSlides = newsData.map((news, index) => ({
-        key: news.id,
-        content: (
-            <NewsCard news={news} index={index} setSlideIndex={setSlideIndex} />
-        ),
-    }));
-
-    const aiNewsFetch = useCallback(async () => {
-        try {
-            const response = await fetch(
-                `${backendUrl}/news_topics`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: idToken,
-                    },
-                }
-            );
-
-            if (!response.ok)
-                throw new Error('Failed to fetch user news topics');
-            const data = await response.json();
-            const randIdx = Math.floor(Math.random() * data.news_topics.length);
-            fetchNewsData(data.news_topics[randIdx]);
-        } catch (error) {
-            console.error(error);
-        }
-    }, [fetchNewsData, idToken]);
+    const {
+        newsData,
+        query,
+        setQuery,
+        slideIndex,
+        loadNewsData,
+        fetchNewsData,
+        aiNewsFetch,
+        readFilter,
+        setReadFilter,
+        setUnreadNewsData,
+    } = useContext(NewsContext);
 
     useEffect(() => {
         loadNewsData();
     }, [loadNewsData]);
 
+    const newsSlides = newsData.map((news, index) => ({
+        key: news.id,
+        content: <NewsCard news={news} index={index} />,
+    }));
+
     return (
-        <MainContainer>
+        <>
             <Button onClick={aiNewsFetch} variant="contained">
                 Let AI pick your news
             </Button>
@@ -151,8 +85,26 @@ const NewsCarousel = () => {
                 >
                     Submit
                 </SearchButton>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={readFilter}
+                            onChange={(event) => {
+                                setReadFilter(event.target.checked);
+                                if (event.target.checked) {
+                                    setUnreadNewsData();
+                                } else {
+                                    loadNewsData();
+                                }
+                            }}
+                            name="readFilter"
+                            color="primary"
+                        />
+                    }
+                    label="Hide read articles"
+                />
             </SearchContainer>
-        </MainContainer>
+        </>
     );
 };
 

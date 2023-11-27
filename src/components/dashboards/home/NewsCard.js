@@ -1,5 +1,6 @@
-import { useState, useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../../../contexts/AuthContext';
+import { NewsContext } from '../../../contexts/NewsContext';
 import {
     Card,
     CardMedia,
@@ -14,12 +15,15 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { motion } from 'framer-motion';
+import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-const NewsCard = ({ news, index, setSlideIndex }) => {
-    const [isRead, setIsRead] = useState(news.is_read);
+const NewsCard = ({ news, index }) => {
+    const { markNewsAsRead, deleteNewsArticle, setSlideIndex } =
+        useContext(NewsContext);
     const { idToken } = useContext(AuthContext);
+    const [openDialog, setOpenDialog] = useState(false);
 
     const markArticleRead = async () => {
         try {
@@ -35,9 +39,27 @@ const NewsCard = ({ news, index, setSlideIndex }) => {
             if (!response.ok) {
                 throw new Error(data.message);
             }
-            setIsRead(true);
-            //TODO: display success message to user
-            console.log(data.response);
+            markNewsAsRead(news.id);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleArticleDelete = async () => {
+        try {
+            const response = await fetch(`${backendUrl}/news_articles`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: idToken,
+                },
+                body: JSON.stringify({ articleId: news.id }),
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message);
+            }
+            deleteNewsArticle(news.id);
         } catch (error) {
             console.error(error);
         }
@@ -75,12 +97,12 @@ const NewsCard = ({ news, index, setSlideIndex }) => {
                             }}
                             onClick={(e) => {
                                 e.stopPropagation(); // Prevent triggering Card's onClick
-                                if (!isRead) {
+                                if (!news.is_read) {
                                     markArticleRead();
                                 }
                             }}
                         >
-                            {isRead ? (
+                            {news.is_read ? (
                                 <CheckBoxIcon />
                             ) : (
                                 <CheckBoxOutlineBlankIcon />
@@ -97,8 +119,8 @@ const NewsCard = ({ news, index, setSlideIndex }) => {
                                 '&:hover': { opacity: 1 },
                             }}
                             onClick={(e) => {
-                                e.stopPropagation(); // Prevent triggering Card's onClick
-                                // Fetch request to delete
+                                e.stopPropagation();
+                                setOpenDialog(true);
                             }}
                         >
                             <DeleteIcon />
@@ -119,6 +141,14 @@ const NewsCard = ({ news, index, setSlideIndex }) => {
                     </Button>
                 </CardActions>
             </Card>
+            <DeleteConfirmationDialog
+                open={openDialog}
+                handleClose={() => setOpenDialog(false)}
+                handleConfirm={() => {
+                    setOpenDialog(false);
+                    handleArticleDelete();
+                }}
+            />
         </motion.div>
     );
 };

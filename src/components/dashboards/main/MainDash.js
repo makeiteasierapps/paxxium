@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { styled } from '@mui/system';
 import NavTabs from './NavTabs';
 import ChatDashboard from '../chat/ChatDashboard';
-import NewsCarousel from '../home/NewsCarousel';
+import Home from '../home/Home';
 import Profile from '../profile/Profile';
 import { ChatProvider } from '../../../contexts/ChatContext';
+import { NewsProvider } from '../../../contexts/NewsContext';
 
 const DashboardWrapper = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -25,7 +26,11 @@ const MainDash = () => {
             <NavTabs setValue={setValue} />
             <DashboardWrapper>
                 <Content>
-                    {value === 0 && <NewsCarousel />}
+                    {value === 0 && (
+                        <NewsProvider>
+                            <Home />
+                        </NewsProvider>
+                    )}
                     {value === 1 && (
                         <ChatProvider>
                             <ChatDashboard />

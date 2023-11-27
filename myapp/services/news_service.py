@@ -123,23 +123,20 @@ def upload_news_data(uid, news_data_list):
             print(f"URL '{url}' already exists, skipping...")
 
 
-def get_random_news_articles(uid):
+def get_all_news_articles(uid):
     db = current_app.config['db']
     news_ref = db.collection('users').document(uid).collection('news_articles')
     
     # Get all news articles
     news_articles = news_ref.get()
     
-    # Randomly select 12 articles
-    random_articles = random.sample(news_articles, 12)
-    
     # Extract the article data
-    random_news = []
-    for article in random_articles:
+    all_news = []
+    for article in news_articles:
         article_data = article.to_dict()
-        random_news.append(article_data)
+        all_news.append(article_data)
     
-    return random_news
+    return all_news
 
 def get_user_news_topics(uid):
     db = current_app.config['db']
@@ -172,9 +169,18 @@ def mark_is_read(uid, doc_id):
 
 def delete_news_article(uid, doc_id):
     db = current_app.config['db']
-    article_ref = db.collection('users').document(uid).collection('news_articles').document(doc_id)
+    articles_ref = db.collection('users').document(uid).collection('news_articles')
     
     try:
+        # Query for the document with the matching 'id' field
+        articles = articles_ref.where('id', '==', doc_id).get()
+
+        if not articles:
+            return "No matching document found"
+
+        # There should only be one matching document, so get the first one
+        article_ref = articles[0].reference
+
         # Delete the document
         article_ref.delete()
         return "Deletion successful"

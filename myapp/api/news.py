@@ -38,7 +38,7 @@ def load_news():
     if not uid:
         return {'message': 'Invalid token'}, 403
     
-    news_data = get_random_news_articles(uid)
+    news_data = get_all_news_articles(uid)
 
     return news_data, 200
 
@@ -59,8 +59,9 @@ def update_or_delete_news_topics():
     
     if not uid:
         return {'message': 'Invalid token'}, 403
-
+    
     data = request.get_json()
+    print(data)
     doc_id = data['articleId']
     if request.method == 'PUT':
         # Update the document
