@@ -20,7 +20,7 @@ export const ChatProvider = ({ children }) => {
     const addMessage = (agentId, newMessage) => {
         setMessages((prevMessageParts) => ({
             ...prevMessageParts,
-            [agentId]: [...prevMessageParts[agentId], newMessage],
+            [agentId]: [...(prevMessageParts[agentId] || []), newMessage],
         }));
     };
 
