@@ -1,15 +1,7 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../../contexts/AuthContext';
-
-import {
-    TextField,
-    IconButton,
-    InputAdornment,
-    Avatar,
-    Box,
-    Typography,
-} from '@mui/material';
-import { Check, Edit } from '@mui/icons-material';
+import { ProfileContext } from '../../../contexts/ProfileContext';
+import { TextField, Avatar, Box, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 
 import shaunoAvatar from '../../../assets/images/shaunoAvatar.png';
@@ -81,64 +73,10 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 const User = () => {
+    const [isEditing, setIsEditing] = useState(false);
     const { idToken } = useContext(AuthContext);
-    const [isEditing, setIsEditing] = useState({
-        avatar: false,
-        username: false,
-        serpapi: false,
-        openai: false,
-        first_name: false,
-        last_name: false,
-    });
-    const [isHovered, setIsHovered] = useState({
-        avatar: false,
-        username: false,
-        serpapi: false,
-        openai: false,
-        first_name: false,
-        last_name: false,
-    });
-    const [profileData, setProfileData] = useState({});
-
-    // Handlers
-    const handleEdit = (field) => {
-        setIsEditing({ ...isEditing, [field]: true });
-    };
-
-    const handleSave = (field, value) => {
-        setProfileData((prevData) => ({ ...prevData, [field]: value }));
-    };
-
-    const handleEditDone = async (field) => {
-        await fetch(`${backendUrl}/profile/update`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: idToken,
-            },
-            body: JSON.stringify({
-                [field]: profileData[field],
-            }),
-        });
-        setIsEditing({ ...isEditing, [field]: false });
-    };
-
-    
-    // I set this timer here so that the edit icon doesnt show up right away
-    // creates a better user experience by showing the edit icon when the user
-    // shows intent to edit
-    let timer = useRef();
-
-    const handleMouseEnter = (field) => {
-        timer.current = setTimeout(() => {
-            setIsHovered((prevHovered) => ({ ...prevHovered, [field]: true }));
-        }, 500);
-    };
-
-    const handleMouseLeave = (field) => {
-        clearTimeout(timer.current);
-        setIsHovered((prevHovered) => ({ ...prevHovered, [field]: false }));
-    };
+    const { handleSave, profileData, setProfileData } =
+        useContext(ProfileContext);
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -158,60 +96,39 @@ const User = () => {
             }
         };
         loadProfile();
-    }, [idToken]);
+    }, [idToken, setProfileData]);
 
     return (
         <UserContainer elevation={9}>
             <AvatarContainer>
                 <StyledAvatar alt="User Avatar" src={shaunoAvatar} />
-                {isEditing.username ? (
-                    <TextField
-                        value={profileData.username}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    {isEditing.username ? (
-                                        <IconButton
-                                            onClick={() =>
-                                                handleEditDone('username')
-                                            }
-                                        >
-                                            <Check />
-                                        </IconButton>
-                                    ) : (
-                                        <IconButton
-                                            onClick={() =>
-                                                handleEdit('username')
-                                            }
-                                        >
-                                            <Edit />
-                                        </IconButton>
-                                    )}
-                                </InputAdornment>
-                            ),
-                        }}
-                        onChange={(e) => handleSave('username', e.target.value)}
-                    />
-                ) : (
-                    <Box
-                        sx={{ display: 'flex', alignItems: 'center' }}
-                        onMouseEnter={() => handleMouseEnter('username')}
-                        onMouseLeave={() => handleMouseLeave('username')}
-                    >
+                <Box
+                    sx={{ display: 'flex', alignItems: 'center' }}
+                    onClick={() => setIsEditing(true)}
+                >
+                    {isEditing ? (
+                        <StyledTextField
+                            size="small"
+                            value={profileData.username}
+                            type="text"
+                            variant="outlined"
+                            onChange={(e) =>
+                                setProfileData({
+                                    ...profileData,
+                                    username: e.target.value,
+                                })
+                            }
+                            onBlur={() => {
+                                setIsEditing(false);
+                                handleSave('username', profileData.username);
+                            }}
+                        />
+                    ) : (
                         <Username variant="body1">
                             {profileData.username}
                         </Username>
-                        <IconButton onClick={() => handleEdit('username')}>
-                            <Edit
-                                style={{
-                                    visibility: isHovered.username
-                                        ? 'visible'
-                                        : 'hidden',
-                                }}
-                            />
-                        </IconButton>
-                    </Box>
-                )}
+                    )}
+                </Box>
             </AvatarContainer>
             <TextFieldContainer>
                 <Box sx={{ display: 'flex', flexDirection: 'row' }}>
@@ -221,149 +138,50 @@ const User = () => {
                         label={!profileData.first_name ? 'First Name' : null}
                         type="text"
                         variant="outlined"
-                        disabled={!isEditing.first_name}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    {isEditing.first_name ? (
-                                        <IconButton
-                                            onClick={() =>
-                                                handleEditDone('first_name')
-                                            }
-                                        >
-                                            <Check />
-                                        </IconButton>
-                                    ) : (
-                                        <IconButton
-                                            onClick={() =>
-                                                handleEdit('first_name')
-                                            }
-                                            style={{
-                                                visibility: isHovered.first_name
-                                                    ? 'visible'
-                                                    : 'hidden',
-                                            }}
-                                        >
-                                            <Edit />
-                                        </IconButton>
-                                    )}
-                                </InputAdornment>
-                            ),
-                        }}
                         onChange={(e) =>
-                            handleSave('first_name', e.target.value)
+                            setProfileData({
+                                ...profileData,
+                                first_name: e.target.value,
+                            })
                         }
-                        onMouseEnter={() => handleMouseEnter('first_name')}
-                        onMouseLeave={() => handleMouseLeave('first_name')}
                     />
                     <StyledTextField
                         size="small"
                         value={profileData.last_name}
                         label={!profileData.last_name ? 'Last Name' : null}
                         type="text"
-                        disabled={!isEditing.last_name}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    {isEditing.last_name ? (
-                                        <IconButton
-                                            onClick={() =>
-                                                handleEditDone('last_name')
-                                            }
-                                        >
-                                            <Check />
-                                        </IconButton>
-                                    ) : (
-                                        <IconButton
-                                            onClick={() =>
-                                                handleEdit('last_name')
-                                            }
-                                            style={{
-                                                visibility: isHovered.last_name
-                                                    ? 'visible'
-                                                    : 'hidden',
-                                            }}
-                                        >
-                                            <Edit />
-                                        </IconButton>
-                                    )}
-                                </InputAdornment>
-                            ),
-                        }}
+                        variant="outlined"
                         onChange={(e) =>
-                            handleSave('last_name', e.target.value)
+                            setProfileData({
+                                ...profileData,
+                                last_name: e.target.value,
+                            })
                         }
-                        onMouseEnter={() => handleMouseEnter('last_name')}
-                        onMouseLeave={() => handleMouseLeave('last_name')}
                     />
                 </Box>
                 <StyledTextField
                     size="small"
                     label="Serpapi Key"
                     type="password"
-                    disabled={!isEditing.serpapi}
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                {isEditing.serpapi ? (
-                                    <IconButton
-                                        onClick={() =>
-                                            handleEditDone('serpapi')
-                                        }
-                                    >
-                                        <Check />
-                                    </IconButton>
-                                ) : (
-                                    <IconButton
-                                        onClick={() => handleEdit('serpapi')}
-                                        style={{
-                                            visibility: isHovered.serpapi
-                                                ? 'visible'
-                                                : 'hidden',
-                                        }}
-                                    >
-                                        <Edit />
-                                    </IconButton>
-                                )}
-                            </InputAdornment>
-                        ),
-                    }}
-                    onChange={(e) => handleSave('serpapi', e.target.value)}
-                    onMouseEnter={() => handleMouseEnter('serpapi')}
-                    onMouseLeave={() => handleMouseLeave('serpapi')}
+                    variant="outlined"
+                    onChange={(e) =>
+                        setProfileData({
+                            ...profileData,
+                            serp_key: e.target.value,
+                        })
+                    }
                 />
                 <StyledTextField
                     size="small"
                     label="OpenAI Key"
                     type="password"
-                    disabled={!isEditing.openai}
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                {isEditing.openai ? (
-                                    <IconButton
-                                        onClick={() => handleEditDone('openai')}
-                                    >
-                                        <Check />
-                                    </IconButton>
-                                ) : (
-                                    <IconButton
-                                        onClick={() => handleEdit('openai')}
-                                        style={{
-                                            visibility: isHovered.openai
-                                                ? 'visible'
-                                                : 'hidden',
-                                        }}
-                                    >
-                                        <Edit />
-                                    </IconButton>
-                                )}
-                            </InputAdornment>
-                        ),
-                    }}
-                    onChange={(e) => handleSave('openai', e.target.value)}
-                    onMouseEnter={() => handleMouseEnter('openai')}
-                    onMouseLeave={() => handleMouseLeave('openai')}
+                    variant="outlined"
+                    onChange={(e) =>
+                        setProfileData({
+                            ...profileData,
+                            open_key: e.target.value,
+                        })
+                    }
                 />
             </TextFieldContainer>
         </UserContainer>

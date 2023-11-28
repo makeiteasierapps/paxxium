@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../../../contexts/AuthContext';
+import { ProfileContext } from '../../../contexts/ProfileContext';
 import { Typography, Box, Button, TextField, Tab, Tabs } from '@mui/material';
 import { styled } from '@mui/system';
 
@@ -110,7 +111,8 @@ const Answer = styled(TextField)(({ theme }) => ({
 
 const Questions = () => {
     const { idToken } = useContext(AuthContext);
-    const [answers, setAnswers] = useState({});
+    const { handleFormSubmit, answers, setAnswers } =
+        useContext(ProfileContext);
     const [currentTab, setCurrentTab] = useState(0);
 
     // Load answers from backend
@@ -134,7 +136,7 @@ const Questions = () => {
             }
         };
         getAnswers();
-    }, [idToken]);
+    }, [idToken, setAnswers]);
 
     const handleAnswerChange = (category, question, answer) => {
         setAnswers((prevAnswers) => ({
@@ -144,27 +146,6 @@ const Questions = () => {
                 [question]: answer,
             },
         }));
-    };
-
-    const handleFormSubmit = async () => {
-        try {
-            const response = await fetch(
-                `${backendUrl}/profile/update-questions`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: idToken,
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({ answers }),
-                }
-            );
-            const data = await response.json();
-            console.log(data);
-        } catch (error) {
-            console.log(error);
-        }
     };
 
     return (
@@ -204,15 +185,6 @@ const Questions = () => {
                     </Box>
                 )
             )}
-            <Box>
-                <Button
-                    variant="contained"
-                    onClick={handleFormSubmit}
-                    sx={{ margin: 3 }}
-                >
-                    Update
-                </Button>
-            </Box>
         </MainPaper>
     );
 };

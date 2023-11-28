@@ -1,10 +1,11 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import {
     BrowserRouter as Router,
     Route,
     Routes,
     useNavigate,
     Navigate,
+    useLocation,
 } from 'react-router-dom';
 import LoginPage from './components/auth/LoginPage';
 import SignUpPage from './components/auth/SignUpPage';
@@ -20,18 +21,29 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const AuthenticatedApp = () => {
-    const { idToken, uid, user, setUid, setUsername, isAuthorized, setIsAuthorized } = useContext(AuthContext);
-    
+    const {
+        idToken,
+        uid,
+        user,
+        setUid,
+        setUsername,
+        isAuthorized,
+        setIsAuthorized,
+    } = useContext(AuthContext);
+
     const db = getFirestore();
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
-        if (!idToken) {
-            navigate('/');
-        } else if (isAuthorized) {
-            navigate('/dashboard');
+        if (location.pathname !== '/signup') {
+            if (!idToken) {
+                navigate('/');
+            } else if (isAuthorized) {
+                navigate('/dashboard');
+            }
         }
-    }, [idToken, isAuthorized, navigate]);
+    }, [idToken, isAuthorized, navigate, location.pathname]);
 
     // Fetches auth status from the db then loads the user into state.
     useEffect(() => {
@@ -99,9 +111,9 @@ const App = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <AuthProvider>
-                    <Router>
-                        <AuthenticatedApp />
-                    </Router>
+                <Router>
+                    <AuthenticatedApp />
+                </Router>
             </AuthProvider>
         </ThemeProvider>
     );

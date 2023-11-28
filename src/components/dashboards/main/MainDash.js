@@ -6,7 +6,7 @@ import Home from '../home/Home';
 import Profile from '../profile/Profile';
 import { ChatProvider } from '../../../contexts/ChatContext';
 import { NewsProvider } from '../../../contexts/NewsContext';
-
+import { ProfileProvider } from '../../../contexts/ProfileContext';
 const DashboardWrapper = styled('div')(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
@@ -36,7 +36,11 @@ const MainDash = () => {
                             <ChatDashboard />
                         </ChatProvider>
                     )}
-                    {value === 2 && <Profile />}
+                    {value === 2 && (
+                        <ProfileProvider>
+                            <Profile />
+                        </ProfileProvider>
+                    )}
                 </Content>
             </DashboardWrapper>
         </>
