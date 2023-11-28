@@ -108,6 +108,7 @@ const User = () => {
                 >
                     {isEditing ? (
                         <StyledTextField
+                            autoFocus
                             size="small"
                             value={profileData.username}
                             type="text"
