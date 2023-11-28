@@ -173,7 +173,7 @@ const User = () => {
                                     {isEditing.username ? (
                                         <IconButton
                                             onClick={() =>
-                                                handleEditDone('username')
+                                                handleEditDone("username")
                                             }
                                         >
                                             <Check />
@@ -181,7 +181,7 @@ const User = () => {
                                     ) : (
                                         <IconButton
                                             onClick={() =>
-                                                handleEdit('username')
+                                                handleEdit("username")
                                             }
                                         >
                                             <Edit />
@@ -190,23 +190,23 @@ const User = () => {
                                 </InputAdornment>
                             ),
                         }}
-                        onChange={(e) => handleSave('username', e.target.value)}
+                        onChange={(e) => handleSave("username", e.target.value)}
                     />
                 ) : (
                     <Box
-                        sx={{ display: 'flex', alignItems: 'center' }}
-                        onMouseEnter={() => handleMouseEnter('username')}
-                        onMouseLeave={() => handleMouseLeave('username')}
+                        sx={{ display: "flex", alignItems: "center" }}
+                        onMouseEnter={() => handleMouseEnter("username")}
+                        onMouseLeave={() => handleMouseLeave("username")}
                     >
                         <Username variant="body1">
                             {profileData.username}
                         </Username>
-                        <IconButton onClick={() => handleEdit('username')}>
+                        <IconButton onClick={() => handleEdit("username")}>
                             <Edit
                                 style={{
                                     visibility: isHovered.username
-                                        ? 'visible'
-                                        : 'hidden',
+                                        ? "visible"
+                                        : "hidden",
                                 }}
                             />
                         </IconButton>
@@ -214,11 +214,11 @@ const User = () => {
                 )}
             </AvatarContainer>
             <TextFieldContainer>
-                <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                <Box sx={{ display: "flex", flexDirection: "row" }}>
                     <StyledTextField
                         size="small"
                         value={profileData.first_name}
-                        label={!profileData.first_name ? 'First Name' : null}
+                        label={!profileData.first_name ? "First Name" : null}
                         type="text"
                         variant="outlined"
                         disabled={!isEditing.first_name}
@@ -228,7 +228,7 @@ const User = () => {
                                     {isEditing.first_name ? (
                                         <IconButton
                                             onClick={() =>
-                                                handleEditDone('first_name')
+                                                handleEditDone("first_name")
                                             }
                                         >
                                             <Check />
@@ -236,12 +236,12 @@ const User = () => {
                                     ) : (
                                         <IconButton
                                             onClick={() =>
-                                                handleEdit('first_name')
+                                                handleEdit("first_name")
                                             }
                                             style={{
                                                 visibility: isHovered.first_name
-                                                    ? 'visible'
-                                                    : 'hidden',
+                                                    ? "visible"
+                                                    : "hidden",
                                             }}
                                         >
                                             <Edit />
@@ -251,15 +251,15 @@ const User = () => {
                             ),
                         }}
                         onChange={(e) =>
-                            handleSave('first_name', e.target.value)
+                            handleSave("first_name", e.target.value)
                         }
-                        onMouseEnter={() => handleMouseEnter('first_name')}
-                        onMouseLeave={() => handleMouseLeave('first_name')}
+                        onMouseEnter={() => handleMouseEnter("first_name")}
+                        onMouseLeave={() => handleMouseLeave("first_name")}
                     />
                     <StyledTextField
                         size="small"
                         value={profileData.last_name}
-                        label={!profileData.last_name ? 'Last Name' : null}
+                        label={!profileData.last_name ? "Last Name" : null}
                         type="text"
                         disabled={!isEditing.last_name}
                         InputProps={{
@@ -268,7 +268,7 @@ const User = () => {
                                     {isEditing.last_name ? (
                                         <IconButton
                                             onClick={() =>
-                                                handleEditDone('last_name')
+                                                handleEditDone("last_name")
                                             }
                                         >
                                             <Check />
@@ -276,12 +276,12 @@ const User = () => {
                                     ) : (
                                         <IconButton
                                             onClick={() =>
-                                                handleEdit('last_name')
+                                                handleEdit("last_name")
                                             }
                                             style={{
                                                 visibility: isHovered.last_name
-                                                    ? 'visible'
-                                                    : 'hidden',
+                                                    ? "visible"
+                                                    : "hidden",
                                             }}
                                         >
                                             <Edit />
@@ -291,10 +291,10 @@ const User = () => {
                             ),
                         }}
                         onChange={(e) =>
-                            handleSave('last_name', e.target.value)
+                            handleSave("last_name", e.target.value)
                         }
-                        onMouseEnter={() => handleMouseEnter('last_name')}
-                        onMouseLeave={() => handleMouseLeave('last_name')}
+                        onMouseEnter={() => handleMouseEnter("last_name")}
+                        onMouseLeave={() => handleMouseLeave("last_name")}
                     />
                 </Box>
                 <StyledTextField
@@ -308,18 +308,18 @@ const User = () => {
                                 {isEditing.serpapi ? (
                                     <IconButton
                                         onClick={() =>
-                                            handleEditDone('serpapi')
+                                            handleEditDone("serpapi")
                                         }
                                     >
                                         <Check />
                                     </IconButton>
                                 ) : (
                                     <IconButton
-                                        onClick={() => handleEdit('serpapi')}
+                                        onClick={() => handleEdit("serpapi")}
                                         style={{
                                             visibility: isHovered.serpapi
-                                                ? 'visible'
-                                                : 'hidden',
+                                                ? "visible"
+                                                : "hidden",
                                         }}
                                     >
                                         <Edit />
@@ -328,9 +328,9 @@ const User = () => {
                             </InputAdornment>
                         ),
                     }}
-                    onChange={(e) => handleSave('serpapi', e.target.value)}
-                    onMouseEnter={() => handleMouseEnter('serpapi')}
-                    onMouseLeave={() => handleMouseLeave('serpapi')}
+                    onChange={(e) => handleSave("serp_key", e.target.value)}
+                    onMouseEnter={() => handleMouseEnter("serpapi")}
+                    onMouseLeave={() => handleMouseLeave("serpapi")}
                 />
                 <StyledTextField
                     size="small"
@@ -342,17 +342,17 @@ const User = () => {
                             <InputAdornment position="end">
                                 {isEditing.openai ? (
                                     <IconButton
-                                        onClick={() => handleEditDone('openai')}
+                                        onClick={() => handleEditDone("openai")}
                                     >
                                         <Check />
                                     </IconButton>
                                 ) : (
                                     <IconButton
-                                        onClick={() => handleEdit('openai')}
+                                        onClick={() => handleEdit("openai")}
                                         style={{
                                             visibility: isHovered.openai
-                                                ? 'visible'
-                                                : 'hidden',
+                                                ? "visible"
+                                                : "hidden",
                                         }}
                                     >
                                         <Edit />
@@ -361,9 +361,9 @@ const User = () => {
                             </InputAdornment>
                         ),
                     }}
-                    onChange={(e) => handleSave('openai', e.target.value)}
-                    onMouseEnter={() => handleMouseEnter('openai')}
-                    onMouseLeave={() => handleMouseLeave('openai')}
+                    onChange={(e) => handleSave("open_key", e.target.value)}
+                    onMouseEnter={() => handleMouseEnter("openai")}
+                    onMouseLeave={() => handleMouseLeave("openai")}
                 />
             </TextFieldContainer>
         </UserContainer>
