@@ -1,74 +1,88 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from "react";
 import {
     BrowserRouter as Router,
     Route,
     Routes,
     useNavigate,
     Navigate,
-} from 'react-router-dom';
-import LoginPage from './components/auth/LoginPage';
-import SignUpPage from './components/auth/SignUpPage';
-import './styles/App.css';
-import MainDash from './components/dashboards/main/MainDash';
-import CssBaseline from '@mui/material/CssBaseline';
-import { AuthProvider, AuthContext } from './contexts/AuthContext';
-import { ThemeProvider } from '@mui/material/styles';
-import { theme } from './Theme';
-import TitleBar from './components/dashboards/main/AppBar';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+    useLocation,
+} from "react-router-dom";
+import LoginPage from "./components/auth/LoginPage";
+import SignUpPage from "./components/auth/SignUpPage";
+import "./styles/App.css";
+import MainDash from "./components/dashboards/main/MainDash";
+import CssBaseline from "@mui/material/CssBaseline";
+import { AuthProvider, AuthContext } from "./contexts/AuthContext";
+import { ThemeProvider } from "@mui/material/styles";
+import { theme } from "./Theme";
+import TitleBar from "./components/dashboards/main/AppBar";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const AuthenticatedApp = () => {
-    const { idToken, uid, user, setUid, setUsername, isAuthorized, setIsAuthorized } = useContext(AuthContext);
-    
+    const auth = useContext(AuthContext);
+    const {
+        idToken,
+        isAuthorized,
+        uid,
+        user,
+        setIsAuthorized,
+        setUid,
+        setUsername,
+    } = auth;
+
     const db = getFirestore();
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
-        if (!idToken) {
-            navigate('/');
-        } else if (isAuthorized) {
-            navigate('/dashboard');
+        // dont check auth on signup page
+        if (location.pathname === "/signup") {
+            return;
         }
-    }, [idToken, isAuthorized, navigate]);
+        if (isAuthorized) {
+            navigate("/dashboard");
+        }
+        navigate("/");
+    }, [isAuthorized]);
 
     // Fetches auth status from the db then loads the user into state.
     useEffect(() => {
+        if ([idToken, user, uid, db].some((value) => !value)) return;
+
         const fetchData = async () => {
-            if (idToken && user) {
-                try {
-                    const response = await fetch(`${backendUrl}/auth_check`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: idToken,
-                        },
-                        body: JSON.stringify({
-                            uid: uid,
-                        }),
-                    });
+            try {
+                const response = await fetch(`${backendUrl}/auth_check`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: idToken,
+                    },
+                    body: JSON.stringify({
+                        uid: uid,
+                    }),
+                });
 
-                    const responseData = await response.json();
+                const responseData = await response.json();
 
-                    // Checks if admin has grtanted access to the app
-                    if (responseData.auth_status) {
-                        setIsAuthorized(true);
-                        setUid(user.uid);
-                        const userDoc = await getDoc(doc(db, 'users', uid));
-                        if (!userDoc.exists()) {
-                            throw new Error('No user found in Firestore');
-                        }
-                        setUsername(userDoc.data().username);
+                // Checks if admin has granted access to the app
+                if (responseData.auth_status) {
+                    setIsAuthorized(true);
+                    setUid(user.uid);
+                    const userDoc = await getDoc(doc(db, "users", uid));
+                    if (!userDoc.exists()) {
+                        throw new Error("No user found in Firestore");
                     }
-                } catch (error) {
-                    console.error('Failed to fetch:', error);
+                    setUsername(userDoc.data().username);
                 }
+            } catch (error) {
+                console.error("Failed to fetch:", error);
             }
         };
 
         fetchData();
-    }, [db, idToken, setUid, setUsername, user, uid, setIsAuthorized]);
+    }, [user]);
 
     return (
         <>
@@ -99,9 +113,9 @@ const App = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <AuthProvider>
-                    <Router>
-                        <AuthenticatedApp />
-                    </Router>
+                <Router>
+                    <AuthenticatedApp />
+                </Router>
             </AuthProvider>
         </ThemeProvider>
     );
