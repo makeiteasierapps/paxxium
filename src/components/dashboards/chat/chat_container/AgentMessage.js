@@ -51,6 +51,7 @@ const AgentMessage = ({ message }) => {
                 if (message.type === 'database') {
                     const result = formatBlockMessage(message);
                     setProcessedMessages(result);
+                    console.log(result);
                 } else if (message.type === 'stream') {
                     formatStreamMessage(
                         message,
