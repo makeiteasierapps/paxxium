@@ -1,5 +1,4 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
-import Prism from "prismjs";
 import io from "socket.io-client";
 import "prismjs/components/prism-javascript.min";
 import "prismjs/components/prism-python";

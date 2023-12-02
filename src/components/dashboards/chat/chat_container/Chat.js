@@ -8,7 +8,7 @@ import MessageInput from './MessageInput';
 import ChatBar from './ChatBar';
 import { AuthContext } from '../../../../contexts/AuthContext';
 import { ChatContext } from '../../../../contexts/ChatContext';
-
+import { formatBlockMessage } from '../utils/messageFormatter';
 import { handleIncomingMessageStream } from '../chat_container/handlers/handleIncomingMessageStream';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -113,12 +113,31 @@ const Chat = ({
 
     useEffect(() => {
         const handleToken = (token) => {
+            const codeStartIndicator = /```/g;
+            const codeEndIndicator = /``/g;
+
+            let messageContent = token.message_content;
+
+            // Detect code block indicators and update the flag without adding them to the state
+            if (
+                codeStartIndicator.test(messageContent) ||
+                codeEndIndicator.test(messageContent)
+            ) {
+                setInsideCodeBlock(
+                    (prevInsideCodeBlock) => !prevInsideCodeBlock
+                );
+                // Remove the code block indicators from the message content
+                messageContent = messageContent
+                    .replace(codeStartIndicator, '')
+                    .replace(codeEndIndicator, '');
+            }
+            token.message_content = messageContent;
+            // Continue with the updated message content without the code block indicators
             setMessages((prevMessage) => {
                 const newMessageParts = handleIncomingMessageStream(
                     prevMessage,
                     id,
                     token,
-                    setInsideCodeBlock,
                     insideCodeBlock
                 );
                 return newMessageParts;
@@ -155,12 +174,15 @@ const Chat = ({
             <MessagesContainer item xs={9}>
                 <MessageArea>
                     {messages[id]?.map((message, index) => {
+                        let formattedMessage = message;
                         if (message.type === 'database') {
                             if (message.message_from === 'agent') {
+                                formattedMessage = formatBlockMessage(message);
                                 return (
                                     <AgentMessage
                                         key={`agent${index}`}
-                                        message={message}
+                                        message={formattedMessage}
+                                        id={id}
                                     />
                                 );
                             } else {
@@ -171,7 +193,7 @@ const Chat = ({
                                     />
                                 );
                             }
-                        } else if (message.type === 'stream') {
+                        } else {
                             return (
                                 <AgentMessage
                                     key={`stream${index}`}

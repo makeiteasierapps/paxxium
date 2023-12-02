@@ -1,38 +1,36 @@
-// This function processes the stream of messages coming from the chat.
-// It takes the previous message, the id of the current chat, and the token of the new message as parameters.
-// it handles returning the new message state object
+import { formatStreamMessage } from '../../utils/messageFormatter';
 export const handleIncomingMessageStream = (
     prevMessage,
     id,
     tokenObj,
-    setInsideCodeBlock
+    insideCodeBlock
 ) => {
-    const lastMessage = prevMessage[id][prevMessage[id].length - 1];
-    const codeStartIndicator = /```/g;
-    const codeEndIndicator = /``/g;
 
-    // Check if the token starts or ends a code block
-    if (
-        codeStartIndicator.test(tokenObj.message_content) ||
-        codeEndIndicator.test(tokenObj.message_content)
-    ) {
-        setInsideCodeBlock((prevInsideCodeBlock) => !prevInsideCodeBlock);
-    }
-
-    if (lastMessage.message_from === 'user') {
+    // 
+    const messagePartsArray = formatStreamMessage(tokenObj, insideCodeBlock);
+    if (prevMessage[id][prevMessage[id].length - 1].message_from === 'user') {
         return {
             ...prevMessage,
-            [id]: [...prevMessage[id], tokenObj],
+            [id]: [...prevMessage[id], messagePartsArray],
         };
     } else {
-        const newLastMessage = {
-            ...lastMessage,
-            message_content:
-                lastMessage.message_content + tokenObj.message_content,
-        };
-        return {
-            ...prevMessage,
-            [id]: [...prevMessage[id].slice(0, -1), newLastMessage],
-        };
+        const newPrevMessage = { ...prevMessage };
+        const lastMessageIndex = newPrevMessage[id].length - 1;
+        const lastMessage = newPrevMessage[id][lastMessageIndex];
+
+        // Check if the last message is of type 'text' and append the new content to it
+        // Get the last object in the lastMessage array
+        const lastMessageObject = lastMessage[lastMessage.length - 1];
+
+        if (lastMessageObject.type === messagePartsArray[0].type) {
+            // If the types match, append the new content to the last object's content
+            lastMessageObject.content += messagePartsArray[0].content;
+        } else {
+            // If the types do not match, add the new result as a new object in the lastMessage array
+            lastMessage.push(messagePartsArray[0]);
+        }
+
+        // Return the updated messages array without spreading it into a new array
+        return newPrevMessage;
     }
 };
