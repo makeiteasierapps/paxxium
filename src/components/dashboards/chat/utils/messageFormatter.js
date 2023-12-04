@@ -61,13 +61,19 @@ export const formatBlockMessage = (message) => {
     return parts;
 };
 
-export const formatStreamMessage = (message, insideCodeBlock) => {
+export const formatStreamMessage = (message, insideCodeBlock, language) => {
     const parts = [];
     if (insideCodeBlock) {
+        console.log(language);
+        const highlightedCode = Prism.highlight(
+            message.message_content,
+            Prism.languages[language] || Prism.languages.plaintext,
+            language
+        );
         parts.push({
             type: 'code',
-            content: message.message_content,
-            language: 'bash',
+            content: highlightedCode,
+            language: language,
         });
     } else {
         parts.push({
