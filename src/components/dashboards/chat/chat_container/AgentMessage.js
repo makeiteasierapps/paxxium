@@ -1,9 +1,8 @@
-import { memo, useState, useContext } from 'react';
+import { useState } from 'react';
 import { Avatar, ListItem, ListItemIcon, Checkbox } from '@mui/material';
 import { styled } from '@mui/system';
 import { Icon } from '@iconify/react';
 import { blueGrey } from '@mui/material/colors';
-import { ChatContext } from '../../../../contexts/ChatContext';
 
 const AgentMessageContainer = styled(ListItem)({
     backgroundColor: blueGrey[700],
@@ -38,8 +37,6 @@ const StyledHeader = styled('div')({
 const AgentMessage = ({ message }) => {
     // State for checkbox and processed messages
     const [checked, setChecked] = useState(false);
-    // Deleting this will prevent the response from rendering to the screen
-    const { insideCodeBlock } = useContext(ChatContext);
     return (
         <AgentMessageContainer>
             <StyledHeader>
@@ -86,4 +83,4 @@ const AgentMessage = ({ message }) => {
     );
 };
 
-export default memo(AgentMessage);
+export default AgentMessage;
