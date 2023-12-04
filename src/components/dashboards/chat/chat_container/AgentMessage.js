@@ -1,13 +1,8 @@
-import { memo, useEffect, useState, useContext } from 'react';
+import { useState } from 'react';
 import { Avatar, ListItem, ListItemIcon, Checkbox } from '@mui/material';
 import { styled } from '@mui/system';
 import { Icon } from '@iconify/react';
 import { blueGrey } from '@mui/material/colors';
-import {
-    formatBlockMessage,
-    formatStreamMessage,
-} from '../utils/messageFormatter';
-import { ChatContext } from '../../../../contexts/ChatContext';
 
 const AgentMessageContainer = styled(ListItem)({
     backgroundColor: blueGrey[700],
@@ -42,30 +37,6 @@ const StyledHeader = styled('div')({
 const AgentMessage = ({ message }) => {
     // State for checkbox and processed messages
     const [checked, setChecked] = useState(false);
-    const [processedMessages, setProcessedMessages] = useState([]);
-    const { insideCodeBlock } = useContext(ChatContext);
-
-    useEffect(() => {
-        const fetchProcessedMessages = async () => {
-            try {
-                if (message.type === 'database') {
-                    const result = formatBlockMessage(message);
-                    setProcessedMessages(result);
-                } else if (message.type === 'stream') {
-                    formatStreamMessage(
-                        message,
-                        insideCodeBlock,
-                        setProcessedMessages
-                    );
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchProcessedMessages();
-    }, [insideCodeBlock, message]);
-
     return (
         <AgentMessageContainer>
             <StyledHeader>
@@ -88,7 +59,7 @@ const AgentMessage = ({ message }) => {
                 />
             </StyledHeader>
             <MessageContent>
-                {processedMessages.map((msg, index) => {
+                {message.map((msg, index) => {
                     if (msg.type === 'text') {
                         return <p key={`text${index}`}>{msg.content}</p>;
                     } else if (msg.type === 'code') {
@@ -112,4 +83,4 @@ const AgentMessage = ({ message }) => {
     );
 };
 
-export default memo(AgentMessage);
+export default AgentMessage;

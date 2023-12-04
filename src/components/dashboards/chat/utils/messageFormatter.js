@@ -61,40 +61,20 @@ export const formatBlockMessage = (message) => {
     return parts;
 };
 
-export const formatStreamMessage = (
-    message,
-    insideCodeBlock,
-    setProcessedMessages
-) => {
-    // If the message ends with two backticks, ignore it
-    // This is needed because the api sends the closing backticks as a separate message
-    if (message.message_content.endsWith('``')) {
-        return message;
-    }
-
-    const splitMessage = message.message_content.split('```');
-    const setMessages = (type, content, language) => {
-        setProcessedMessages((prevMsgs) => {
-            if (
-                prevMsgs.length === 0 ||
-                prevMsgs[prevMsgs.length - 1].type !== type
-            ) {
-                return [...prevMsgs, { type, content, language }];
-            } else {
-                let newMsgs = [...prevMsgs];
-                newMsgs[newMsgs.length - 1] = { type, content, language };
-                return newMsgs;
-            }
+export const formatStreamMessage = (message, insideCodeBlock) => {
+    const parts = [];
+    if (insideCodeBlock) {
+        parts.push({
+            type: 'code',
+            content: message.message_content,
+            language: 'bash',
         });
-    };
-
-    for (let i = 0; i < splitMessage.length; i++) {
-        if (insideCodeBlock) {
-            setMessages('code', splitMessage[i], 'bash');
-        } else {
-            setMessages('text', splitMessage[i]);
-        }
+    } else {
+        parts.push({
+            type: 'text',
+            content: message.message_content,
+        });
     }
 
-    return message;
+    return parts;
 };

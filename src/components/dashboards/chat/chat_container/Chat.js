@@ -1,4 +1,11 @@
-import React, { useRef, useContext, useEffect, useCallback, memo } from 'react';
+import React, {
+    useRef,
+    useState,
+    useContext,
+    useEffect,
+    useCallback,
+    memo,
+} from 'react';
 import { styled } from '@mui/system';
 import { List, Box } from '@mui/material';
 import io from 'socket.io-client';
@@ -8,7 +15,7 @@ import MessageInput from './MessageInput';
 import ChatBar from './ChatBar';
 import { AuthContext } from '../../../../contexts/AuthContext';
 import { ChatContext } from '../../../../contexts/ChatContext';
-
+import { formatBlockMessage } from '../utils/messageFormatter';
 import { handleIncomingMessageStream } from '../chat_container/handlers/handleIncomingMessageStream';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -47,6 +54,9 @@ const Chat = ({
     useProfileData,
 }) => {
     const socketRef = useRef(null);
+
+    const [queue, setQueue] = useState([]);
+
     const {
         messages,
         setMessages,
@@ -111,31 +121,69 @@ const Chat = ({
         fetchMessages();
     }, [fetchMessages]);
 
+    // ...
+
     useEffect(() => {
         const handleToken = (token) => {
+            console.log(token);
+            setQueue((prevQueue) => [...prevQueue, token]);
+        };
+
+        socketRef.current = io.connect(backendUrl);
+        socketRef.current.emit('join', { room: id });
+        socketRef.current.on('token', handleToken);
+
+        return () => {
+            socketRef.current.off('token', handleToken);
+        };
+    }, [id]);
+
+    useEffect(() => {
+        const processToken = (token) => {
+            const codeStartIndicator = /```/g;
+            const codeEndIndicator = /``/g;
+
+            let messageContent = token.message_content;
+
+            if (
+                codeStartIndicator.test(messageContent) ||
+                codeEndIndicator.test(messageContent)
+            ) {
+                setInsideCodeBlock(
+                    (prevInsideCodeBlock) => !prevInsideCodeBlock
+                );
+
+                messageContent = messageContent
+                    .replace(codeStartIndicator, '')
+                    .replace(codeEndIndicator, '');
+
+                token.message_content = messageContent;
+            }
+
             setMessages((prevMessage) => {
                 const newMessageParts = handleIncomingMessageStream(
                     prevMessage,
                     id,
                     token,
-                    setInsideCodeBlock,
                     insideCodeBlock
                 );
                 return newMessageParts;
             });
         };
 
-        socketRef.current = io.connect(backendUrl);
-        // Join the room after connection.
-        socketRef.current.emit('join', { room: id });
-        // Register the event listener for incoming tokens.
-        socketRef.current.on('token', handleToken);
+        // Set an interval to process tokens
+        const intervalId = setInterval(() => {
+            if (queue.length > 0) {
+                processToken(queue[0]);
+                setQueue((prevQueue) => prevQueue.slice(1));
+            }
+        }, 100); // Adjust this value as needed
 
-        // Clean up by removing the event listener when the component is unmounted.
+        // Clear the interval when the component is unmounted
         return () => {
-            socketRef.current.off('token', handleToken);
+            clearInterval(intervalId);
         };
-    }, [id, setMessages, setInsideCodeBlock, insideCodeBlock]);
+    }, [queue, setMessages, setInsideCodeBlock, insideCodeBlock, id]);
 
     return (
         <ChatContainerStyled
@@ -155,12 +203,15 @@ const Chat = ({
             <MessagesContainer item xs={9}>
                 <MessageArea>
                     {messages[id]?.map((message, index) => {
+                        let formattedMessage = message;
                         if (message.type === 'database') {
                             if (message.message_from === 'agent') {
+                                formattedMessage = formatBlockMessage(message);
                                 return (
                                     <AgentMessage
                                         key={`agent${index}`}
-                                        message={message}
+                                        message={formattedMessage}
+                                        id={id}
                                     />
                                 );
                             } else {
@@ -171,7 +222,7 @@ const Chat = ({
                                     />
                                 );
                             }
-                        } else if (message.type === 'stream') {
+                        } else {
                             return (
                                 <AgentMessage
                                     key={`stream${index}`}
