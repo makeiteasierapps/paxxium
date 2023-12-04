@@ -56,6 +56,7 @@ const Chat = ({
     const socketRef = useRef(null);
     const [queue, setQueue] = useState([]);
     const ignoreNextTokenRef = useRef(false);
+    const languageRef = useRef('markdown');
 
     const {
         messages,
@@ -123,7 +124,6 @@ const Chat = ({
 
     useEffect(() => {
         const handleToken = (token) => {
-            console.log(token);
             setQueue((prevQueue) => [...prevQueue, token]);
         };
 
@@ -144,7 +144,30 @@ const Chat = ({
             let messageContent = token.message_content;
 
             if (ignoreNextTokenRef.current) {
+                if (token.message_content.trim() !== '`') {
+                    // This means the token is not a backtick, so it should be the language
+                    languageRef.current = token.message_content.trim();
+                }
+
+                // Reset the flag after processing the token, regardless of its content
                 ignoreNextTokenRef.current = false;
+                return;
+            }
+
+            // Check if we are not ignoring this token and if there is a language set
+            // This is the next tokenObj after we captured the language.
+            if (!ignoreNextTokenRef.current && languageRef.current) {
+                // Add the language property to the token object
+                token.language = languageRef.current;
+                //Removes a new line character
+                token.message_content = ' ';
+                // Reset languageRef as it has been used for this code block
+                languageRef.current = null;
+            }
+
+            if (ignoreNextTokenRef.current) {
+                ignoreNextTokenRef.current = false;
+
                 return;
             }
 
@@ -152,7 +175,9 @@ const Chat = ({
                 setInsideCodeBlock(
                     (prevInsideCodeBlock) => !prevInsideCodeBlock
                 );
+
                 ignoreNextTokenRef.current = true;
+
                 return;
             }
 
@@ -160,7 +185,9 @@ const Chat = ({
                 setInsideCodeBlock(
                     (prevInsideCodeBlock) => !prevInsideCodeBlock
                 );
+
                 ignoreNextTokenRef.current = true;
+
                 return;
             }
 
