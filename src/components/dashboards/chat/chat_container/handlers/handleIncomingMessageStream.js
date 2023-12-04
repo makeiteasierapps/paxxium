@@ -5,8 +5,11 @@ export const handleIncomingMessageStream = (
     tokenObj,
     insideCodeBlock
 ) => {
+    // Ignore empty message_content
+    if (tokenObj.message_content === '') {
+        return prevMessage;
+    }
 
-    // 
     const messagePartsArray = formatStreamMessage(tokenObj, insideCodeBlock);
     if (prevMessage[id][prevMessage[id].length - 1].message_from === 'user') {
         return {

@@ -1,8 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
-import "prismjs/components/prism-javascript.min";
-import "prismjs/components/prism-python";
-import "prismjs/themes/prism-okaidia.css";
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { styled } from "@mui/system";

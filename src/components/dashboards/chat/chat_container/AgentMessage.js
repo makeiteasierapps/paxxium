@@ -3,8 +3,6 @@ import { Avatar, ListItem, ListItemIcon, Checkbox } from '@mui/material';
 import { styled } from '@mui/system';
 import { Icon } from '@iconify/react';
 import { blueGrey } from '@mui/material/colors';
-// Deleting this will give you a package error
-import { formatStreamMessage } from '../utils/messageFormatter';
 import { ChatContext } from '../../../../contexts/ChatContext';
 
 const AgentMessageContainer = styled(ListItem)({

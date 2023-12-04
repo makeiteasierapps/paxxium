@@ -1,4 +1,11 @@
-import React, { useRef, useContext, useEffect, useCallback, memo } from 'react';
+import React, {
+    useRef,
+    useState,
+    useContext,
+    useEffect,
+    useCallback,
+    memo,
+} from 'react';
 import { styled } from '@mui/system';
 import { List, Box } from '@mui/material';
 import io from 'socket.io-client';
@@ -47,6 +54,9 @@ const Chat = ({
     useProfileData,
 }) => {
     const socketRef = useRef(null);
+
+    const [queue, setQueue] = useState([]);
+
     const {
         messages,
         setMessages,
@@ -111,14 +121,30 @@ const Chat = ({
         fetchMessages();
     }, [fetchMessages]);
 
+    // ...
+
     useEffect(() => {
         const handleToken = (token) => {
+            console.log(token);
+            setQueue((prevQueue) => [...prevQueue, token]);
+        };
+
+        socketRef.current = io.connect(backendUrl);
+        socketRef.current.emit('join', { room: id });
+        socketRef.current.on('token', handleToken);
+
+        return () => {
+            socketRef.current.off('token', handleToken);
+        };
+    }, [id]);
+
+    useEffect(() => {
+        const processToken = (token) => {
             const codeStartIndicator = /```/g;
             const codeEndIndicator = /``/g;
 
             let messageContent = token.message_content;
 
-            // Detect code block indicators and update the flag without adding them to the state
             if (
                 codeStartIndicator.test(messageContent) ||
                 codeEndIndicator.test(messageContent)
@@ -126,13 +152,14 @@ const Chat = ({
                 setInsideCodeBlock(
                     (prevInsideCodeBlock) => !prevInsideCodeBlock
                 );
-                // Remove the code block indicators from the message content
+
                 messageContent = messageContent
                     .replace(codeStartIndicator, '')
                     .replace(codeEndIndicator, '');
+
+                token.message_content = messageContent;
             }
-            token.message_content = messageContent;
-            // Continue with the updated message content without the code block indicators
+
             setMessages((prevMessage) => {
                 const newMessageParts = handleIncomingMessageStream(
                     prevMessage,
@@ -144,17 +171,19 @@ const Chat = ({
             });
         };
 
-        socketRef.current = io.connect(backendUrl);
-        // Join the room after connection.
-        socketRef.current.emit('join', { room: id });
-        // Register the event listener for incoming tokens.
-        socketRef.current.on('token', handleToken);
+        // Set an interval to process tokens
+        const intervalId = setInterval(() => {
+            if (queue.length > 0) {
+                processToken(queue[0]);
+                setQueue((prevQueue) => prevQueue.slice(1));
+            }
+        }, 100); // Adjust this value as needed
 
-        // Clean up by removing the event listener when the component is unmounted.
+        // Clear the interval when the component is unmounted
         return () => {
-            socketRef.current.off('token', handleToken);
+            clearInterval(intervalId);
         };
-    }, [id, setMessages, setInsideCodeBlock, insideCodeBlock]);
+    }, [queue, setMessages, setInsideCodeBlock, insideCodeBlock, id]);
 
     return (
         <ChatContainerStyled
