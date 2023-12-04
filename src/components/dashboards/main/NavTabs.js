@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Tabs, Tab, Box, styled } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Box, Tab, Tabs, styled } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 // Function to generate accessibility properties for tabs
 // This function provides flexibility, reduces errors, promotes code reusability, and improves readability
@@ -24,18 +24,30 @@ const StyledNavTabs = styled(Tabs)(({ theme }) => ({
 
 // Define NavTabs component
 const NavTabs = () => {
+    const location = useLocation();
     // Use React's useState hook to manage the selected tab index
-    const [index, setIndex] = useState(0);
+    const [selectedTab, setSelectedTab] = useState(0);
+
+    const getTabValue = (path) => {
+        // Map paths to corresponding tab index
+        const pathToTabIndex = {
+            "/agents": 1,
+            "/profile": 2,
+        };
+
+        const tabIndex = pathToTabIndex[path] || 0;
+        return tabIndex;
+    };
+
+    useEffect(() => {
+        setSelectedTab(getTabValue(location.pathname));
+    }, [location]);
 
     // Render the NavTabs component
     return (
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <StyledNavTabs
-                value={index}
-                onChange={(_, index) => {
-                    setIndex(index);
-                    // setValue(index);
-                }}
+                value={selectedTab}
                 sx={{
                     // Remove the tab indicator
                     "& .MuiTabs-indicator": {
