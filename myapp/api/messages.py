@@ -23,9 +23,9 @@ def authenticate_request(id_token=None):
 @messages.route('/<string:conversation_id>/messages', methods=['POST'])
 def get_messages(conversation_id):
     uid = authenticate_request()
-    message_service = current_app.message_service
+    ms = current_app.message_service
     chat_data = request.get_json()
-    conversation_data = message_service.get_all_messages(uid, conversation_id)
+    conversation_data = ms.get_all_messages(uid, conversation_id)
     agent_model = chat_data['agentModel']
 
     # If the conversation requested is a debate no need to set an Agent instance
@@ -47,13 +47,13 @@ def handle_message(data):
     return process_message(data, uid, chat_id)
 
 def process_message(data, uid, chat_id):
-    message_service = current_app.message_service
+    ms = current_app.message_service
     # Extrtact data from request
     message_content = data.get('message_content')
     message_from = data.get('message_from')
 
     # Create a new message in the database
-    new_message = message_service.create_message(conversation_id=chat_id, message_content=message_content, message_from=message_from, user_id=uid)
+    new_message = ms.create_message(conversation_id=chat_id, message_content=message_content, message_from=message_from, user_id=uid)
     
     agent = current_app.master_agent_service.get_agent_by_key(uid, chat_id)
     
@@ -74,7 +74,3 @@ def clear_memory(conversation_id):
     message_service = current_app.message_service
     message_service.delete_all_messages(uid, conversation_id)
     return {'message': 'Memory cleared'}, 200
-
-
-
-

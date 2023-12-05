@@ -35,10 +35,11 @@ class MasterAgent:
         self.serp_key = user_service.decrypt(encrypted_serp_key)
         self.uid = uid
         self.chat_id = chat_id
+        self.model = model
         self.system_prompt = system_prompt
         self.chat_constants = chat_constants
         self.search = SerpAPIWrapper(serpapi_api_key=self.serp_key)
-        self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse(self.chat_id)], temperature=0, model=model, openai_api_key=self.openai_api_key)
+        self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse(self.chat_id)], temperature=0, model=self.model, openai_api_key=self.openai_api_key)
         self.memory=ConversationBufferWindowMemory(memory_key='memory', return_messages=True, k=3)
         self.save_message = SaveMessageTool(memory=self.memory)
         self.tools = [
@@ -65,10 +66,27 @@ class MasterAgent:
             )
         self.message_service = message_service
 
+    def update_agent(self, model, system_prompt):
+        self.model = model
+        self.system_prompt = system_prompt
+        self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse(self.chat_id)], temperature=0, model=self.model, openai_api_key=self.openai_api_key)
+        custom_system_message = SystemMessage(content=self.system_prompt)
+        self.agent_kwargs = {
+            "extra_prompt_messages": [MessagesPlaceholder(variable_name="memory")],
+            "system_message": custom_system_message,
+        }
+        self.master_ai = initialize_agent(
+            self.tools,
+            self.llm,
+            agent=AgentType.OPENAI_FUNCTIONS,
+            memory=self.memory,
+            verbose=True,
+            agent_kwargs=self.agent_kwargs
+        )
     
     def pass_to_master_agent(self, message_obj, conversation_id, user_id):
         data = message_obj['message_content']
-        message_content = 'CHAT DETAILS: \n' + self.chat_constants + '\n' + data
+        message_content = '*** \n THINGS TO REMEMBER:  \n' + self.chat_constants + '\n***' + data
         response = self.master_ai.run(message_content)                                 
         response_obj = self.message_service.create_message(conversation_id=conversation_id, message_from='agent', user_id=user_id, message_content=response)
         

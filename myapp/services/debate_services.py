@@ -13,7 +13,6 @@ class DebateManager:
 
         message_service = current_app.message_service
         
-
         # Initialize two agents
         self.agent1 = MasterAgent(message_service, self.uid, self.conversation_id, system_prompt=self.role1)
         self.agent2 = MasterAgent(message_service, self.uid, self.conversation_id, system_prompt=self.role2)
