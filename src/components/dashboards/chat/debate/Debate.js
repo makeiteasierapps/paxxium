@@ -1,32 +1,20 @@
-// This whole component and logic needs to be refactored
-// I think setting up socket.io would be a better solution
-// With that I could remove shouldStartDebate and fetchMessages
-
-import React, {
-    useRef,
-    useContext,
-    useEffect,
-    useState,
-    useCallback,
-} from 'react';
-
+import { useEffect, useState, useRef, useContext, useCallback } from 'react';
+import io from 'socket.io-client';
 import { styled } from '@mui/system';
 import { List, Box } from '@mui/material';
 import ChatBar from '../chat_container/ChatBar';
 import DebateMessage from './DebateMessage';
 import { AuthContext } from '../../../../contexts/AuthContext';
-import { ChatContext } from '../../../../contexts/ChatContext';
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 // Syled components
 const DebateContainerStyled = styled(Box)(({ theme }) => ({
-    marginLeft: '20px',
-    height: '800px',
-    width: '50%',
+    height: '80vh',
+    width: '70%',
     display: 'flex',
     flexDirection: 'column',
-    boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.75)',
+    boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.63)',
     overflow: 'auto',
+    borderRadius: '5px',
 }));
 
 const MessageArea = styled(List)({
@@ -43,45 +31,16 @@ const MessagesContainer = styled('div')({
     whiteSpace: 'pre-line',
 });
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
 const Debate = ({ id, chatName, topic }) => {
-    const messagesEndRef = useRef(null);
-    const { setAgentArray } = useContext(ChatContext);
-    const { idToken } = useContext(AuthContext);
+    const [socket, setSocket] = useState(null);
     const [messages, setMessages] = useState([]);
-    const [shouldStartDebate, setShouldStartDebate] = useState(false);
+    const messagesEndRef = useRef(null);
 
-    const startDebate = useCallback(
-        async (turn = 0) => {
-            try {
-                const response = await fetch(
-                    `${backendUrl}/debate/start_debate`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: idToken,
-                        },
-                        body: JSON.stringify({
-                            turn: turn,
-                            topic: topic,
-                        }),
-                    }
-                );
-                const data = await response.json();
-                setMessages((prevMessages) => [...prevMessages, data.message]);
-
-                if (data.hasMoreTurns) {
-                    startDebate(turn + 1);
-                }
-            } catch (error) {
-                console.error('Failed to start debate:', error);
-            }
-        },
-        [idToken, topic]
-    );
+    const { uid, idToken } = useContext(AuthContext);
 
     const fetchMessages = useCallback(async () => {
-        if (!shouldStartDebate) return;
         try {
             const requestData = {
                 agentModel: 'AgentDebate',
@@ -97,29 +56,65 @@ const Debate = ({ id, chatName, topic }) => {
             });
             if (!response.ok) throw new Error('Failed to fetch messages');
             const data = await response.json();
-
-            if (data.messages && data.messages.length > 0) {
-                setMessages(data.messages);
-            } else {
-                console.log('No messages found, starting debate');
-                startDebate();
-            }
+            setMessages(data.messages);
+            return data.messages; // Add this line
         } catch (error) {
             console.error(error);
+            return []; // Return an empty array in case of an error
         }
-    }, [id, idToken, shouldStartDebate, startDebate]);
+    }, [id, idToken]);
 
+    // Initialize socket connection
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setShouldStartDebate(true);
-        }, 1000);
+        const newSocket = io.connect(backendUrl);
+        setSocket(newSocket);
 
-        return () => clearTimeout(timer);
+        return () => newSocket.close();
     }, []);
 
     useEffect(() => {
-        fetchMessages();
-    }, [fetchMessages, id]);
+        if (!socket) return;
+
+        socket.on('debate_started', (data) => {
+            setMessages((prevMessages) => [...prevMessages, data.message]);
+
+            // Continue the debate if there are more turns
+            if (data.hasMoreTurns) {
+                socket.emit('start_debate', {
+                    uid_debate_id_tuple: [uid, id],
+                    topic: topic,
+                    turn: messages.length, // The turn is the current number of messages
+                });
+            }
+        });
+
+        return () => socket.off('debate_started');
+    }, [socket, messages, uid, id, topic]);
+
+    useEffect(() => {
+        // Start the debate when the component mounts
+        const startDebate = async (turn = 0) => {
+            if (!socket) return;
+
+            // Try to fetch messages first
+            const messages = await fetchMessages();
+            if (messages.length > 0) {
+                setMessages(messages);
+                return;
+            }
+
+            // Join the room named after the debate's id
+            socket.emit('join', { room: id });
+
+            // Send 'start_debate' event to the server
+            socket.emit('start_debate', {
+                uid_debate_id_tuple: [uid, id],
+                topic: topic,
+                turn: turn,
+            });
+        };
+        startDebate();
+    }, [fetchMessages, id, socket, topic, uid]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -128,14 +123,7 @@ const Debate = ({ id, chatName, topic }) => {
 
     return (
         <DebateContainerStyled>
-            <ChatBar
-                chatName={chatName}
-                id={id}
-                idToken={idToken}
-                setAgentArray={setAgentArray}
-                setMessages={setMessages}
-                backendUrl={backendUrl}
-            />
+            <ChatBar chatName={chatName} id={id} />
             <MessagesContainer item xs={9}>
                 <MessageArea>
                     {messages.map((message, index) => {

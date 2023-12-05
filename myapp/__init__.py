@@ -31,7 +31,6 @@ def create_app():
     def on_join(data):
         room = data['room']
         join_room(room)
-        print(f'Joined room {room}')
 
     # Configure CORS
     CORS(app, origins=[frontend_url], supports_credentials=True, allow_headers=['Content-Type', 'Authorization'], methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])

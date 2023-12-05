@@ -33,7 +33,7 @@ def get_messages(conversation_id):
         return jsonify(conversation_data), 200
     
     # Check if there is an instance in memory, if not create one and add memory
-    agent, key = current_app.master_agent_service.check_and_set_agent_instance(uid=uid, chat_id=conversation_id, agent_model=agent_model, system_prompt=chat_data['systemPrompt'], chat_constants=chat_data['chatConstants'])
+    agent, key = current_app.master_agent_service.check_and_set_agent_instance(uid=uid, chat_ids=[conversation_id], agent_model=agent_model, system_prompt=chat_data['systemPrompt'], chat_constants=chat_data['chatConstants'])
     agent.load_history_to_memory(conversation_data)
     return jsonify(conversation_data), 200
 
@@ -55,7 +55,7 @@ def process_message(data, uid, chat_id):
     # Create a new message in the database
     new_message = ms.create_message(conversation_id=chat_id, message_content=message_content, message_from=message_from, user_id=uid)
     
-    agent = current_app.master_agent_service.get_agent_by_key(uid, chat_id)
+    agent = current_app.master_agent_service.get_agent_by_key(uid, [chat_id])
     
     # Pass message to Agent
     response_from_llm = agent.pass_to_master_agent(message_obj=new_message, conversation_id=chat_id, user_id=uid)

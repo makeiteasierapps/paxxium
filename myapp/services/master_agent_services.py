@@ -8,8 +8,8 @@ class MasterAgentService:
         self.message_service = message_service
         self.max_agent_instances = 1000
 
-    def check_and_set_agent_instance(self, uid, chat_id, system_prompt, chat_constants, agent_model):
-        key = (uid, chat_id)
+    def check_and_set_agent_instance(self, uid, chat_ids, system_prompt, chat_constants, agent_model):
+        key = (uid, tuple(chat_ids))
 
         if agent_model == 'GPT-4':
             agent_model = 'gpt-4-0613'
@@ -25,7 +25,7 @@ class MasterAgentService:
                 self.master_agents.popitem(last=False)
 
             # Create a new MasterAgent instance and add it to the master_agents dictionary
-            self.master_agents[key] = MasterAgent(self.message_service, uid, chat_id=chat_id, model=agent_model, system_prompt=system_prompt, chat_constants=chat_constants,)
+            self.master_agents[key] = MasterAgent(self.message_service, uid, chat_ids, model=agent_model, system_prompt=system_prompt, chat_constants=chat_constants,)
         else:
             self.master_agents[key].chat_constants = chat_constants
             self.master_agents[key].update_agent(agent_model, system_prompt)
@@ -35,8 +35,8 @@ class MasterAgentService:
         # Return the MasterAgent instance associated with the provided key
         return self.master_agents[key], key
     
-    def get_agent_by_key(self, uid, chat_id):
-        key = (uid, chat_id)
+    def get_agent_by_key(self, uid, chat_ids):
+        key = (uid, tuple(chat_ids))
         
         if key in self.master_agents:
             return self.master_agents[key]

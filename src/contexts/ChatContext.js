@@ -8,13 +8,6 @@ export const ChatProvider = ({ children }) => {
     const [messages, setMessages] = useState({});
     const [insideCodeBlock, setInsideCodeBlock] = useState(false);
 
-    const addAgent = (newAgent) => {
-        setAgentArray((prevAgents) => [newAgent, ...prevAgents]);
-        setSelectedAgent(newAgent);
-        setMessages((prevMessages) => ({
-            ...prevMessages,
-        }));
-    };
 
     // Used to add a new user message to the messages state
     const addMessage = (agentId, newMessage) => {
@@ -31,7 +24,6 @@ export const ChatProvider = ({ children }) => {
                 setAgentArray,
                 selectedAgent,
                 setSelectedAgent,
-                addAgent,
                 messages,
                 setMessages,
                 addMessage,

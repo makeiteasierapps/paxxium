@@ -18,7 +18,7 @@ function DebateSettings() {
     const [role1Description, setRole1Description] = useState('');
     const [role2Description, setRole2Description] = useState('');
     const { idToken } = useContext(AuthContext);
-    const { addAgent } = useContext(ChatContext);
+    const { setAgentArray } = useContext(ChatContext);
 
     const createDebate = async () => {
         try {
@@ -36,8 +36,8 @@ function DebateSettings() {
                 }),
             });
             const data = await response.json();
-            const newDebate = data;
-            addAgent(newDebate);
+            // Update the agentArray directly here
+            setAgentArray((prevAgents) => [data, ...prevAgents]);
         } catch (error) {
             console.error('Failed to start debate:', error);
         }
