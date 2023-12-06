@@ -1,21 +1,20 @@
-import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import LogoutIcon from "@mui/icons-material/Logout";
 import {
-    Toolbar,
+    AppBar,
     Box,
+    IconButton,
+    Toolbar,
     Typography,
     styled,
-    IconButton,
-    AppBar,
-} from '@mui/material';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { AuthContext } from '../../../contexts/AuthContext';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../../contexts/AuthContext';
+} from "@mui/material";
+import { signOut } from "firebase/auth";
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext, auth } from "../../../contexts/AuthContext";
 
 // Styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-    position: 'fixed',
+    position: "fixed",
 }));
 
 const TitleBar = () => {
@@ -29,20 +28,21 @@ const TitleBar = () => {
             setIdToken(null);
             setUser(null);
             setIsAuthorized(false);
-            navigate('/');
+            localStorage.setItem("isAuthorized", "false");
+            navigate("/");
         } catch (error) {
             console.log(error);
         }
     };
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: "flex" }}>
             <StyledAppBar>
                 <Toolbar variant="dense">
                     <Typography
                         variant="h5"
                         noWrap
-                        fontFamily={'Montserrat'}
+                        fontFamily={"Montserrat"}
                         component="div"
                         flexGrow={1}
                         align="center"
@@ -50,7 +50,7 @@ const TitleBar = () => {
                         Welcome {username}
                     </Typography>
                     <IconButton onClick={handleLogout}>
-                        <LogoutIcon sx={{ color: '#fff' }} />
+                        <LogoutIcon sx={{ color: "#fff" }} />
                     </IconButton>
                 </Toolbar>
             </StyledAppBar>
