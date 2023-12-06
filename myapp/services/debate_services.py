@@ -13,10 +13,9 @@ class DebateManager:
 
         message_service = current_app.message_service
         
-
         # Initialize two agents
-        self.agent1 = MasterAgent(message_service, self.uid, self.conversation_id, system_prompt=self.role1)
-        self.agent2 = MasterAgent(message_service, self.uid, self.conversation_id, system_prompt=self.role2)
+        self.agent1 = MasterAgent(message_service, self.uid, [self.conversation_id], system_prompt=self.role1)
+        self.agent2 = MasterAgent(message_service, self.uid, [self.conversation_id], system_prompt=self.role2)
 
     @staticmethod
     def create_debate(user_id):
@@ -29,7 +28,8 @@ class DebateManager:
         new_chat = {
             'chat_name': 'Debate',
             'agent_model': 'AgentDebate',
-            'created_at': datetime.utcnow()
+            'created_at': datetime.utcnow(),
+            'is_open': True,
         }
         new_chat_ref = db.collection('users').document(user_id).collection('conversations').add(new_chat)
         new_chat_id = new_chat_ref[1].id

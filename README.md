@@ -14,13 +14,10 @@
 - Consider allowing users to add custom questions or remove existing ones for customization. This will require updates to the questionnaire system to allow for user input.
 
 ## Debate Agent Overhaul:
-- Rethink the overall architecture of the debate agent. This may involve changes to how debates are initiated, managed, and displayed.
-- Change to socket.io for streaming the response back. This will involve a significant overhaul of the current response system.
-- This will require some backend work, including potentially a new server setup for socket.io.
+- Working on Streaming the response. Backend is ready just need to set up a socket connection on the frontend. Then implement the same logic as AgentMessage
 
 ## Additional Features:
 - Add a secondary check for when the chat clear or trash buttons are clicked. This could be a confirmation dialog that prevents accidental deletion of chats.
-- Resolve bug related to code formatting in the response of streaming. This will involve investigating the current formatting system and identifying why it fails with multiple code blocks in a single response.
 
 ## General Refactoring:
 - The styled components could be moved into their own files to reduce the size of the main files.

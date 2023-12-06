@@ -10,6 +10,7 @@ from myapp.services.master_agent_services import MasterAgentService
 from myapp.services.user_services import UserService
 from myapp.services.chat_services import ChatService
 from myapp.services.firebase_service import FirebaseService
+from myapp.services.news_service import NewsService
 
 
 # Initialize Firebase
@@ -25,19 +26,11 @@ def create_app():
     # Create the Flask application
     app = Flask(__name__)
     
-    @socketio.on('connect')
-    def test_connect():
-        print('Client connected')
-
-    @socketio.on('disconnect')
-    def test_disconnect():
-        print('Client disconnected')
 
     @socketio.on('join')
     def on_join(data):
         room = data['room']
         join_room(room)
-        print(f'Joined room {room}')
 
     # Configure CORS
     CORS(app, origins=[frontend_url], supports_credentials=True, allow_headers=['Content-Type', 'Authorization'], methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
@@ -53,6 +46,7 @@ def create_app():
     app.user_service = UserService(db)
     app.firebase_service = FirebaseService()
     app.chat_service = ChatService(db)
+    app.news_service = NewsService(db)
 
     # Register blueprints
     from myapp import views
