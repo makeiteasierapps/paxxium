@@ -64,7 +64,6 @@ export const formatBlockMessage = (message) => {
 export const formatStreamMessage = (message, insideCodeBlock, language) => {
     const parts = [];
     if (insideCodeBlock) {
-        console.log(language);
         const highlightedCode = Prism.highlight(
             message.message_content,
             Prism.languages[language] || Prism.languages.plaintext,
@@ -74,11 +73,13 @@ export const formatStreamMessage = (message, insideCodeBlock, language) => {
             type: 'code',
             content: highlightedCode,
             language: language,
+            message_from: message.message_from,
         });
     } else {
         parts.push({
             type: 'text',
             content: message.message_content,
+            message_from: message.message_from,
         });
     }
 

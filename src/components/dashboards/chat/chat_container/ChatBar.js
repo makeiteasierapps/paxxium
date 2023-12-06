@@ -61,7 +61,12 @@ const ChatBar = ({ chatName, id }) => {
                 <IconButton
                     aria-label="close"
                     onClick={() =>
-                        handleCloseChat(id, idToken, setAgentArray, backendUrl)
+                        handleCloseChat(
+                            id,
+                            idToken,
+                            setAgentArray,
+                            backendUrl,
+                        )
                     }
                 >
                     <CloseIcon />

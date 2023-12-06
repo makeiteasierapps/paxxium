@@ -5,6 +5,9 @@ import { List, Box } from '@mui/material';
 import ChatBar from '../chat_container/ChatBar';
 import DebateMessage from './DebateMessage';
 import { AuthContext } from '../../../../contexts/AuthContext';
+import { ChatContext } from '../../../../contexts/ChatContext';
+import { processToken } from '../utils/processToken';
+import { handleIncomingMessageStream } from '../chat_container/handlers/handleIncomingMessageStream';
 
 // Syled components
 const DebateContainerStyled = styled(Box)(({ theme }) => ({
@@ -34,10 +37,17 @@ const MessagesContainer = styled('div')({
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const Debate = ({ id, chatName, topic }) => {
-    const [socket, setSocket] = useState(null);
-    const [messages, setMessages] = useState([]);
-    const messagesEndRef = useRef(null);
+    const socketRef = useRef(null);
+    const [queue, setQueue] = useState([]);
+    const ignoreNextTokenRef = useRef(false);
+    const languageRef = useRef('markdown');
 
+    const {
+        insideCodeBlock,
+        setInsideCodeBlock,
+        debateMessages,
+        setDebateMessages,
+    } = useContext(ChatContext);
     const { uid, idToken } = useContext(AuthContext);
 
     const fetchMessages = useCallback(async () => {
@@ -56,99 +66,145 @@ const Debate = ({ id, chatName, topic }) => {
             });
             if (!response.ok) throw new Error('Failed to fetch messages');
             const data = await response.json();
-            setMessages(data.messages);
-            return data.messages; // Add this line
+            console.log(data);
+            setDebateMessages(data.messages);
+            return data.messages;
         } catch (error) {
             console.error(error);
-            return []; // Return an empty array in case of an error
+            return [];
         }
-    }, [id, idToken]);
+    }, [id, idToken, setDebateMessages]);
 
-    // Initialize socket connection
+    // Initialize/Close socket connection
     useEffect(() => {
-        const newSocket = io.connect(backendUrl);
-        setSocket(newSocket);
+        socketRef.current = io.connect(backendUrl);
 
-        return () => newSocket.close();
+        return () => socketRef.current.close();
     }, []);
 
-    useEffect(() => {
-        if (!socket) return;
-
-        socket.on('debate_started', (data) => {
-            setMessages((prevMessages) => [...prevMessages, data.message]);
-
-            // Continue the debate if there are more turns
-            if (data.hasMoreTurns) {
-                socket.emit('start_debate', {
-                    uid_debate_id_tuple: [uid, id],
-                    topic: topic,
-                    turn: messages.length, // The turn is the current number of messages
-                });
-            }
-        });
-
-        return () => socket.off('debate_started');
-    }, [socket, messages, uid, id, topic]);
-
+    // Runs when component mounts to either fetch messages or start the debate
     useEffect(() => {
         // Start the debate when the component mounts
         const startDebate = async (turn = 0) => {
-            if (!socket) return;
+            if (!socketRef.current) return;
 
             // Try to fetch messages first
             const messages = await fetchMessages();
             if (messages.length > 0) {
-                setMessages(messages);
+                setDebateMessages(messages);
                 return;
             }
 
             // Join the room named after the debate's id
-            socket.emit('join', { room: id });
+            socketRef.current.emit('join', { room: id });
 
             // Send 'start_debate' event to the server
-            socket.emit('start_debate', {
+            socketRef.current.emit('start_debate', {
                 uid_debate_id_tuple: [uid, id],
                 topic: topic,
                 turn: turn,
             });
         };
         startDebate();
-    }, [fetchMessages, id, socket, topic, uid]);
+    }, [fetchMessages, id, setDebateMessages, topic, uid]);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-    useEffect(scrollToBottom, [messages]);
+    // Manages the debate after it starts
+    useEffect(() => {
+        if (!socketRef.current) return;
+
+        socketRef.current.on('debate_started', (data) => {
+            setDebateMessages((prevMessages) => {
+                const lastMessage =
+                    prevMessages[id][prevMessages[id].length - 1];
+                console.log(lastMessage);
+                console.log(data);
+                if (lastMessage.message_from === data.message.message_from) {
+                    return {
+                        ...prevMessages,
+                        [id]: [data.message],
+                    };
+                } else {
+                    return {
+                        ...prevMessages,
+                        [id]: [...prevMessages[id], data.message],
+                    };
+                }
+            });
+
+            // Continue the debate if there are more turns
+            if (data.hasMoreTurns) {
+                console.log(debateMessages[id])
+                socketRef.current.emit('start_debate', {
+                    uid_debate_id_tuple: [uid, id],
+                    topic: topic,
+                    turn: debateMessages[id].length, // The turn is the current number of messages
+                });
+            }
+        });
+
+        return () => socketRef.current.off('debate_started');
+    }, [uid, id, topic, setDebateMessages, debateMessages.length, debateMessages]);
+
+    useEffect(() => {
+        const handleToken = (token) => {
+            setQueue((prevQueue) => [...prevQueue, token]);
+        };
+
+        socketRef.current = io.connect(backendUrl);
+        socketRef.current.emit('join', { room: id });
+        socketRef.current.on('token', handleToken);
+    }, [id]);
+
+    useEffect(() => {
+        if (queue.length > 0) {
+            processToken(
+                queue[0],
+                setInsideCodeBlock,
+                insideCodeBlock,
+                setDebateMessages,
+                handleIncomingMessageStream,
+                id,
+                ignoreNextTokenRef,
+                languageRef
+            );
+            setQueue((prevQueue) => prevQueue.slice(1));
+        }
+    }, [queue, setInsideCodeBlock, insideCodeBlock, id, setDebateMessages]);
 
     return (
         <DebateContainerStyled>
             <ChatBar chatName={chatName} id={id} />
             <MessagesContainer item xs={9}>
                 <MessageArea>
-                    {messages.map((message, index) => {
-                        if (message) {
-                            if (message.message_from === 'agent1') {
-                                return (
-                                    <DebateMessage
-                                        key={index}
-                                        message={message}
-                                        agent="agent1"
-                                    />
-                                );
-                            } else if (message.message_from === 'agent2') {
-                                return (
-                                    <DebateMessage
-                                        key={index}
-                                        message={message}
-                                        agent="agent2"
-                                    />
-                                );
+                    {debateMessages[id]?.map((messageObj, index) => {
+                        console.log(messageObj);
+                        // Check if messageObj is an array, if not convert it into an array
+                        const messages = Array.isArray(messageObj)
+                            ? messageObj
+                            : [messageObj];
+                        return messages.map((message, subIndex) => {
+                            if (message) {
+                                if (message.message_from === 'agent1') {
+                                    return (
+                                        <DebateMessage
+                                            key={`${index}-${subIndex}`}
+                                            message={message.content}
+                                            agent="agent1"
+                                        />
+                                    );
+                                } else if (message.message_from === 'agent2') {
+                                    return (
+                                        <DebateMessage
+                                            key={`${index}-${subIndex}`}
+                                            message={message.content}
+                                            agent="agent2"
+                                        />
+                                    );
+                                }
                             }
-                        }
-                        return null; // return null when the message doesn't exist
+                            return null; // return null when the message doesn't exist
+                        });
                     })}
-                    <div ref={messagesEndRef} />
                 </MessageArea>
             </MessagesContainer>
         </DebateContainerStyled>

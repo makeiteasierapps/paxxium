@@ -25,10 +25,10 @@ class MasterAgentService:
                 self.master_agents.popitem(last=False)
 
             # Create a new MasterAgent instance and add it to the master_agents dictionary
-            self.master_agents[key] = MasterAgent(self.message_service, uid, chat_ids, model=agent_model, system_prompt=system_prompt, chat_constants=chat_constants,)
+            self.master_agents[key] = MasterAgent(self.message_service, uid, chat_ids, 'agent', model=agent_model, system_prompt=system_prompt, chat_constants=chat_constants,)
         else:
             self.master_agents[key].chat_constants = chat_constants
-            self.master_agents[key].update_agent(agent_model, system_prompt)
+            self.master_agents[key].update_agent(agent_model, system_prompt, 'agent')
             # Move the key to the end of the dictionary to indicate it was most recently used
             self.master_agents.move_to_end(key)
         

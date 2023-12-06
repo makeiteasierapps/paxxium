@@ -6,6 +6,7 @@ export const ChatProvider = ({ children }) => {
     const [agentArray, setAgentArray] = useState([]);
     const [selectedAgent, setSelectedAgent] = useState(null);
     const [messages, setMessages] = useState({});
+    const [debateMessages, setDebateMessages] = useState({});
     const [insideCodeBlock, setInsideCodeBlock] = useState(false);
 
 
@@ -26,6 +27,8 @@ export const ChatProvider = ({ children }) => {
                 setSelectedAgent,
                 messages,
                 setMessages,
+                debateMessages,
+                setDebateMessages,
                 addMessage,
                 insideCodeBlock,
                 setInsideCodeBlock,
