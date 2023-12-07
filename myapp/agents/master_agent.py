@@ -15,32 +15,30 @@ from myapp.agents.tools.tools import SaveMessageTool
 
 
 class StreamResponse(BaseCallbackHandler):
-    def __init__(self, chat_ids: list, agent_name: str):
-        self.chat_ids = chat_ids
+    def __init__(self, chat_id, agent_name: str):
+        self.chat_id = chat_id
         self.agent_name = agent_name
 
     def on_llm_new_token(self, token: str, **kwargs) -> None:
         from myapp import socketio
-        for chat_id in self.chat_ids:
-            print(chat_id)
-            join_room(chat_id)
-            socketio.emit('token', {'message_from': self.agent_name, 'message_content': token, 'chat_id': chat_id, 'type': 'stream',}, room=chat_id)
+        join_room(self.chat_id)
+        socketio.emit('token', {'message_from': 'agent', 'message_content': token, 'chat_id': self.chat_id, 'type': 'stream',}, room=self.chat_id)
         socketio.sleep(0.1)
 
 class MasterAgent:
-    def __init__(self, message_service, uid, chat_ids, agent_name, model="gpt-3.5-turbo-0613", system_prompt="You are a friendly but genuine AI Agent. Don't be annoyingly nice, but don't be rude either.", chat_constants=''):
+    def __init__(self, message_service, uid, chat_id, agent_name,  model="gpt-3.5-turbo-0613", system_prompt="You are a friendly but genuine AI Agent. Don't be annoyingly nice, but don't be rude either.", chat_constants=''):
         langchain.debug = True
         user_service = current_app.user_service
         encrypted_openai_key, encrypted_serp_key = user_service.get_keys(uid)
         self.openai_api_key = user_service.decrypt(encrypted_openai_key)
         self.serp_key = user_service.decrypt(encrypted_serp_key)
         self.uid = uid
-        self.chat_id = chat_ids[0]
+        self.chat_id = chat_id
         self.model = model
         self.system_prompt = system_prompt
         self.chat_constants = chat_constants
         self.search = SerpAPIWrapper(serpapi_api_key=self.serp_key)
-        self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse(chat_ids, agent_name)], temperature=0, model=self.model, openai_api_key=self.openai_api_key)
+        self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse(self.chat_id, agent_name)], temperature=0, model=self.model, openai_api_key=self.openai_api_key)
         self.memory=ConversationBufferWindowMemory(memory_key='memory', return_messages=True, k=3)
         self.save_message = SaveMessageTool(memory=self.memory)
         self.tools = [

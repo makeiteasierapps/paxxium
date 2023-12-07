@@ -8,15 +8,14 @@ class MasterAgentService:
         self.message_service = message_service
         self.max_agent_instances = 1000
 
-    def check_and_set_agent_instance(self, uid, chat_ids, system_prompt, chat_constants, agent_model):
-        key = (uid, tuple(chat_ids))
+    def check_and_set_agent_instance(self, uid, chat_id, system_prompt, chat_constants, agent_model):
+        key = (uid, chat_id)
 
         if agent_model == 'GPT-4':
             agent_model = 'gpt-4-0613'
         else:
             agent_model = 'gpt-3.5-turbo-0613'
         
-
         # Check if the AI instance for the given key exists in the master_agents dictionary
         if key not in self.master_agents:
             # If the number of master_agents has reached the maximum allowed instances,
@@ -25,7 +24,7 @@ class MasterAgentService:
                 self.master_agents.popitem(last=False)
 
             # Create a new MasterAgent instance and add it to the master_agents dictionary
-            self.master_agents[key] = MasterAgent(self.message_service, uid, chat_ids, 'agent', model=agent_model, system_prompt=system_prompt, chat_constants=chat_constants,)
+            self.master_agents[key] = MasterAgent(self.message_service, uid, chat_id, 'agent', model=agent_model, system_prompt=system_prompt, chat_constants=chat_constants,)
         else:
             self.master_agents[key].chat_constants = chat_constants
             self.master_agents[key].update_agent(agent_model, system_prompt, 'agent')
@@ -35,8 +34,9 @@ class MasterAgentService:
         # Return the MasterAgent instance associated with the provided key
         return self.master_agents[key], key
     
-    def get_agent_by_key(self, uid, chat_ids):
-        key = (uid, tuple(chat_ids))
+    def get_agent_by_key(self, uid, chat_id):
+        print('38', chat_id)
+        key = (uid, chat_id)
         
         if key in self.master_agents:
             return self.master_agents[key]
