@@ -133,7 +133,7 @@ const Debate = ({ id, chatName, topic }) => {
 
             // Continue the debate if there are more turns
             if (data.hasMoreTurns) {
-                console.log(debateMessages[id])
+                console.log(debateMessages[id]);
                 socketRef.current.emit('start_debate', {
                     uid_debate_id_tuple: [uid, id],
                     topic: topic,
@@ -143,7 +143,14 @@ const Debate = ({ id, chatName, topic }) => {
         });
 
         return () => socketRef.current.off('debate_started');
-    }, [uid, id, topic, setDebateMessages, debateMessages.length, debateMessages]);
+    }, [
+        uid,
+        id,
+        topic,
+        setDebateMessages,
+        debateMessages.length,
+        debateMessages,
+    ]);
 
     useEffect(() => {
         const handleToken = (token) => {
