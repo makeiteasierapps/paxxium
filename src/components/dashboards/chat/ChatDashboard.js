@@ -54,6 +54,7 @@ const ChatDashboard = () => {
     const [settingsOpen, setSettingsOpen] = useState(false);
 
     useEffect(() => {
+        if (!idToken) return;
         const getChatData = async () => {
             try {
                 const response = await fetch(`${backendUrl}/chat`, {

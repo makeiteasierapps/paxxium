@@ -7,41 +7,26 @@ import Profile from '../profile/Profile';
 import { ChatProvider } from '../../../contexts/ChatContext';
 import { NewsProvider } from '../../../contexts/NewsContext';
 import { ProfileProvider } from '../../../contexts/ProfileContext';
-const DashboardWrapper = styled('div')(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
+import { useLocation } from "react-router-dom";
+
+const DashboardWrapper = styled("div")(({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
     height: `93vh`,
-    width: '100%',
-    overflow: 'auto',
+    width: "100%",
+    overflow: "auto",
 }));
 
-const Content = styled('div')(({ theme }) => ({
+const Content = styled("div")(({ theme }) => ({
     marginTop: theme.spacing(8),
 }));
 
-const MainDash = () => {
-    const [value, setValue] = useState(0);
+const MainDash = ({ children }) => {
     return (
         <>
-            <NavTabs setValue={setValue} />
+            <NavTabs />
             <DashboardWrapper>
-                <Content>
-                    {value === 0 && (
-                        <NewsProvider>
-                            <Home />
-                        </NewsProvider>
-                    )}
-                    {value === 1 && (
-                        <ChatProvider>
-                            <ChatDashboard />
-                        </ChatProvider>
-                    )}
-                    {value === 2 && (
-                        <ProfileProvider>
-                            <Profile />
-                        </ProfileProvider>
-                    )}
-                </Content>
+                <Content>{children}</Content>
             </DashboardWrapper>
         </>
     );
