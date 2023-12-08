@@ -1,5 +1,5 @@
 ## Bug Fixes:
-- When you close a chat and then try to reload via the "Load Chat" the socket connection does not re-establish. Error of 'Invalid frame header' is thrown. This might be because the socket connection is not being closed properly. This will require a review of the socket connection code to ensure that the connection is closed properly when the chat is closed.
+- When you close a chat and then try to reload via the "Load Chat" the socket connection does not re-establish. Error of 'Invalid frame header' is thrown. This might be because the socket connection is not being closed properly. This is not causing any issues but something to be aware of.
 
 - Add visual indication to show selected chat box. This could be a change in color, a border, or any other visual cue that clearly indicates the active chat box.
 
@@ -15,8 +15,6 @@
 - Review existing questions and decide which ones to keep or add. This will involve a review of the current questionnaire and potentially the creation of new questions.
 - Consider allowing users to add custom questions or remove existing ones for customization. This will require updates to the questionnaire system to allow for user input.
 
-## Debate Agent Overhaul:
-- Working on Streaming the response. Backend is ready just need to set up a socket connection on the frontend. Then implement the same logic as AgentMessage
 
 ## Additional Features:
 - Add a secondary check for when the chat clear or trash buttons are clicked. This could be a confirmation dialog that prevents accidental deletion of chats.
