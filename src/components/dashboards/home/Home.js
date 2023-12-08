@@ -1,25 +1,22 @@
-import NewsCarousel from './NewsCarousel';
-import { styled, Box } from '@mui/system';
-
+import { Box, styled } from "@mui/system";
+import NewsCarousel from "./NewsCarousel";
 
 // Styled Components
 const MainContainer = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
+    display: "flex",
+    flexDirection: "column",
     padding: theme.spacing(2),
-    backgroundColor: theme.palette.background.default,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
 }));
 
-
 const Home = () => {
-  return (
-    <MainContainer>
-      <NewsCarousel />
-    </MainContainer>
-  )
-}
+    return (
+        <MainContainer id="main-container">
+            <NewsCarousel />
+        </MainContainer>
+    );
+};
 
-export default Home
+export default Home;
