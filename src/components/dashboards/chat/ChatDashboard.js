@@ -122,7 +122,7 @@ const ChatDashboard = () => {
                                         systemPrompt={agent.system_prompt}
                                         chatName={agent.chat_name}
                                         agentModel={agent.agent_model}
-                                        useProfileData={agent.use_profile_data}
+                             truetoself           useProfileData={agent.use_profile_data}
                                     />
                                 );
                             }

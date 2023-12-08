@@ -5,7 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CommentsDisabledIcon from '@mui/icons-material/CommentsDisabled';
 import { styled } from '@mui/system';
 import { ChatContext } from '../../../../contexts/ChatContext';
-
+import { AuthContext } from '../../../../contexts/AuthContext';
 import {
     handleClearMessages,
     handleDeleteChat,
@@ -28,8 +28,11 @@ const ChatBarIcons = styled(Box)(({ theme }) => ({
     alignItems: 'center',
 }));
 
-const ChatBar = ({ chatName, id, idToken, backendUrl }) => {
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+const ChatBar = ({ chatName, id }) => {
     const { setMessages, setAgentArray } = useContext(ChatContext);
+    const { idToken } = useContext(AuthContext);
     return (
         <Bar>
             <Typography variant="h6">{chatName}</Typography>
@@ -58,7 +61,12 @@ const ChatBar = ({ chatName, id, idToken, backendUrl }) => {
                 <IconButton
                     aria-label="close"
                     onClick={() =>
-                        handleCloseChat(id, idToken, setAgentArray, backendUrl)
+                        handleCloseChat(
+                            id,
+                            idToken,
+                            setAgentArray,
+                            backendUrl,
+                        )
                     }
                 >
                     <CloseIcon />

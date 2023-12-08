@@ -23,12 +23,13 @@ def create_chat():
     system_prompt = data['systemPrompt']
     chat_constants = data['chatConstants']
     use_profile_data = data['useProfileData']
-    
-    chat_service = current_app.chat_service
-    new_chat_id = chat_service.create_chat(uid, chat_name, agent_model, system_prompt, chat_constants, use_profile_data)
-    
+
     master_agent_service = current_app.master_agent_service
-    master_agent_service.check_and_set_agent_instance(uid, new_chat_id, agent_model, system_prompt, chat_constants)
+    chat_service = current_app.chat_service
+
+    new_chat_id = chat_service.create_chat_in_db(uid, chat_name, agent_model, system_prompt, chat_constants, use_profile_data)
+    master_agent_service.check_and_set_agent_instance(uid, new_chat_id, system_prompt, chat_constants, agent_model)
+    
     chat_data = {
         'id': new_chat_id,
         'chat_name': chat_name,

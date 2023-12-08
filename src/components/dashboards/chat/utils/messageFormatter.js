@@ -15,7 +15,7 @@ export const formatBlockMessage = (message) => {
     let match;
     let lastIndex = 0;
 
-    while ((match = codeblock.exec(message.message_content)) !== null) {
+    while ((match = codeblock.exec(message.content)) !== null) {
         let lang = match[1] || 'markdown'; // set to markdown if no language is specified
         const code = match[2].trim();
 
@@ -33,7 +33,7 @@ export const formatBlockMessage = (message) => {
         if (match.index > lastIndex) {
             parts.push({
                 type: 'text',
-                content: message.message_content.substring(
+                content: message.content.substring(
                     lastIndex,
                     match.index
                 ),
@@ -51,10 +51,10 @@ export const formatBlockMessage = (message) => {
     }
 
     // If there's any remaining message content, add it to the parts array.
-    if (lastIndex < message.message_content.length) {
+    if (lastIndex < message.content.length) {
         parts.push({
             type: 'text',
-            content: message.message_content.substring(lastIndex),
+            content: message.content.substring(lastIndex),
         });
     }
 
@@ -64,9 +64,8 @@ export const formatBlockMessage = (message) => {
 export const formatStreamMessage = (message, insideCodeBlock, language) => {
     const parts = [];
     if (insideCodeBlock) {
-        console.log(language);
         const highlightedCode = Prism.highlight(
-            message.message_content,
+            message.content,
             Prism.languages[language] || Prism.languages.plaintext,
             language
         );
@@ -74,11 +73,13 @@ export const formatStreamMessage = (message, insideCodeBlock, language) => {
             type: 'code',
             content: highlightedCode,
             language: language,
+            message_from: message.message_from,
         });
     } else {
         parts.push({
             type: 'text',
-            content: message.message_content,
+            content: message.content,
+            message_from: message.message_from,
         });
     }
 

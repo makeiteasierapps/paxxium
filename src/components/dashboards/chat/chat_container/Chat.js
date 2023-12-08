@@ -1,11 +1,4 @@
-import React, {
-    useRef,
-    useState,
-    useContext,
-    useEffect,
-    useCallback,
-    memo,
-} from 'react';
+import React, { useRef, useState, useContext, useEffect, memo } from 'react';
 import { styled } from '@mui/system';
 import { List, Box } from '@mui/material';
 import io from 'socket.io-client';
@@ -17,9 +10,7 @@ import { AuthContext } from '../../../../contexts/AuthContext';
 import { ChatContext } from '../../../../contexts/ChatContext';
 import { formatBlockMessage } from '../utils/messageFormatter';
 import { handleIncomingMessageStream } from '../chat_container/handlers/handleIncomingMessageStream';
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
+import { processToken } from '../utils/processToken';
 // STYLED COMPONENTS
 const ChatContainerStyled = styled(Box)(({ theme }) => ({
     height: '80vh',
@@ -45,6 +36,8 @@ const MessagesContainer = styled('div')({
     whiteSpace: 'pre-line',
 });
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
 const Chat = ({
     id,
     chatConstants,
@@ -66,61 +59,61 @@ const Chat = ({
         setSelectedAgent,
         agentArray,
     } = useContext(ChatContext);
+
     const { idToken } = useContext(AuthContext);
 
     // Fetch messages from the database
-    const fetchMessages = useCallback(async () => {
-        try {
-            const requestData = {
-                id,
-                chatConstants,
-                systemPrompt,
-                chatName,
-                agentModel,
-                useProfileData,
-            };
+    useEffect(() => {
+        const fetchMessages = async () => {
+            try {
+                const requestData = {
+                    id,
+                    chatConstants,
+                    systemPrompt,
+                    chatName,
+                    agentModel,
+                    useProfileData,
+                };
 
-            const messageResponse = await fetch(
-                `${backendUrl}/${id}/messages`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: idToken,
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify(requestData),
+                const messageResponse = await fetch(
+                    `${backendUrl}/${id}/messages`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: idToken,
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify(requestData),
+                    }
+                );
+
+                if (!messageResponse.ok) {
+                    throw new Error('Failed to load messages');
                 }
-            );
 
-            if (!messageResponse.ok) {
-                throw new Error('Failed to load messages');
+                const messageData = await messageResponse.json();
+                if (messageData && messageData.messages.length > 0) {
+                    setMessages((prevMessageParts) => ({
+                        ...prevMessageParts,
+                        [id]: messageData.messages,
+                    }));
+                }
+            } catch (error) {
+                console.error(error);
             }
-
-            const messageData = await messageResponse.json();
-            if (messageData && messageData.messages.length > 0) {
-                setMessages((prevMessageParts) => ({
-                    ...prevMessageParts,
-                    [id]: messageData.messages,
-                }));
-            }
-        } catch (error) {
-            console.error(error);
-        }
+        };
+        fetchMessages();
     }, [
-        id,
-        chatConstants,
-        systemPrompt,
-        chatName,
         agentModel,
-        useProfileData,
+        chatConstants,
+        chatName,
+        id,
         idToken,
         setMessages,
+        systemPrompt,
+        useProfileData,
     ]);
-
-    useEffect(() => {
-        fetchMessages();
-    }, [fetchMessages]);
 
     useEffect(() => {
         const handleToken = (token) => {
@@ -133,79 +126,25 @@ const Chat = ({
 
         return () => {
             socketRef.current.off('token', handleToken);
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+            }
         };
     }, [id]);
 
     useEffect(() => {
-        const processToken = (token) => {
-            const codeStartIndicator = /```/g;
-            const codeEndIndicator = /``/g;
-
-            let messageContent = token.message_content;
-
-            if (ignoreNextTokenRef.current) {
-                if (token.message_content.trim() !== '`') {
-                    // This means the token is not a backtick, so it should be the language
-                    languageRef.current = token.message_content.trim();
-                }
-
-                // Reset the flag after processing the token, regardless of its content
-                ignoreNextTokenRef.current = false;
-                return;
-            }
-
-            // Check if we are not ignoring this token and if there is a language set
-            // This is the next tokenObj after we captured the language.
-            if (!ignoreNextTokenRef.current && languageRef.current) {
-                // Add the language property to the token object
-                token.language = languageRef.current;
-                //Removes a new line character
-                token.message_content = ' ';
-                // Reset languageRef as it has been used for this code block
-                languageRef.current = null;
-            }
-
-            if (ignoreNextTokenRef.current) {
-                ignoreNextTokenRef.current = false;
-
-                return;
-            }
-
-            if (codeStartIndicator.test(messageContent)) {
-                setInsideCodeBlock(
-                    (prevInsideCodeBlock) => !prevInsideCodeBlock
-                );
-
-                ignoreNextTokenRef.current = true;
-
-                return;
-            }
-
-            if (codeEndIndicator.test(messageContent)) {
-                setInsideCodeBlock(
-                    (prevInsideCodeBlock) => !prevInsideCodeBlock
-                );
-
-                ignoreNextTokenRef.current = true;
-
-                return;
-            }
-
-            // If we reach here, it means the token is not a code start or end indicator
-            // So, we can add it to the messages
-            setMessages((prevMessage) => {
-                const newMessageParts = handleIncomingMessageStream(
-                    prevMessage,
-                    id,
-                    token,
-                    insideCodeBlock
-                );
-                return newMessageParts;
-            });
-        };
-
         if (queue.length > 0) {
-            processToken(queue[0]);
+            processToken(
+                queue[0],
+                setInsideCodeBlock,
+                insideCodeBlock,
+                setMessages,
+                handleIncomingMessageStream,
+                id,
+                ignoreNextTokenRef,
+                languageRef
+            );
+
             setQueue((prevQueue) => prevQueue.slice(1));
         }
     }, [queue, setMessages, setInsideCodeBlock, insideCodeBlock, id]);
@@ -230,7 +169,9 @@ const Chat = ({
                     {messages[id]?.map((message, index) => {
                         let formattedMessage = message;
                         if (message.type === 'database') {
+                            console.log('message', message);
                             if (message.message_from === 'agent') {
+                                
                                 formattedMessage = formatBlockMessage(message);
                                 return (
                                     <AgentMessage
