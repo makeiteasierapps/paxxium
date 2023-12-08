@@ -1,5 +1,5 @@
 ## Bug Fixes:
-- When you close a chat and then try to reload via the "Load Chat" the socket connection does not re-establish. Error of 'Invalid frame header' is thrown. This might be because the socket connection is not being closed properly. This is not causing any issues but something to be aware of.
+- When you close a chat and then try to reload via the "Load Chat" the socket connection does not re-establish. After looking into this it appears to be coming from the hot reload and wont be an issue in production.
 
 - Add visual indication to show selected chat box. This could be a change in color, a border, or any other visual cue that clearly indicates the active chat box.
 
