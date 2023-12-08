@@ -75,14 +75,14 @@ const NewsCard = ({ news, index }) => {
             <Card
                 key={news.id}
                 sx={{
-                    height: "100%",
+                    maxWidth: 400,
                     overflowY: "scroll",
                     boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.75)",
                 }}
                 onClick={() => setSlideIndex(index)}
             >
                 <CardMedia
-                    sx={{ height: "40%", position: "relative" }}
+                    sx={{ height: 200, position: "relative" }}
                     image={news.image}
                 >
                     <Tooltip title="Mark read" placement="top-end">
@@ -126,19 +126,17 @@ const NewsCard = ({ news, index }) => {
                         </IconButton>
                     </Tooltip>
                 </CardMedia>
-                <CardContent sx={{ height: "60%" }}>
+                <CardContent sx={{ height: 300 }}>
                     <Typography variant="h5" component="div" gutterBottom>
                         {news.title}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                         {news.summary}
                     </Typography>
-                </CardContent>
-                <CardActions>
                     <Button variant="outlined" href={news.url}>
                         Read More
                     </Button>
-                </CardActions>
+                </CardContent>
             </Card>
             <DeleteConfirmationDialog
                 open={openDialog}
