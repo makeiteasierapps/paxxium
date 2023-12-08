@@ -1,24 +1,21 @@
-import { useContext } from 'react';
-import User from './User';
-import Questions from './Questions';
-import { styled } from '@mui/material/styles';
-import { Paper, Box, Button } from '@mui/material';
-import { ProfileContext } from '../../../contexts/ProfileContext';
+import { Button, Paper } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { useContext } from "react";
+import { ProfileContext } from "../../../contexts/ProfileContext";
+import Questions from "./Questions";
+import User from "./User";
 
 const MainContainer = styled(Paper)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
     padding: theme.spacing(2),
-    margin: 'auto',
-    width: '100%',
-    maxWidth: '800px',
-    height: '100%',
+    margin: "auto",
+    maxWidth: "800px",
     backgroundColor: theme.palette.background.paper,
 }));
 
 const Profile = () => {
-    const { handleSave, handleFormSubmit,  } =
-        useContext(ProfileContext);
+    const { handleSave, handleFormSubmit } = useContext(ProfileContext);
 
     const handleUpdate = async () => {
         await handleSave();
@@ -26,16 +23,17 @@ const Profile = () => {
     };
 
     return (
-        <MainContainer>
+        <MainContainer id="main-container">
             <User />
             <Questions />
-                <Button
-                    variant="contained"
-                    onClick={handleUpdate}
-                    sx={{ margin: 3 }}
-                >
-                    Update
-                </Button>
+            <Button
+                id="update-profile-button"
+                variant="contained"
+                onClick={handleUpdate}
+                sx={{ margin: 3 }}
+            >
+                Update
+            </Button>
         </MainContainer>
     );
 };
