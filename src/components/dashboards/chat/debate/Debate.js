@@ -8,6 +8,7 @@ import { AuthContext } from '../../../../contexts/AuthContext';
 import { ChatContext } from '../../../../contexts/ChatContext';
 import { processToken } from '../utils/processToken';
 import { handleIncomingMessageStream } from '../chat_container/handlers/handleIncomingMessageStream';
+import { formatBlockMessage } from '../utils/messageFormatter';
 
 // Syled components
 const DebateContainerStyled = styled(Box)(({ theme }) => ({
@@ -179,12 +180,14 @@ const Debate = ({ id, chatName, topic }) => {
                             ? messageObj
                             : [messageObj];
                         return messages.map((message, subIndex) => {
+                            let formattedMessage = message;
                             if (message) {
+                                formattedMessage = formatBlockMessage(message);
                                 if (message.message_from === 'agent1') {
                                     return (
                                         <DebateMessage
                                             key={`${index}-${subIndex}`}
-                                            message={message.content}
+                                            message={formattedMessage}
                                             agent="agent1"
                                         />
                                     );
@@ -192,7 +195,7 @@ const Debate = ({ id, chatName, topic }) => {
                                     return (
                                         <DebateMessage
                                             key={`${index}-${subIndex}`}
-                                            message={message.content}
+                                            message={formattedMessage}
                                             agent="agent2"
                                         />
                                     );

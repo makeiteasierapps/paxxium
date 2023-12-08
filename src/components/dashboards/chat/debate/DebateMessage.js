@@ -1,11 +1,5 @@
-import React from 'react';
-import {
-    Avatar,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    Checkbox,
-} from '@mui/material';
+import { useState } from 'react';
+import { Avatar, ListItem, ListItemIcon, Checkbox } from '@mui/material';
 import { styled } from '@mui/system';
 import { blueGrey, green, red } from '@mui/material/colors';
 
@@ -17,14 +11,19 @@ const AgentMessageStyled = styled(ListItem)({
     flexDirection: 'column',
 });
 
-const MessageText = styled(ListItemText)({
-    wordBreak: 'break-word',
+const MessageContent = styled('div')({
+    maxHeight: '100%',
+    padding: '0px 31px',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    width: '100%',
+    whiteSpace: 'pre-wrap',
 });
 
 const StyledCheckbox = styled(Checkbox)({
-    color: blueGrey[800], // Specify your styles here
+    color: blueGrey[800],
     '&.Mui-checked': {
-        color: '#1C282E', // Specify your styles for checked state
+        color: '#1C282E',
     },
 });
 
@@ -36,7 +35,7 @@ const StyledHeader = styled('div')({
 });
 
 const DebateMessage = ({ message, agent }) => {
-    const [checked, setChecked] = React.useState(false);
+    const [checked, setChecked] = useState(false);
 
     const getAvatarColor = (agent) => {
         switch (agent) {
@@ -70,7 +69,27 @@ const DebateMessage = ({ message, agent }) => {
                     inputProps={{ 'aris-label': 'Select message' }}
                 />
             </StyledHeader>
-            <MessageText primary={message} />
+            <MessageContent>
+                {message.map((msg, index) => {
+                    if (msg.type === 'text') {
+                        return <p key={`text${index}`}>{msg.content}</p>;
+                    } else if (msg.type === 'code') {
+                        return (
+                            <pre
+                                key={`code${index}`}
+                                className={`language-${msg.language}`}
+                            >
+                                <code
+                                    dangerouslySetInnerHTML={{
+                                        __html: msg.content,
+                                    }}
+                                />
+                            </pre>
+                        );
+                    }
+                    return null;
+                })}
+            </MessageContent>
         </AgentMessageStyled>
     );
 };

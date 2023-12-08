@@ -15,6 +15,8 @@
 - Review existing questions and decide which ones to keep or add. This will involve a review of the current questionnaire and potentially the creation of new questions.
 - Consider allowing users to add custom questions or remove existing ones for customization. This will require updates to the questionnaire system to allow for user input.
 
+## Debate
+- Code gets added as a new message and not formatted properly while streaming.
 
 ## Additional Features:
 - Add a secondary check for when the chat clear or trash buttons are clicked. This could be a confirmation dialog that prevents accidental deletion of chats.
