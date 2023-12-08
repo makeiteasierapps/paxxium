@@ -21,9 +21,10 @@ class StreamResponse(BaseCallbackHandler):
 
     def on_llm_new_token(self, token: str, **kwargs) -> None:
         from myapp import socketio
+        print(token)
         join_room(self.chat_id)
-        socketio.emit('token', {'message_from': 'agent', 'message_content': token, 'chat_id': self.chat_id, 'type': 'stream',}, room=self.chat_id)
-        socketio.sleep(0.1)
+        socketio.emit('token', {'message_from': self.agent_name, 'content': token, 'chat_id': self.chat_id, 'type': 'stream',}, room=self.chat_id)
+        socketio.sleep(0)
 
 class MasterAgent:
     def __init__(self, message_service, uid, chat_id, agent_name,  model="gpt-3.5-turbo-0613", system_prompt="You are a friendly but genuine AI Agent. Don't be annoyingly nice, but don't be rude either.", chat_constants=''):
@@ -84,7 +85,7 @@ class MasterAgent:
         )
     
     def pass_to_master_agent(self, message_obj, conversation_id, user_id):
-        data = message_obj['message_content']
+        data = message_obj['content']
         message_content = '*** \n THINGS TO REMEMBER:  \n' + self.chat_constants + '\n***' + data
         response = self.master_ai.run(message_content)                                 
         response_obj = self.message_service.create_message(conversation_id=conversation_id, message_from='agent', user_id=user_id, message_content=response)
@@ -92,7 +93,7 @@ class MasterAgent:
         return response_obj
     
     def pass_to_debateAI(self, message_obj):
-        message_content = message_obj['message_content']
+        message_content = message_obj['content']
         response = self.master_ai.run(message_content)
         return response
     
@@ -129,9 +130,9 @@ class MasterAgent:
                     if next_message_from == 'chatbot':
                         pairs.append((message, next_message))
                 else:
-                    pairs.append((message, {"message_content": "This is not a part of your conversation, end of buffer", "message_from": "chatbot"}))
+                    pairs.append((message, {"content": "This is not a part of your conversation, end of buffer", "message_from": "chatbot"}))
             if len(pairs) == 3:
                 break
         pairs.reverse()
         for pair in pairs:
-            self.memory.save_context({"input": pair[0]['message_content']}, {"output": pair[1]['message_content']})
+            self.memory.save_context({"input": pair[0]['content']}, {"output": pair[1]['content']})

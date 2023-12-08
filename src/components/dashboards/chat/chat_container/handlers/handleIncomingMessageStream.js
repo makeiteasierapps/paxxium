@@ -7,7 +7,7 @@ export const handleIncomingMessageStream = (
 ) => {
     let language = '';
     // Ignore empty message_content
-    if (tokenObj.message_content === '') {
+    if (tokenObj.content === '') {
         return prevMessage;
     }
 
@@ -22,22 +22,17 @@ export const handleIncomingMessageStream = (
     );
 
     // Start of a debate Stream
-    if (!prevMessage || !prevMessage[id]) {
+    if (!prevMessage[id] || prevMessage[id].length === 0) {
         return {
             ...prevMessage,
             [id]: [messagePartsArray],
         };
     }
 
-    if (
-        tokenObj.message_from === 'agent1' ||
-        tokenObj.message_from === 'agent2'
-    ) {
-        console.log('agent1 or agent2');
-    }
-
-    // Handles a response from a user
-    if (prevMessage[id][prevMessage[id].length - 1].message_from === 'user') {
+    const lastMessageFrom =
+        prevMessage[id][prevMessage[id].length - 1].message_from;
+    // If this is truthy that means the last message is an object and this is a start of a new stream
+    if (lastMessageFrom) {
         return {
             ...prevMessage,
             [id]: [...prevMessage[id], messagePartsArray],

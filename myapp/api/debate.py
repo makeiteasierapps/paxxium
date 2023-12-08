@@ -57,9 +57,9 @@ def start_debate(data):
    
     debate_manager = debate_managers[uid_debate_id_tuple]
     response_content, has_more_turns, agent_responding = debate_manager.start_debate(topic, turn)
-
+    
     emit('debate_started', {'hasMoreTurns': has_more_turns, 'message': {
-            'message_content': response_content,
+            'content': response_content,
             'message_from': agent_responding,
             'agent_model': 'AgentDebate',
             'topic': topic,

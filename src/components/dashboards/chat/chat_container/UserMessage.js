@@ -59,7 +59,7 @@ const UserMessage = ({ message }) => {
                     inputProps={{ 'aris-label': 'Select message' }}
                 />
             </StyledHeader>
-            <MessageText primary={message.message_content} />
+            <MessageText primary={message.content} />
         </UserMessageStyled>
     );
 };

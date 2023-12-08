@@ -41,13 +41,10 @@ const Debate = ({ id, chatName, topic }) => {
     const [queue, setQueue] = useState([]);
     const ignoreNextTokenRef = useRef(false);
     const languageRef = useRef('markdown');
+    const [debateMessages, setDebateMessages] = useState({});
 
-    const {
-        insideCodeBlock,
-        setInsideCodeBlock,
-        debateMessages,
-        setDebateMessages,
-    } = useContext(ChatContext);
+    const { insideCodeBlock, setInsideCodeBlock } = useContext(ChatContext);
+
     const { uid, idToken } = useContext(AuthContext);
 
     const fetchMessages = useCallback(async () => {
@@ -66,14 +63,13 @@ const Debate = ({ id, chatName, topic }) => {
             });
             if (!response.ok) throw new Error('Failed to fetch messages');
             const data = await response.json();
-            console.log(data);
-            setDebateMessages(data.messages);
-            return data.messages;
+            const newMessages = { [id]: data.messages };
+            return newMessages;
         } catch (error) {
             console.error(error);
             return [];
         }
-    }, [id, idToken, setDebateMessages]);
+    }, [id, idToken]);
 
     // Initialize/Close socket connection
     useEffect(() => {
@@ -90,7 +86,7 @@ const Debate = ({ id, chatName, topic }) => {
 
             // Try to fetch messages first
             const messages = await fetchMessages();
-            if (messages.length > 0) {
+            if (messages[id].length > 0) {
                 setDebateMessages(messages);
                 return;
             }
@@ -114,26 +110,20 @@ const Debate = ({ id, chatName, topic }) => {
 
         socketRef.current.on('debate_started', (data) => {
             setDebateMessages((prevMessages) => {
-                const lastMessage =
-                    prevMessages[id][prevMessages[id].length - 1];
-                console.log(lastMessage);
-                console.log(data);
-                if (lastMessage.message_from === data.message.message_from) {
-                    return {
-                        ...prevMessages,
-                        [id]: [data.message],
-                    };
-                } else {
-                    return {
-                        ...prevMessages,
-                        [id]: [...prevMessages[id], data.message],
-                    };
-                }
+                return {
+                    ...prevMessages,
+                    [id]: [
+                        ...prevMessages[id].slice(
+                            0,
+                            prevMessages[id].length - 1
+                        ),
+                        data.message,
+                    ],
+                };
             });
 
             // Continue the debate if there are more turns
             if (data.hasMoreTurns) {
-                console.log(debateMessages[id]);
                 socketRef.current.emit('start_debate', {
                     uid_debate_id_tuple: [uid, id],
                     topic: topic,
@@ -184,7 +174,6 @@ const Debate = ({ id, chatName, topic }) => {
             <MessagesContainer item xs={9}>
                 <MessageArea>
                     {debateMessages[id]?.map((messageObj, index) => {
-                        console.log(messageObj);
                         // Check if messageObj is an array, if not convert it into an array
                         const messages = Array.isArray(messageObj)
                             ? messageObj

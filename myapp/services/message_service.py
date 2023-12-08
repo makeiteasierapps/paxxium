@@ -27,7 +27,7 @@ class MessageService:
             ):
         new_message = {
             'message_from': message_from,
-            'message_content': message_content,
+            'content': message_content,
             'type': 'database',
             'time_stamp': datetime.utcnow()
         }

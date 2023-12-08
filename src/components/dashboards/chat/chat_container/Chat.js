@@ -169,7 +169,9 @@ const Chat = ({
                     {messages[id]?.map((message, index) => {
                         let formattedMessage = message;
                         if (message.type === 'database') {
+                            console.log('message', message);
                             if (message.message_from === 'agent') {
+                                
                                 formattedMessage = formatBlockMessage(message);
                                 return (
                                     <AgentMessage

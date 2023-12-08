@@ -11,11 +11,11 @@ export const processToken = (
     const codeStartIndicator = /```/g;
     const codeEndIndicator = /``/g;
 
-    let messageContent = token.message_content;
+    let messageContent = token.content;
     if (ignoreNextTokenRef.current) {
-        if (token.message_content.trim() !== '`') {
+        if (token.content.trim() !== '`') {
             // This means the token is not a backtick, so it should be the language
-            languageRef.current = token.message_content.trim();
+            languageRef.current = token.content.trim();
         }
 
         // Reset the flag after processing the token, regardless of its content
@@ -29,7 +29,7 @@ export const processToken = (
         // Add the language property to the token object
         token.language = languageRef.current;
         //Removes a new line character
-        token.message_content = ' ';
+        token.content = ' ';
         // Reset languageRef as it has been used for this code block
         languageRef.current = null;
     }

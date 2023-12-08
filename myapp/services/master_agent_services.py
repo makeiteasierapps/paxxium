@@ -35,7 +35,6 @@ class MasterAgentService:
         return self.master_agents[key], key
     
     def get_agent_by_key(self, uid, chat_id):
-        print('38', chat_id)
         key = (uid, chat_id)
         
         if key in self.master_agents:

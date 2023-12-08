@@ -50,7 +50,7 @@ def handle_message(data):
 def process_message(data, uid, chat_id):
     ms = current_app.message_service
     # Extrtact data from request
-    message_content = data.get('message_content')
+    message_content = data.get('content')
     message_from = data.get('message_from')
 
     # Create a new message in the database

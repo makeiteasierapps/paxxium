@@ -38,16 +38,16 @@ class DebateManager:
     def start_debate(self, topic, turn):
         message_service = current_app.message_service
         agent_responding = None
-        if turn == 0:  # Start of the debate
-            opening_argument_content = self.agent1.pass_to_debateAI({'message_content': f"You are in a debate and have been chosen to go first. The topic to be debated is: {topic}. Please make your opening argument."})
+        if turn == 0:
+            opening_argument_content = self.agent1.pass_to_debateAI({'content': f"You are in a debate and have been chosen to go first. The topic to be debated is: {topic}. Please make your opening argument."})
             self.response_content = opening_argument_content
             agent_responding = 'agent1'
         else:
             if turn % 2 == 0:  # Even round
-                self.response_content = self.agent1.pass_to_debateAI({'message_content': self.response_content})
+                self.response_content = self.agent1.pass_to_debateAI({'content': self.response_content})
                 agent_responding = 'agent1'
             else:  # Odd round
-                self.response_content = self.agent2.pass_to_debateAI({'message_content': f"You are in a debate, based on the role you were given respond to your opponents message: {self.response_content}" })
+                self.response_content = self.agent2.pass_to_debateAI({'content': f"You are in a debate, based on the role you were given respond to your opponents message: {self.response_content}" })
                 agent_responding = 'agent2'
 
         # Create a new message for each response
