@@ -6,10 +6,10 @@ import AgentMessage from './AgentMessage';
 import UserMessage from './UserMessage';
 import MessageInput from './MessageInput';
 import ChatBar from './ChatBar';
-import { AuthContext } from '../../../../contexts/AuthContext';
-import { ChatContext } from '../../../../contexts/ChatContext';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { ChatContext } from '../../../contexts/ChatContext';
 import { formatBlockMessage } from '../utils/messageFormatter';
-import { handleIncomingMessageStream } from '../chat_container/handlers/handleIncomingMessageStream';
+import { handleIncomingMessageStream } from '../chat/handlers/handleIncomingMessageStream';
 import { processToken } from '../utils/processToken';
 // STYLED COMPONENTS
 const ChatContainerStyled = styled(Box)(({ theme }) => ({

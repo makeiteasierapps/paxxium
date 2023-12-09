@@ -2,8 +2,8 @@ import { useContext } from 'react';
 import User from './User';
 import Questions from './Questions';
 import { styled } from '@mui/material/styles';
-import { Paper, Box, Button } from '@mui/material';
-import { ProfileContext } from '../../../contexts/ProfileContext';
+import { Paper, Button } from '@mui/material';
+import { ProfileContext } from '../../contexts/ProfileContext';
 
 const MainContainer = styled(Paper)(({ theme }) => ({
     display: 'flex',
@@ -17,8 +17,7 @@ const MainContainer = styled(Paper)(({ theme }) => ({
 }));
 
 const Profile = () => {
-    const { handleSave, handleFormSubmit,  } =
-        useContext(ProfileContext);
+    const { handleSave, handleFormSubmit, handleAnalyze } = useContext(ProfileContext);
 
     const handleUpdate = async () => {
         await handleSave();
@@ -29,13 +28,20 @@ const Profile = () => {
         <MainContainer>
             <User />
             <Questions />
-                <Button
-                    variant="contained"
-                    onClick={handleUpdate}
-                    sx={{ margin: 3 }}
-                >
-                    Update
-                </Button>
+            <Button
+                variant="contained"
+                onClick={handleUpdate}
+                sx={{ margin: 3 }}
+            >
+                Save
+            </Button>
+            <Button
+                variant="contained"
+                onClick={handleAnalyze}
+                sx={{ margin: 3 }}
+            >
+                Analyze
+            </Button>
         </MainContainer>
     );
 };

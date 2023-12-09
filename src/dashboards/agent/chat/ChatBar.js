@@ -4,8 +4,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CommentsDisabledIcon from '@mui/icons-material/CommentsDisabled';
 import { styled } from '@mui/system';
-import { ChatContext } from '../../../../contexts/ChatContext';
-import { AuthContext } from '../../../../contexts/AuthContext';
+import { ChatContext } from '../../../contexts/ChatContext';
+import { AuthContext } from '../../../contexts/AuthContext';
 import {
     handleClearMessages,
     handleDeleteChat,
@@ -61,12 +61,7 @@ const ChatBar = ({ chatName, id }) => {
                 <IconButton
                     aria-label="close"
                     onClick={() =>
-                        handleCloseChat(
-                            id,
-                            idToken,
-                            setAgentArray,
-                            backendUrl,
-                        )
+                        handleCloseChat(id, idToken, setAgentArray, backendUrl)
                     }
                 >
                     <CloseIcon />

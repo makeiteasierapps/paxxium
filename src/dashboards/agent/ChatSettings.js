@@ -10,8 +10,8 @@ import {
     FormControlLabel,
 } from '@mui/material';
 
-import { ChatContext } from '../../../contexts/ChatContext';
-import { AuthContext } from '../../../contexts/AuthContext';
+import { ChatContext } from '../../contexts/ChatContext';
+import { AuthContext } from '../../contexts/AuthContext';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 

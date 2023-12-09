@@ -1,11 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../../contexts/AuthContext';
-import { ProfileContext } from '../../../contexts/ProfileContext';
+import { AuthContext } from '../../contexts/AuthContext';
+import { ProfileContext } from '../../contexts/ProfileContext';
 import { TextField, Avatar, Box, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 
-import shaunoAvatar from '../../../assets/images/shaunoAvatar.png';
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import shaunoAvatar from '../../assets/images/shaunoAvatar.png';
 
 // Syled Components
 const UserContainer = styled(Box)(({ theme }) => ({
@@ -71,6 +70,8 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
         color: theme.palette.secondary.dark,
     },
 }));
+
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const User = () => {
     const [isEditing, setIsEditing] = useState(false);

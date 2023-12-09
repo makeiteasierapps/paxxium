@@ -1,11 +1,11 @@
 import React, { memo, useState, useContext, useEffect } from 'react';
-import { ChatContext } from '../../../contexts/ChatContext';
+import { ChatContext } from '../../contexts/ChatContext';
 
-import { AuthContext } from '../../../contexts/AuthContext';
+import { AuthContext } from '../../contexts/AuthContext';
 import { styled, Box } from '@mui/system';
 import { Button } from '@mui/material';
-import Chat from './chat_container/Chat';
-import Debate from '../chat/debate/Debate';
+import Chat from './chat/Chat';
+import Debate from '../agent/debate/Debate';
 
 import AgentMenu from './AgentMenu';
 

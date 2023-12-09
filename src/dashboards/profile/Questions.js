@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { AuthContext } from '../../../contexts/AuthContext';
-import { ProfileContext } from '../../../contexts/ProfileContext';
-import { Typography, Box, Button, TextField, Tab, Tabs } from '@mui/material';
+import { AuthContext } from '../../contexts/AuthContext';
+import { ProfileContext } from '../../contexts/ProfileContext';
+import { Typography, Box, TextField, Tab, Tabs } from '@mui/material';
 import { styled } from '@mui/system';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -111,7 +111,7 @@ const Answer = styled(TextField)(({ theme }) => ({
 
 const Questions = () => {
     const { idToken } = useContext(AuthContext);
-    const { handleFormSubmit, answers, setAnswers } =
+    const { answers, setAnswers } =
         useContext(ProfileContext);
     const [currentTab, setCurrentTab] = useState(0);
 
@@ -120,7 +120,7 @@ const Questions = () => {
         const getAnswers = async () => {
             try {
                 const response = await fetch(
-                    `${backendUrl}/profile/get-questions`,
+                    `${backendUrl}/profile/questions`,
                     {
                         method: 'GET',
                         headers: {

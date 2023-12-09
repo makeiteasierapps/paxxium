@@ -1,6 +1,4 @@
 from flask import Blueprint, request, jsonify, current_app
-from myapp.services.profile_services import ProfileService as ps
-from myapp.services.user_services import UserService as us
 
 profile = Blueprint('profile', __name__)
 
@@ -13,28 +11,22 @@ def authenticate_request():
         return None
     return decoded_token['uid']
 
-@profile.route('/profile/update-questions', methods=['POST'])
-def update_questions():
+@profile.route('/profile/questions', methods=['GET', 'POST'])
+def handle_questions():
     """
-    Add profie data to the users collection
-    """
-    # Get the request data
-    uid = authenticate_request()
-    ps.update_profile_questions(uid, request.get_json())
-    parsed_analysis = us.analyze_profile(uid)
-    user_service = current_app.user_service
-    user_service.update_news_topics(uid, parsed_analysis['news_topics'])
-
-    return jsonify(parsed_analysis), 200
-
-@profile.route('/profile/get-questions', methods=['GET'])
-def get_questions():
-    """
-    Get profile data from the users collection
+    Handle profile questions data in the users collection
     """
     uid = authenticate_request()
+    ps = current_app.profile_service
+
+    # Updating profile questions
+    if request.method == 'POST':
+        ps.update_profile_questions(uid, request.get_json())
+        return {'response': 'Profile questions updated successfully'}, 200
+        
+
+    # Handling a GET request
     profile_data = ps.load_profile_questions(uid)
-    
     return jsonify(profile_data), 200
 
 @profile.route('/profile', methods=['GET'])
@@ -42,20 +34,35 @@ def get_profile():
     """
     Get profile data from the users collection
     """
-
-    user_service = current_app.user_service
     uid = authenticate_request()
-    profile_data = user_service.get_profile(uid)
+    us = current_app.user_service
+    
+    profile_data = us.get_profile(uid)
     
     return jsonify(profile_data), 200
 
-@profile.route('/profile/update', methods=['POST'])
-def update_profile():
+@profile.route('/profile/user', methods=['POST'])
+def update_user():
     """
     Update profile data in the users collection
     """
-    user_service = current_app.user_service
+    us = current_app.user_service
     uid = authenticate_request()
-    user_service.update_profile(uid, request.get_json())
+
+    us.update_profile(uid, request.get_json())
     
-    return jsonify({'message': 'Profile updated successfully'}), 200
+    return {'response': 'Profile updated successfully'}, 200
+
+@profile.route('/profile/analyze', methods=['POST'])
+def analyze_profile():
+    """
+    Update profile data in the users collection
+    """
+    uid = authenticate_request()
+    us = current_app.user_service
+
+    parsed_analysis = us.analyze_profile(uid)
+    us.update_news_topics(uid, parsed_analysis['news_topics'])
+    us.update_profile(uid, request.get_json())
+
+    return jsonify(parsed_analysis), 200

@@ -11,6 +11,7 @@ from myapp.services.user_services import UserService
 from myapp.services.chat_services import ChatService
 from myapp.services.firebase_service import FirebaseService
 from myapp.services.news_service import NewsService
+from myapp.services.profile_services import ProfileService
 
 
 # Initialize Firebase
@@ -47,6 +48,7 @@ def create_app():
     app.firebase_service = FirebaseService()
     app.chat_service = ChatService(db)
     app.news_service = NewsService(db)
+    app.profile_service = ProfileService()
 
     # Register blueprints
     from myapp import views

@@ -2,12 +2,12 @@ import { useEffect, useState, useRef, useContext, useCallback } from 'react';
 import io from 'socket.io-client';
 import { styled } from '@mui/system';
 import { List, Box } from '@mui/material';
-import ChatBar from '../chat_container/ChatBar';
+import ChatBar from '../chat/ChatBar';
 import DebateMessage from './DebateMessage';
-import { AuthContext } from '../../../../contexts/AuthContext';
-import { ChatContext } from '../../../../contexts/ChatContext';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { ChatContext } from '../../../contexts/ChatContext';
 import { processToken } from '../utils/processToken';
-import { handleIncomingMessageStream } from '../chat_container/handlers/handleIncomingMessageStream';
+import { handleIncomingMessageStream } from '../chat/handlers/handleIncomingMessageStream';
 import { formatBlockMessage } from '../utils/messageFormatter';
 
 // Syled components

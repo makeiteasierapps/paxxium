@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
-import { AuthContext } from '../../../contexts/AuthContext';
-import { NewsContext } from '../../../contexts/NewsContext';
+import { AuthContext } from '../../contexts/AuthContext';
+import { NewsContext } from '../../contexts/NewsContext';
 import {
     Card,
     CardMedia,

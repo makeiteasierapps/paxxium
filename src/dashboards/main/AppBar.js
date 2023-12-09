@@ -10,7 +10,7 @@ import {
 import { signOut } from "firebase/auth";
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext, auth } from "../../../contexts/AuthContext";
+import { AuthContext, auth } from "../../contexts/AuthContext";
 
 // Styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({

@@ -10,9 +10,27 @@ export const ProfileProvider = ({ children }) => {
 
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
+    const handleAnalyzeProfile = async () => {
+        try {
+            const response = await fetch(`${backendUrl}/profile/analyze`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: idToken,
+                },
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message);
+            }
+            console.log(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
     // updates the user's(User.js) profile data
-    const handleSave = async () => {
-        await fetch(`${backendUrl}/profile/update`, {
+    const handleUserUpdate = async () => {
+        await fetch(`${backendUrl}/profile/user`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -23,20 +41,17 @@ export const ProfileProvider = ({ children }) => {
     };
 
     // updates answers(Questions.js)
-    const handleFormSubmit = async () => {
+    const handleQuestionsUpdate = async () => {
         try {
-            const response = await fetch(
-                `${backendUrl}/profile/update-questions`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: idToken,
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({ answers }),
-                }
-            );
+            const response = await fetch(`${backendUrl}/profile/questions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: idToken,
+                },
+                credentials: 'include',
+                body: JSON.stringify({ answers }),
+            });
             const data = await response.json();
             console.log(data);
         } catch (error) {
@@ -51,8 +66,9 @@ export const ProfileProvider = ({ children }) => {
                 setProfileData,
                 answers,
                 setAnswers,
-                handleSave,
-                handleFormSubmit,
+                handleUserUpdate,
+                handleQuestionsUpdate,
+                handleAnalyzeProfile,
             }}
         >
             {children}

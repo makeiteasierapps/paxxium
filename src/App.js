@@ -9,13 +9,13 @@ import {
     Routes,
 } from "react-router-dom";
 import { theme } from "./Theme";
-import LoginPage from "./components/auth/LoginPage";
-import SignUpPage from "./components/auth/SignUpPage";
-import ChatDashboard from "./components/dashboards/chat/ChatDashboard";
-import Home from "./components/dashboards/home/Home";
-import TitleBar from "./components/dashboards/main/AppBar";
-import MainDash from "./components/dashboards/main/MainDash";
-import Profile from "./components/dashboards/profile/Profile";
+import LoginPage from "./auth/LoginPage";
+import SignUpPage from "./auth/SignUpPage";
+import ChatDashboard from "./dashboards/agent/ChatDashboard";
+import Home from "./dashboards/home/Home";
+import TitleBar from "./dashboards/main/AppBar";
+import MainDash from "./dashboards/main/MainDash";
+import Profile from "./dashboards/profile/Profile";
 import { AuthContext, AuthProvider } from "./contexts/AuthContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import { NewsProvider } from "./contexts/NewsContext";
