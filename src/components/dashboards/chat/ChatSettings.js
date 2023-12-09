@@ -1,99 +1,33 @@
-import { useState, useContext, useEffect } from 'react';
-import { styled } from '@mui/system';
 import {
-    TextField,
     Button,
-    MenuItem,
-    Box,
     Checkbox,
-    FormGroup,
     FormControlLabel,
-} from '@mui/material';
-
-import { ChatContext } from '../../../contexts/ChatContext';
-import { AuthContext } from '../../../contexts/AuthContext';
+    Grid,
+    MenuItem,
+    TextField,
+} from "@mui/material";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../../contexts/AuthContext";
+import { ChatContext } from "../../../contexts/ChatContext";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-// Styled components
-const SettingsContainer = styled(FormGroup)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-}));
-
-const RowOne = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing(2),
-}));
-
-const AgentDropdown = styled(TextField)(({ theme }) => ({
-    flexGrow: 1,
-    paddingRight: theme.spacing(2),
-}));
-
-const ChatName = styled(TextField)(({ theme }) => ({
-    flexGrow: 1,
-    paddingRight: theme.spacing(2),
-}));
-
-const UseProfileCheckbox = styled(Checkbox)({
-    flexGrow: 1,
-});
-
-const RowTwo = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing(2),
-}));
-
-const SystemPrompt = styled(TextField)(({ theme }) => ({
-    flexGrow: 1,
-    paddingRight: theme.spacing(2),
-}));
-
-const ChatConstants = styled(TextField)(({ theme }) => ({
-    flexGrow: 1,
-    paddingRight: theme.spacing(2),
-}));
-
-const ButtonContainer = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: theme.spacing(2),
-}));
-const StyledButton = styled(Button)({
-    margin: '0 8px',
-});
-
 const ChatSettings = () => {
-    const {
-        setSelectedAgent,
-        selectedAgent,
-        setAgentArray,
-    } = useContext(ChatContext);
-
-    const [agentModel, setAgentModel] = useState('');
-    const [systemPrompt, setSystemPrompt] = useState('');
-    const [chatConstants, setChatConstants] = useState('');
-    const [useProfileData, setUseProfileData] = useState(false);
-    const [chatName, setChatName] = useState('');
-
+    const { setSelectedAgent, selectedAgent, setAgentArray } =
+        useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
+    const [agentModel, setAgentModel] = useState("");
+    const [systemPrompt, setSystemPrompt] = useState("");
+    const [chatConstants, setChatConstants] = useState("");
+    const [useProfileData, setUseProfileData] = useState(false);
+    const [chatName, setChatName] = useState("");
 
     useEffect(() => {
-        setAgentModel(selectedAgent?.agent_model || '');
-        setSystemPrompt(selectedAgent?.system_prompt || '');
-        setChatConstants(selectedAgent?.chat_constants || '');
+        setAgentModel(selectedAgent?.agent_model || "");
+        setSystemPrompt(selectedAgent?.system_prompt || "");
+        setChatConstants(selectedAgent?.chat_constants || "");
         setUseProfileData(selectedAgent?.use_profile_data || false);
-        setChatName(selectedAgent?.chat_name || '');
+        setChatName(selectedAgent?.chat_name || "");
     }, [selectedAgent]);
 
     // START CHAT
@@ -106,12 +40,12 @@ const ChatSettings = () => {
     ) => {
         try {
             const response = await fetch(`${backendUrl}/chat/create`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                     Authorization: idToken,
                 },
-                credentials: 'include',
+                credentials: "include",
                 body: JSON.stringify({
                     agentModel,
                     systemPrompt,
@@ -126,7 +60,6 @@ const ChatSettings = () => {
 
             // Set the new agent as the selectedAgent
             setSelectedAgent(data);
-
         } catch (error) {
             console.error(error);
         }
@@ -155,12 +88,12 @@ const ChatSettings = () => {
         // Update the settings in the database
         try {
             await fetch(`${backendUrl}/chat/update_settings`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                     Authorization: idToken,
                 },
-                credentials: 'include',
+                credentials: "include",
                 body: JSON.stringify(newAgentSettings),
             });
         } catch (error) {
@@ -178,27 +111,41 @@ const ChatSettings = () => {
     };
 
     return (
-        <SettingsContainer>
-            <RowOne>
-                <AgentDropdown
+        <>
+            <Grid item xs={12} sm={3}>
+                <TextField
+                    required
                     select
+                    id="selectModel"
+                    name="selectModel"
                     label="Select Model"
+                    fullWidth
+                    variant="standard"
                     value={agentModel}
                     onChange={(event) => setAgentModel(event.target.value)}
-                    variant="standard"
                 >
                     <MenuItem value="GPT-3.5">GPT 3.5</MenuItem>
                     <MenuItem value="GPT-4">GPT 4</MenuItem>
-                </AgentDropdown>
-                <ChatName
+                </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6} md={5}>
+                <TextField
+                    required
+                    id="name"
+                    name="name"
                     label="Name"
+                    fullWidth
                     variant="standard"
                     value={chatName}
                     onChange={(event) => setChatName(event.target.value)}
                 />
+            </Grid>
+            <Grid item xs={12} sm={3} md={4} textAlign={"center"}>
                 <FormControlLabel
                     control={
-                        <UseProfileCheckbox
+                        <Checkbox
+                            color="secondary"
+                            name="useProfileData"
                             defaultChecked
                             onChange={(event) =>
                                 setUseProfileData(event.target.checked)
@@ -207,33 +154,52 @@ const ChatSettings = () => {
                     }
                     label="Use Profile Data"
                 />
-            </RowOne>
-            <RowTwo>
-                <SystemPrompt
+            </Grid>
+            <Grid item xs={12} sm={12}>
+                <TextField
+                    id="systemPrompt"
+                    name="systemPrompt"
                     label="System Prompt"
+                    fullWidth
+                    variant="standard"
                     value={systemPrompt}
                     onChange={(event) => setSystemPrompt(event.target.value)}
-                    variant="standard"
                 />
-                <ChatConstants
+            </Grid>
+            <Grid item xs={12} sm={12}>
+                <TextField
+                    id="chatConstants"
+                    name="chatConstants"
                     label="Chat Constants"
+                    fullWidth
+                    variant="standard"
                     value={chatConstants}
                     onChange={(event) => setChatConstants(event.target.value)}
-                    variant="standard"
                 />
-            </RowTwo>
-            <ButtonContainer>
-                <StyledButton variant="contained" onClick={handleSubmit}>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <Button
+                    id="createButton"
+                    name="createButton"
+                    fullWidth
+                    variant="contained"
+                    onClick={handleSubmit}
+                >
                     Create
-                </StyledButton>
-                <StyledButton
+                </Button>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <Button
+                    id="updateButton"
+                    name="updateButton"
+                    fullWidth
                     variant="contained"
                     onClick={() => updateSettings(selectedAgent.id)}
                 >
                     Update
-                </StyledButton>
-            </ButtonContainer>
-        </SettingsContainer>
+                </Button>
+            </Grid>
+        </>
     );
 };
 
