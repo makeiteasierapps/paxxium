@@ -1,10 +1,7 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { AuthContext } from '../../contexts/AuthContext';
-import { ProfileContext } from '../../contexts/ProfileContext';
+import React, { useState, useContext } from 'react';
+import { ProfileContext } from '../ProfileContext';
 import { Typography, Box, TextField, Tab, Tabs } from '@mui/material';
 import { styled } from '@mui/system';
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const questions = {
     'Personal Interests': [
@@ -110,43 +107,8 @@ const Answer = styled(TextField)(({ theme }) => ({
 }));
 
 const Questions = () => {
-    const { idToken } = useContext(AuthContext);
-    const { answers, setAnswers } =
-        useContext(ProfileContext);
+    const { answers, handleAnswerChange } = useContext(ProfileContext);
     const [currentTab, setCurrentTab] = useState(0);
-
-    // Load answers from backend
-    useEffect(() => {
-        const getAnswers = async () => {
-            try {
-                const response = await fetch(
-                    `${backendUrl}/profile/questions`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            Authorization: idToken,
-                        },
-                        credentials: 'include',
-                    }
-                );
-                const data = await response.json();
-                setAnswers(data.answers);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        getAnswers();
-    }, [idToken, setAnswers]);
-
-    const handleAnswerChange = (category, question, answer) => {
-        setAnswers((prevAnswers) => ({
-            ...prevAnswers,
-            [category]: {
-                ...(prevAnswers[category] || {}),
-                [question]: answer,
-            },
-        }));
-    };
 
     return (
         <MainPaper>

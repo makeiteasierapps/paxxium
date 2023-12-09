@@ -1,9 +1,14 @@
 import { useContext } from 'react';
-import User from './User';
-import Questions from './Questions';
+import User from './components/User';
+import Questions from './components/Questions';
 import { styled } from '@mui/material/styles';
-import { Paper, Button } from '@mui/material';
-import { ProfileContext } from '../../contexts/ProfileContext';
+import { Paper, Button, Box } from '@mui/material';
+import { ProfileContext } from './ProfileContext';
+import { AuthContext } from '../../contexts/AuthContext';
+import {
+    handleUserUpdate,
+    handleQuestionsUpdate,
+} from './handlers/profileHandlers';
 
 const MainContainer = styled(Paper)(({ theme }) => ({
     display: 'flex',
@@ -17,11 +22,18 @@ const MainContainer = styled(Paper)(({ theme }) => ({
 }));
 
 const Profile = () => {
-    const { handleSave, handleFormSubmit, handleAnalyze } = useContext(ProfileContext);
+    const { handleAnalyzeProfile, analysis, profileData, answers } =
+        useContext(ProfileContext);
 
-    const handleUpdate = async () => {
-        await handleSave();
-        await handleFormSubmit();
+    const { idToken } = useContext(AuthContext);
+
+    const handleUpdate = async (
+        idToken = null,
+        profileData = null,
+        answers = null
+    ) => {
+        await handleUserUpdate(idToken, profileData);
+        await handleQuestionsUpdate(idToken, answers);
     };
 
     return (
@@ -30,14 +42,24 @@ const Profile = () => {
             <Questions />
             <Button
                 variant="contained"
-                onClick={handleUpdate}
+                onClick={() => handleUpdate(idToken, profileData, answers)}
                 sx={{ margin: 3 }}
             >
                 Save
             </Button>
+            <Box
+                sx={{
+                    margin: 3,
+                    padding: 2,
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                }}
+            >
+                {analysis ? analysis : 'Analyze Profile'}
+            </Box>
             <Button
                 variant="contained"
-                onClick={handleAnalyze}
+                onClick={handleAnalyzeProfile}
                 sx={{ margin: 3 }}
             >
                 Analyze

@@ -49,11 +49,11 @@ def update_user():
     us = current_app.user_service
     uid = authenticate_request()
 
-    us.update_profile(uid, request.get_json())
+    us.update_profile_db(uid, request.get_json())
     
     return {'response': 'Profile updated successfully'}, 200
 
-@profile.route('/profile/analyze', methods=['POST'])
+@profile.route('/profile/analyze', methods=['GET', 'POST'])
 def analyze_profile():
     """
     Update profile data in the users collection
@@ -61,8 +61,11 @@ def analyze_profile():
     uid = authenticate_request()
     us = current_app.user_service
 
-    parsed_analysis = us.analyze_profile(uid)
-    us.update_news_topics(uid, parsed_analysis['news_topics'])
-    us.update_profile(uid, request.get_json())
-
-    return jsonify(parsed_analysis), 200
+    if request.method == 'POST':
+        parsed_analysis = us.analyze_profile(uid)
+        us.update_user_profile(uid, analysis=parsed_analysis['analysis'], news_topics=parsed_analysis['news_topics'])
+        return jsonify(parsed_analysis), 200
+    
+    # GET request
+    profile_analysis = us.get_profile_analysis(uid)
+    return jsonify(profile_analysis), 200

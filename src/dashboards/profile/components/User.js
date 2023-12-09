@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../contexts/AuthContext';
-import { ProfileContext } from '../../contexts/ProfileContext';
+import { useContext, useState } from 'react';
+import { ProfileContext } from '../ProfileContext';
 import { TextField, Avatar, Box, Typography } from '@mui/material';
 import { styled } from '@mui/system';
+import { handleUserUpdate } from '../handlers/profileHandlers';
 
-import shaunoAvatar from '../../assets/images/shaunoAvatar.png';
+import shaunoAvatar from '../../../assets/images/shaunoAvatar.png';
 
 // Syled Components
 const UserContainer = styled(Box)(({ theme }) => ({
@@ -71,33 +71,9 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     },
 }));
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
 const User = () => {
     const [isEditing, setIsEditing] = useState(false);
-    const { idToken } = useContext(AuthContext);
-    const { handleSave, profileData, setProfileData } =
-        useContext(ProfileContext);
-
-    useEffect(() => {
-        const loadProfile = async () => {
-            try {
-                const response = await fetch(`${backendUrl}/profile`, {
-                    method: 'GET',
-                    headers: {
-                        Authorization: idToken,
-                    },
-                    credentials: 'include',
-                });
-
-                const data = await response.json();
-                setProfileData(data);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        loadProfile();
-    }, [idToken, setProfileData]);
+    const { profileData, setProfileData } = useContext(ProfileContext);
 
     return (
         <UserContainer elevation={9}>
@@ -122,7 +98,10 @@ const User = () => {
                             }
                             onBlur={() => {
                                 setIsEditing(false);
-                                handleSave('username', profileData.username);
+                                handleUserUpdate(
+                                    'username',
+                                    profileData.username
+                                );
                             }}
                         />
                     ) : (
