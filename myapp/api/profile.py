@@ -49,7 +49,19 @@ def update_user():
     us = current_app.user_service
     uid = authenticate_request()
 
-    us.update_profile_db(uid, request.get_json())
+    data = request.get_json()
+
+    if 'serp_key' in data:
+        # Encrypt the value and update the request data
+        data['serp_key'] = us.encrypt(data['serp_key'])
+
+    if 'open_key' in data:
+        # Encrypt the value and update the request data
+        data['open_key'] = us.encrypt(data['open_key'])
+
+    print(data)
+    
+    us.update_user_profile(uid, data)
     
     return {'response': 'Profile updated successfully'}, 200
 
@@ -63,7 +75,11 @@ def analyze_profile():
 
     if request.method == 'POST':
         parsed_analysis = us.analyze_profile(uid)
-        us.update_user_profile(uid, analysis=parsed_analysis['analysis'], news_topics=parsed_analysis['news_topics'])
+        us.update_user_profile(uid, parsed_analysis)
+
+        if 'news_topics' in parsed_analysis:
+            parsed_analysis['news_topics'] = parsed_analysis['news_topics'].values
+
         return jsonify(parsed_analysis), 200
     
     # GET request

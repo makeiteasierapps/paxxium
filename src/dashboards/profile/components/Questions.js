@@ -66,7 +66,6 @@ const questions = {
         'Are you open to exploring new technologies and gadgets, or do you prefer sticking to what you are familiar with?',
     ],
 };
-
 // Styled Components
 const MainPaper = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -75,7 +74,6 @@ const MainPaper = styled(Box)(({ theme }) => ({
     width: '100%',
     marginTop: theme.spacing(2),
 }));
-
 const StyledTabs = styled(Tabs)(({ theme }) => ({
     '& .MuiTabs-indicator': {
         display: 'none',
@@ -84,7 +82,6 @@ const StyledTabs = styled(Tabs)(({ theme }) => ({
 const Question = styled(Typography)(({ theme }) => ({
     marginBottom: theme.spacing(2),
 }));
-
 const Answer = styled(TextField)(({ theme }) => ({
     marginBottom: theme.spacing(2),
     '& .MuiOutlinedInput-root': {

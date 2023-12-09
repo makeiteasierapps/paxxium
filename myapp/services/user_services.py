@@ -82,12 +82,6 @@ class UserService:
 
         return decrypted_key.plaintext
 
-    def update_profile_db(self, uid, updates):
-        self.db.collection('users').document(uid).set(updates, merge=True)
-        
-        return {'message': 'User updated successfully'}, 200
-
-
     def get_profile(self, uid):
         user_doc = self.db.collection('users').document(uid).get(['first_name', 'last_name', 'username'])
         
@@ -143,12 +137,11 @@ class UserService:
         
         return user_doc.to_dict()
     
-    def update_user_profile(self, uid, analysis=None, news_topics=None):
+    def update_user_profile(self, uid, updates):
         user_ref = self.db.collection('users').document(uid)
-        updates = {}
-        if analysis:
-            updates['analysis'] = analysis
-        if news_topics:
-            news_topics_list = [topic.lower().strip() for topic in news_topics.split(',')]
+        
+        if 'news_topics' in updates:
+            news_topics_list = [topic.lower().strip() for topic in updates['news_topics'].split(',')]
             updates['news_topics'] = firestore.ArrayUnion(news_topics_list)
+        
         user_ref.update(updates)
