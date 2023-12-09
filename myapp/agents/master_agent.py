@@ -21,13 +21,12 @@ class StreamResponse(BaseCallbackHandler):
 
     def on_llm_new_token(self, token: str, **kwargs) -> None:
         from myapp import socketio
-        print(token)
         join_room(self.chat_id)
         socketio.emit('token', {'message_from': self.agent_name, 'content': token, 'chat_id': self.chat_id, 'type': 'stream',}, room=self.chat_id)
         socketio.sleep(0)
 
 class MasterAgent:
-    def __init__(self, message_service, uid, chat_id, agent_name,  model="gpt-3.5-turbo-0613", system_prompt="You are a friendly but genuine AI Agent. Don't be annoyingly nice, but don't be rude either.", chat_constants=''):
+    def __init__(self, message_service, uid, chat_id, agent_name,  model="gpt-3.5-turbo-0613", system_prompt="You are a friendly but genuine AI Agent. Don't be annoyingly nice, but don't be rude either.", chat_constants='', user_analysis=''):
         langchain.debug = True
         user_service = current_app.user_service
         encrypted_openai_key, encrypted_serp_key = user_service.get_keys(uid)
@@ -38,6 +37,7 @@ class MasterAgent:
         self.model = model
         self.system_prompt = system_prompt
         self.chat_constants = chat_constants
+        self.user_analysis = user_analysis
         self.search = SerpAPIWrapper(serpapi_api_key=self.serp_key)
         self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse(self.chat_id, agent_name)], temperature=0, model=self.model, openai_api_key=self.openai_api_key)
         self.memory=ConversationBufferWindowMemory(memory_key='memory', return_messages=True, k=3)
@@ -66,7 +66,7 @@ class MasterAgent:
             )
         self.message_service = message_service
 
-    def update_agent(self, model, system_prompt, agent_name):
+    def update_llm_instance(self, model, system_prompt, agent_name):
         self.model = model
         self.system_prompt = system_prompt
         self.llm = ChatOpenAI(streaming=True, callbacks=[StreamResponse(self.chat_id, agent_name)], temperature=0, model=self.model, openai_api_key=self.openai_api_key)
@@ -85,8 +85,9 @@ class MasterAgent:
         )
     
     def pass_to_master_agent(self, message_obj, conversation_id, user_id):
-        data = message_obj['content']
-        message_content = '*** \n THINGS TO REMEMBER:  \n' + self.chat_constants + '\n***' + data
+        print(self.user_analysis)
+        content = message_obj['content']
+        message_content = f'***USER ANALYSIS***\n{self.user_analysis}\n***THINGS TO REMEMBER***\n{self.chat_constants}\n**************\n{content}'
         response = self.master_ai.run(message_content)                                 
         response_obj = self.message_service.create_message(conversation_id=conversation_id, message_from='agent', user_id=user_id, message_content=response)
         

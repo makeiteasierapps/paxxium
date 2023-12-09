@@ -8,7 +8,7 @@ class MasterAgentService:
         self.message_service = message_service
         self.max_agent_instances = 1000
 
-    def check_and_set_agent_instance(self, uid, chat_id, system_prompt, chat_constants, agent_model):
+    def check_and_set_agent_instance(self, uid, chat_id, system_prompt, chat_constants, agent_model, user_analysis=None):
         key = (uid, chat_id)
 
         if agent_model == 'GPT-4':
@@ -23,11 +23,11 @@ class MasterAgentService:
             if len(self.master_agents) >= self.max_agent_instances:
                 self.master_agents.popitem(last=False)
 
-            # Create a new MasterAgent instance and add it to the master_agents dictionary
-            self.master_agents[key] = MasterAgent(self.message_service, uid, chat_id, 'agent', model=agent_model, system_prompt=system_prompt, chat_constants=chat_constants,)
+            self.master_agents[key] = MasterAgent(self.message_service, uid, chat_id, 'agent', model=agent_model, system_prompt=system_prompt, chat_constants=chat_constants, user_analysis=user_analysis)
         else:
+            self.master_agents[key].user_analysis = user_analysis
             self.master_agents[key].chat_constants = chat_constants
-            self.master_agents[key].update_agent(agent_model, system_prompt, 'agent')
+            self.master_agents[key].update_llm_instance(agent_model, system_prompt, 'agent')
             # Move the key to the end of the dictionary to indicate it was most recently used
             self.master_agents.move_to_end(key)
         

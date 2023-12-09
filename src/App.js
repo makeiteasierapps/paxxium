@@ -1,26 +1,26 @@
-import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider } from "@mui/material/styles";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
-import { useContext, useEffect } from "react";
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider } from '@mui/material/styles';
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import { useContext, useEffect } from 'react';
 import {
     Navigate,
     Route,
     BrowserRouter as Router,
     Routes,
-} from "react-router-dom";
-import { theme } from "./Theme";
-import LoginPage from "./auth/LoginPage";
-import SignUpPage from "./auth/SignUpPage";
-import ChatDashboard from "./dashboards/agent/ChatDashboard";
-import Home from "./dashboards/home/Home";
-import TitleBar from "./dashboards/main/AppBar";
-import MainDash from "./dashboards/main/MainDash";
-import Profile from "./dashboards/profile/Profile";
-import { AuthContext, AuthProvider } from "./contexts/AuthContext";
-import { ChatProvider } from "./contexts/ChatContext";
-import { NewsProvider } from "./contexts/NewsContext";
-import { ProfileProvider } from "./dashboards/profile/ProfileContext";
-import "./styles/App.css";
+} from 'react-router-dom';
+import { theme } from './Theme';
+import LoginPage from './auth/LoginPage';
+import SignUpPage from './auth/SignUpPage';
+import ChatDash from './dashboards/agent/ChatDash';
+import Home from './dashboards/home/Home';
+import TitleBar from './dashboards/main/AppBar';
+import MainDash from './dashboards/main/MainDash';
+import ProfileDash from './dashboards/profile/ProfileDash';
+import { AuthContext, AuthProvider } from './contexts/AuthContext';
+import { ChatProvider } from './contexts/ChatContext';
+import { NewsProvider } from './contexts/NewsContext';
+import { ProfileProvider } from './dashboards/profile/ProfileContext';
+import './styles/App.css';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -36,7 +36,7 @@ const AuthenticatedApp = () => {
         setIsAuthorized,
     } = useContext(AuthContext);
 
-    const isAuth = localStorage.getItem("isAuthorized") === "true";
+    const isAuth = localStorage.getItem('isAuthorized') === 'true';
 
     // Fetches auth status from the db then loads the user into state.
     useEffect(() => {
@@ -45,9 +45,9 @@ const AuthenticatedApp = () => {
             if (idToken && user) {
                 try {
                     const response = await fetch(`${backendUrl}/auth_check`, {
-                        method: "POST",
+                        method: 'POST',
                         headers: {
-                            "Content-Type": "application/json",
+                            'Content-Type': 'application/json',
                             Authorization: idToken,
                         },
                         body: JSON.stringify({
@@ -60,16 +60,16 @@ const AuthenticatedApp = () => {
                     // Checks if admin has grtanted access to the app
                     if (responseData.auth_status) {
                         setIsAuthorized(true);
-                        localStorage.setItem("isAuthorized", "true");
+                        localStorage.setItem('isAuthorized', 'true');
                         setUid(user.uid);
-                        const userDoc = await getDoc(doc(db, "users", uid));
+                        const userDoc = await getDoc(doc(db, 'users', uid));
                         if (!userDoc.exists()) {
-                            throw new Error("No user found in Firestore");
+                            throw new Error('No user found in Firestore');
                         }
                         setUsername(userDoc.data().username);
                     }
                 } catch (error) {
-                    console.error("Failed to fetch:", error);
+                    console.error('Failed to fetch:', error);
                 }
             }
         };
@@ -82,7 +82,7 @@ const AuthenticatedApp = () => {
             {isAuth && <TitleBar />}
             {isAuth ? (
                 <Routes>
-                    {["/", "/dashboard", "/home"].map((path, i) => {
+                    {['/', '/dashboard', '/home'].map((path, i) => {
                         return (
                             <Route
                                 path={path}
@@ -102,7 +102,7 @@ const AuthenticatedApp = () => {
                         element={
                             <MainDash>
                                 <ChatProvider>
-                                    <ChatDashboard />
+                                    <ChatDash />
                                 </ChatProvider>
                             </MainDash>
                         }
@@ -112,7 +112,7 @@ const AuthenticatedApp = () => {
                         element={
                             <MainDash>
                                 <ProfileProvider>
-                                    <Profile />
+                                    <ProfileDash />
                                 </ProfileProvider>
                             </MainDash>
                         }

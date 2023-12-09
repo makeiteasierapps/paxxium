@@ -5,7 +5,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { styled, Box } from '@mui/system';
 import { Button } from '@mui/material';
 import Chat from './chat/Chat';
-import Debate from '../agent/debate/Debate';
+import Debate from './debate/Debate';
 
 import AgentMenu from './AgentMenu';
 
@@ -27,7 +27,6 @@ const ChatsContainer = styled(Box)(({ theme }) => ({
     flexWrap: 'wrap',
     justifyContent: 'center',
     gap: theme.spacing(2),
-    
 }));
 
 const Settings = styled(Box)(({ theme }) => ({
@@ -46,7 +45,7 @@ const SettingsContainer = styled(Box)(({ theme }) => ({
     marginBottom: 0,
 }));
 
-const ChatDashboard = () => {
+const ChatDash = () => {
     const { setSelectedAgent, agentArray, setAgentArray } =
         useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
@@ -123,7 +122,8 @@ const ChatDashboard = () => {
                                         systemPrompt={agent.system_prompt}
                                         chatName={agent.chat_name}
                                         agentModel={agent.agent_model}
-                             truetoself           useProfileData={agent.use_profile_data}
+                                        truetoself
+                                        useProfileData={agent.use_profile_data}
                                     />
                                 );
                             }
@@ -134,4 +134,4 @@ const ChatDashboard = () => {
     );
 };
 
-export default memo(ChatDashboard);
+export default memo(ChatDash);

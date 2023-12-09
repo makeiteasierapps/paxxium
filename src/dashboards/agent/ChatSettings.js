@@ -11,9 +11,7 @@ import {
 } from '@mui/material';
 
 import { ChatContext } from '../../contexts/ChatContext';
-import { AuthContext } from '../../contexts/AuthContext';
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import { AuthContext, backendUrl } from '../../contexts/AuthContext';
 
 // Styled components
 const SettingsContainer = styled(FormGroup)(({ theme }) => ({
@@ -40,6 +38,16 @@ const ChatName = styled(TextField)(({ theme }) => ({
     paddingRight: theme.spacing(2),
 }));
 
+const SystemPrompt = styled(TextField)(({ theme }) => ({
+    flexGrow: 1,
+    paddingRight: theme.spacing(2),
+}));
+
+const ChatConstants = styled(TextField)(({ theme }) => ({
+    flexGrow: 1,
+    paddingRight: theme.spacing(2),
+}));
+
 const UseProfileCheckbox = styled(Checkbox)({
     flexGrow: 1,
 });
@@ -50,16 +58,6 @@ const RowTwo = styled(Box)(({ theme }) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: theme.spacing(2),
-}));
-
-const SystemPrompt = styled(TextField)(({ theme }) => ({
-    flexGrow: 1,
-    paddingRight: theme.spacing(2),
-}));
-
-const ChatConstants = styled(TextField)(({ theme }) => ({
-    flexGrow: 1,
-    paddingRight: theme.spacing(2),
 }));
 
 const ButtonContainer = styled(Box)(({ theme }) => ({
@@ -74,11 +72,8 @@ const StyledButton = styled(Button)({
 });
 
 const ChatSettings = () => {
-    const {
-        setSelectedAgent,
-        selectedAgent,
-        setAgentArray,
-    } = useContext(ChatContext);
+    const { setSelectedAgent, selectedAgent, setAgentArray } =
+        useContext(ChatContext);
 
     const [agentModel, setAgentModel] = useState('');
     const [systemPrompt, setSystemPrompt] = useState('');
@@ -126,7 +121,6 @@ const ChatSettings = () => {
 
             // Set the new agent as the selectedAgent
             setSelectedAgent(data);
-
         } catch (error) {
             console.error(error);
         }
@@ -199,7 +193,7 @@ const ChatSettings = () => {
                 <FormControlLabel
                     control={
                         <UseProfileCheckbox
-                            defaultChecked
+                            checked={useProfileData}
                             onChange={(event) =>
                                 setUseProfileData(event.target.checked)
                             }

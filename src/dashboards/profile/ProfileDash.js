@@ -21,7 +21,7 @@ const MainContainer = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.background.paper,
 }));
 
-const Profile = () => {
+const ProfileDash = () => {
     const { handleAnalyzeProfile, analysis, profileData, answers } =
         useContext(ProfileContext);
 
@@ -68,4 +68,4 @@ const Profile = () => {
     );
 };
 
-export default Profile;
+export default ProfileDash;

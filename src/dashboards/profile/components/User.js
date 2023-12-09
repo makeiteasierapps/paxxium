@@ -2,7 +2,6 @@ import { useContext, useState } from 'react';
 import { ProfileContext } from '../ProfileContext';
 import { TextField, Avatar, Box, Typography } from '@mui/material';
 import { styled } from '@mui/system';
-import { handleUserUpdate } from '../handlers/profileHandlers';
 
 import shaunoAvatar from '../../../assets/images/shaunoAvatar.png';
 
@@ -98,10 +97,6 @@ const User = () => {
                             }
                             onBlur={() => {
                                 setIsEditing(false);
-                                handleUserUpdate(
-                                    'username',
-                                    profileData.username
-                                );
                             }}
                         />
                     ) : (

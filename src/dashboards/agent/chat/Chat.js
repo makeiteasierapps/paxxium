@@ -104,16 +104,7 @@ const Chat = ({
             }
         };
         fetchMessages();
-    }, [
-        agentModel,
-        chatConstants,
-        chatName,
-        id,
-        idToken,
-        setMessages,
-        systemPrompt,
-        useProfileData,
-    ]);
+    }, [id, idToken, setMessages]);
 
     useEffect(() => {
         const handleToken = (token) => {
@@ -170,7 +161,6 @@ const Chat = ({
                         let formattedMessage = message;
                         if (message.type === 'database') {
                             if (message.message_from === 'agent') {
-                                
                                 formattedMessage = formatBlockMessage(message);
                                 return (
                                     <AgentMessage
