@@ -1,4 +1,4 @@
-import { backendUrl } from '../../../contexts/AuthContext';
+import { backendUrl } from '../../../auth/AuthContext';
 
 export const handleUserUpdate = async (idToken, profileData) => {
     try {

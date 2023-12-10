@@ -1,12 +1,10 @@
 import { useState, useContext } from 'react';
 import { styled } from '@mui/system';
 import { TextField, MenuItem, FormGroup, Box } from '@mui/material';
-import ChatSettings from './ChatSettings';
+import ChatSettings from './chat/components/ChatSettings';
 import DebateSettings from '../agent/debate/DebateSettings';
-import { AuthContext } from '../../contexts/AuthContext';
-import { ChatContext } from '../../contexts/ChatContext';
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import { AuthContext, backendUrl } from '../../auth/AuthContext';
+import { ChatContext } from '../../dashboards/agent/chat/ChatContext';
 
 // Styled components
 const SettingsContainer = styled(FormGroup)(({ theme }) => ({

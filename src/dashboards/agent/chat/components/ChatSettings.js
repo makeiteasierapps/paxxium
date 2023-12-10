@@ -9,9 +9,8 @@ import {
     FormGroup,
     FormControlLabel,
 } from '@mui/material';
-
-import { ChatContext } from '../../contexts/ChatContext';
-import { AuthContext, backendUrl } from '../../contexts/AuthContext';
+import { ChatContext } from '../ChatContext';
+import { AuthContext, backendUrl } from '../../../../auth/AuthContext';
 
 // Styled components
 const SettingsContainer = styled(FormGroup)(({ theme }) => ({

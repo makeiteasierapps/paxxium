@@ -2,15 +2,16 @@ import React, { useRef, useState, useContext, useEffect, memo } from 'react';
 import { styled } from '@mui/system';
 import { List, Box } from '@mui/material';
 import io from 'socket.io-client';
-import AgentMessage from './AgentMessage';
-import UserMessage from './UserMessage';
-import MessageInput from './MessageInput';
-import ChatBar from './ChatBar';
-import { AuthContext } from '../../../contexts/AuthContext';
-import { ChatContext } from '../../../contexts/ChatContext';
+import AgentMessage from './components/AgentMessage';
+import UserMessage from './components/UserMessage';
+import MessageInput from './components/MessageInput';
+import ChatBar from './components/ChatBar';
+import { AuthContext, backendUrl } from '../../../auth/AuthContext';
+import { ChatContext } from '../../../dashboards/agent/chat/ChatContext';
 import { formatBlockMessage } from '../utils/messageFormatter';
 import { handleIncomingMessageStream } from '../chat/handlers/handleIncomingMessageStream';
 import { processToken } from '../utils/processToken';
+
 // STYLED COMPONENTS
 const ChatContainerStyled = styled(Box)(({ theme }) => ({
     height: '80vh',
@@ -35,8 +36,6 @@ const MessagesContainer = styled('div')({
     overflow: 'hidden',
     whiteSpace: 'pre-line',
 });
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const Chat = ({
     id,

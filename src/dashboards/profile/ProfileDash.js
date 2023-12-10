@@ -4,7 +4,7 @@ import Questions from './components/Questions';
 import { styled } from '@mui/material/styles';
 import { Paper, Button, Box } from '@mui/material';
 import { ProfileContext } from './ProfileContext';
-import { AuthContext } from '../../contexts/AuthContext';
+import { AuthContext } from '../../auth/AuthContext';
 import {
     handleUserUpdate,
     handleQuestionsUpdate,

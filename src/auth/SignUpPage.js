@@ -1,6 +1,6 @@
 import { React, useContext, useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { AuthContext } from '../contexts/AuthContext';
+import { AuthContext } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/system';
 import Avatar from '@mui/material/Avatar';

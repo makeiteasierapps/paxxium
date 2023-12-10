@@ -1,7 +1,6 @@
 import React, { memo, useState, useContext, useEffect } from 'react';
-import { ChatContext } from '../../contexts/ChatContext';
-
-import { AuthContext } from '../../contexts/AuthContext';
+import { ChatContext } from './chat/ChatContext';
+import { AuthContext } from '../../auth/AuthContext';
 import { styled, Box } from '@mui/system';
 import { Button } from '@mui/material';
 import Chat from './chat/Chat';
@@ -45,7 +44,7 @@ const SettingsContainer = styled(Box)(({ theme }) => ({
     marginBottom: 0,
 }));
 
-const ChatDash = () => {
+const AgentDash = () => {
     const { setSelectedAgent, agentArray, setAgentArray } =
         useContext(ChatContext);
     const { idToken } = useContext(AuthContext);
@@ -134,4 +133,4 @@ const ChatDash = () => {
     );
 };
 
-export default memo(ChatDash);
+export default memo(AgentDash);

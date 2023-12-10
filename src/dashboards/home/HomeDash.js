@@ -1,6 +1,5 @@
-import NewsCarousel from './NewsCarousel';
+import NewsCarousel from './news/components/NewsCarousel';
 import { styled, Box } from '@mui/system';
-
 
 // Styled Components
 const MainContainer = styled(Box)(({ theme }) => ({
@@ -13,13 +12,12 @@ const MainContainer = styled(Box)(({ theme }) => ({
     justifyContent: 'center',
 }));
 
+const HomeDash = () => {
+    return (
+        <MainContainer>
+            <NewsCarousel />
+        </MainContainer>
+    );
+};
 
-const Home = () => {
-  return (
-    <MainContainer>
-      <NewsCarousel />
-    </MainContainer>
-  )
-}
-
-export default Home
+export default HomeDash;

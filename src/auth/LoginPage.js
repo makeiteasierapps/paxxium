@@ -11,7 +11,7 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { AuthContext } from '../contexts/AuthContext';
+import { AuthContext } from './AuthContext';
 
 export default function LoginPage() {
     const auth = getAuth();

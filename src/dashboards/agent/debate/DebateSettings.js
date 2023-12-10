@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { styled } from '@mui/system';
 import { TextField, Button, FormGroup } from '@mui/material';
-import { AuthContext } from '../../../contexts/AuthContext';
-import { ChatContext } from '../../../contexts/ChatContext';
+import { AuthContext } from '../../../auth/AuthContext';
+import { ChatContext } from '../../../dashboards/agent/chat/ChatContext';
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 // Styled components

@@ -2,10 +2,10 @@ import { useEffect, useState, useRef, useContext, useCallback } from 'react';
 import io from 'socket.io-client';
 import { styled } from '@mui/system';
 import { List, Box } from '@mui/material';
-import ChatBar from '../chat/ChatBar';
+import ChatBar from '../chat/components/ChatBar';
 import DebateMessage from './DebateMessage';
-import { AuthContext } from '../../../contexts/AuthContext';
-import { ChatContext } from '../../../contexts/ChatContext';
+import { AuthContext, backendUrl } from '../../../auth/AuthContext';
+import { ChatContext } from '../../../dashboards/agent/chat/ChatContext';
 import { processToken } from '../utils/processToken';
 import { handleIncomingMessageStream } from '../chat/handlers/handleIncomingMessageStream';
 import { formatBlockMessage } from '../utils/messageFormatter';
@@ -34,8 +34,6 @@ const MessagesContainer = styled('div')({
     overflow: 'hidden',
     whiteSpace: 'pre-line',
 });
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const Debate = ({ id, chatName, topic }) => {
     const socketRef = useRef(null);

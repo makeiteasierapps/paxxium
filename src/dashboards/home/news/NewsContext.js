@@ -1,5 +1,5 @@
 import { useState, createContext, useCallback, useContext } from 'react';
-import { AuthContext } from './AuthContext';
+import { AuthContext } from '../../../auth/AuthContext';
 
 export const NewsContext = createContext();
 

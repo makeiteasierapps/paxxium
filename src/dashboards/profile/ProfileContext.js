@@ -5,7 +5,7 @@ import {
     useEffect,
     useCallback,
 } from 'react';
-import { AuthContext, backendUrl } from '../../contexts/AuthContext';
+import { AuthContext, backendUrl } from '../../auth/AuthContext';
 
 export const ProfileContext = createContext();
 

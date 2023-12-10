@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import Carousel from 'react-spring-3d-carousel';
-import { NewsContext } from '../../contexts/NewsContext';
+import { NewsContext } from '../NewsContext';
 import NewsCard from './NewsCard';
 import { styled, Box } from '@mui/system';
 import Button from '@mui/material/Button';

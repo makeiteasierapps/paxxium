@@ -11,18 +11,17 @@ import {
 import { theme } from './Theme';
 import LoginPage from './auth/LoginPage';
 import SignUpPage from './auth/SignUpPage';
-import ChatDash from './dashboards/agent/ChatDash';
-import Home from './dashboards/home/Home';
+import ChatDash from './dashboards/agent/AgentDash';
+import HomeDash from './dashboards/home/HomeDash';
 import TitleBar from './dashboards/main/AppBar';
 import MainDash from './dashboards/main/MainDash';
 import ProfileDash from './dashboards/profile/ProfileDash';
-import { AuthContext, AuthProvider } from './contexts/AuthContext';
-import { ChatProvider } from './contexts/ChatContext';
-import { NewsProvider } from './contexts/NewsContext';
+import { AuthContext, AuthProvider, backendUrl } from './auth/AuthContext';
+import { ChatProvider } from './dashboards/agent/chat/ChatContext';
+import { NewsProvider } from './dashboards/home/news/NewsContext';
 import { ProfileProvider } from './dashboards/profile/ProfileContext';
 import './styles/App.css';
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const AuthenticatedApp = () => {
     const db = getFirestore();
@@ -89,7 +88,7 @@ const AuthenticatedApp = () => {
                                 element={
                                     <MainDash>
                                         <NewsProvider>
-                                            <Home />
+                                            <HomeDash />
                                         </NewsProvider>
                                     </MainDash>
                                 }

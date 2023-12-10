@@ -3,9 +3,9 @@ import io from "socket.io-client";
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { styled } from "@mui/system";
-import { AuthContext } from "../../../contexts/AuthContext";
-import { ChatContext } from "../../../contexts/ChatContext";
-import { sendMessage, keyDown } from "./handlers/messageInputHandlers";
+import { AuthContext } from '../../../../auth/AuthContext';
+import { ChatContext } from '../ChatContext';
+import { sendMessage, keyDown } from "../handlers/messageInputHandlers";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const InputArea = styled("div")({

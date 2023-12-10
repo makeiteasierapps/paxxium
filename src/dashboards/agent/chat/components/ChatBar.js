@@ -4,13 +4,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CommentsDisabledIcon from '@mui/icons-material/CommentsDisabled';
 import { styled } from '@mui/system';
-import { ChatContext } from '../../../contexts/ChatContext';
-import { AuthContext } from '../../../contexts/AuthContext';
+import { AuthContext } from '../../../../auth/AuthContext';
+import { ChatContext } from '../ChatContext';
 import {
     handleClearMessages,
     handleDeleteChat,
     handleCloseChat,
-} from './handlers/chatBarHandlers';
+} from '../handlers/chatBarHandlers';
 
 const Bar = styled(Box)(({ theme }) => ({
     display: 'flex',
