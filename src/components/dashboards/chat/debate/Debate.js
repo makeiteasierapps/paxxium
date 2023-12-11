@@ -1,34 +1,33 @@
-import { useEffect, useState, useRef, useContext, useCallback } from 'react';
-import io from 'socket.io-client';
-import { styled } from '@mui/system';
-import { List, Box } from '@mui/material';
-import ChatBar from '../chat_container/ChatBar';
-import DebateMessage from './DebateMessage';
-import { AuthContext } from '../../../../contexts/AuthContext';
+import { Box, List } from "@mui/material";
+import { styled } from "@mui/system";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import io from "socket.io-client";
+import { AuthContext } from "../../../../contexts/AuthContext";
+import ChatBar from "../chat_container/ChatBar";
+import DebateMessage from "./DebateMessage";
 
 // Syled components
-const DebateContainerStyled = styled(Box)(({ theme }) => ({
-    height: '80vh',
-    width: '70%',
-    display: 'flex',
-    flexDirection: 'column',
-    boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.63)',
-    overflow: 'auto',
-    borderRadius: '5px',
+const DebateContainerStyled = styled(Box)(() => ({
+    height: "75vh",
+    display: "flex",
+    flexDirection: "column",
+    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
+    overflow: "auto",
+    borderRadius: "5px",
 }));
 
 const MessageArea = styled(List)({
     flexGrow: 1,
-    overflowY: 'auto',
-    width: '100%',
+    overflowY: "auto",
+    width: "100%",
 });
 
-const MessagesContainer = styled('div')({
+const MessagesContainer = styled("div")({
     flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
-    whiteSpace: 'pre-line',
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+    whiteSpace: "pre-line",
 });
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -43,18 +42,18 @@ const Debate = ({ id, chatName, topic }) => {
     const fetchMessages = useCallback(async () => {
         try {
             const requestData = {
-                agentModel: 'AgentDebate',
+                agentModel: "AgentDebate",
             };
             const response = await fetch(`${backendUrl}/${id}/messages`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                     Authorization: idToken,
                 },
-                credentials: 'include',
+                credentials: "include",
                 body: JSON.stringify(requestData),
             });
-            if (!response.ok) throw new Error('Failed to fetch messages');
+            if (!response.ok) throw new Error("Failed to fetch messages");
             const data = await response.json();
             setMessages(data.messages);
             return data.messages; // Add this line
@@ -75,12 +74,12 @@ const Debate = ({ id, chatName, topic }) => {
     useEffect(() => {
         if (!socket) return;
 
-        socket.on('debate_started', (data) => {
+        socket.on("debate_started", (data) => {
             setMessages((prevMessages) => [...prevMessages, data.message]);
 
             // Continue the debate if there are more turns
             if (data.hasMoreTurns) {
-                socket.emit('start_debate', {
+                socket.emit("start_debate", {
                     uid_debate_id_tuple: [uid, id],
                     topic: topic,
                     turn: messages.length, // The turn is the current number of messages
@@ -88,7 +87,7 @@ const Debate = ({ id, chatName, topic }) => {
             }
         });
 
-        return () => socket.off('debate_started');
+        return () => socket.off("debate_started");
     }, [socket, messages, uid, id, topic]);
 
     useEffect(() => {
@@ -104,10 +103,10 @@ const Debate = ({ id, chatName, topic }) => {
             }
 
             // Join the room named after the debate's id
-            socket.emit('join', { room: id });
+            socket.emit("join", { room: id });
 
             // Send 'start_debate' event to the server
-            socket.emit('start_debate', {
+            socket.emit("start_debate", {
                 uid_debate_id_tuple: [uid, id],
                 topic: topic,
                 turn: turn,
@@ -117,7 +116,7 @@ const Debate = ({ id, chatName, topic }) => {
     }, [fetchMessages, id, socket, topic, uid]);
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
     useEffect(scrollToBottom, [messages]);
 
@@ -128,7 +127,7 @@ const Debate = ({ id, chatName, topic }) => {
                 <MessageArea>
                     {messages.map((message, index) => {
                         if (message) {
-                            if (message.message_from === 'agent1') {
+                            if (message.message_from === "agent1") {
                                 return (
                                     <DebateMessage
                                         key={index}
@@ -136,7 +135,7 @@ const Debate = ({ id, chatName, topic }) => {
                                         agent="agent1"
                                     />
                                 );
-                            } else if (message.message_from === 'agent2') {
+                            } else if (message.message_from === "agent2") {
                                 return (
                                     <DebateMessage
                                         key={index}
