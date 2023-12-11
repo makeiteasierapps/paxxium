@@ -1,48 +1,47 @@
-import React, {
-    useRef,
-    useState,
+import { Box, List } from "@mui/material";
+import { styled } from "@mui/system";
+import {
+    memo,
+    useCallback,
     useContext,
     useEffect,
-    useCallback,
-    memo,
-} from 'react';
-import { styled } from '@mui/system';
-import { List, Box } from '@mui/material';
-import io from 'socket.io-client';
-import AgentMessage from './AgentMessage';
-import UserMessage from './UserMessage';
-import MessageInput from './MessageInput';
-import ChatBar from './ChatBar';
-import { AuthContext } from '../../../../contexts/AuthContext';
-import { ChatContext } from '../../../../contexts/ChatContext';
-import { formatBlockMessage } from '../utils/messageFormatter';
-import { handleIncomingMessageStream } from '../chat_container/handlers/handleIncomingMessageStream';
+    useRef,
+    useState,
+} from "react";
+import io from "socket.io-client";
+import { AuthContext } from "../../../../contexts/AuthContext";
+import { ChatContext } from "../../../../contexts/ChatContext";
+import { handleIncomingMessageStream } from "../chat_container/handlers/handleIncomingMessageStream";
+import { formatBlockMessage } from "../utils/messageFormatter";
+import AgentMessage from "./AgentMessage";
+import ChatBar from "./ChatBar";
+import MessageInput from "./MessageInput";
+import UserMessage from "./UserMessage";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 // STYLED COMPONENTS
-const ChatContainerStyled = styled(Box)(({ theme }) => ({
-    height: '80vh',
-    width: '70%',
-    display: 'flex',
-    flexDirection: 'column',
-    boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.63)',
-    overflow: 'auto',
-    borderRadius: '5px',
+const ChatContainerStyled = styled(Box)(() => ({
+    height: "75vh",
+    display: "flex",
+    flexDirection: "column",
+    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
+    overflow: "auto",
+    borderRadius: "5px",
 }));
 
 const MessageArea = styled(List)({
     flexGrow: 1,
-    overflowY: 'auto',
-    width: '100%',
+    overflowY: "auto",
+    width: "100%",
 });
 
-const MessagesContainer = styled('div')({
+const MessagesContainer = styled("div")({
     flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
-    whiteSpace: 'pre-line',
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+    whiteSpace: "pre-line",
 });
 
 const Chat = ({
@@ -56,7 +55,7 @@ const Chat = ({
     const socketRef = useRef(null);
     const [queue, setQueue] = useState([]);
     const ignoreNextTokenRef = useRef(false);
-    const languageRef = useRef('markdown');
+    const languageRef = useRef("markdown");
 
     const {
         messages,
@@ -83,18 +82,18 @@ const Chat = ({
             const messageResponse = await fetch(
                 `${backendUrl}/${id}/messages`,
                 {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                         Authorization: idToken,
                     },
-                    credentials: 'include',
+                    credentials: "include",
                     body: JSON.stringify(requestData),
                 }
             );
 
             if (!messageResponse.ok) {
-                throw new Error('Failed to load messages');
+                throw new Error("Failed to load messages");
             }
 
             const messageData = await messageResponse.json();
@@ -128,11 +127,11 @@ const Chat = ({
         };
 
         socketRef.current = io.connect(backendUrl);
-        socketRef.current.emit('join', { room: id });
-        socketRef.current.on('token', handleToken);
+        socketRef.current.emit("join", { room: id });
+        socketRef.current.on("token", handleToken);
 
         return () => {
-            socketRef.current.off('token', handleToken);
+            socketRef.current.off("token", handleToken);
         };
     }, [id]);
 
@@ -144,7 +143,7 @@ const Chat = ({
             let messageContent = token.message_content;
 
             if (ignoreNextTokenRef.current) {
-                if (token.message_content.trim() !== '`') {
+                if (token.message_content.trim() !== "`") {
                     // This means the token is not a backtick, so it should be the language
                     languageRef.current = token.message_content.trim();
                 }
@@ -160,7 +159,7 @@ const Chat = ({
                 // Add the language property to the token object
                 token.language = languageRef.current;
                 //Removes a new line character
-                token.message_content = ' ';
+                token.message_content = " ";
                 // Reset languageRef as it has been used for this code block
                 languageRef.current = null;
             }
@@ -225,12 +224,12 @@ const Chat = ({
                 idToken={idToken}
                 backendUrl={backendUrl}
             />
-            <MessagesContainer item xs={9}>
+            <MessagesContainer item xs={9} id="messages-container">
                 <MessageArea>
                     {messages[id]?.map((message, index) => {
                         let formattedMessage = message;
-                        if (message.type === 'database') {
-                            if (message.message_from === 'agent') {
+                        if (message.type === "database") {
+                            if (message.message_from === "agent") {
                                 formattedMessage = formatBlockMessage(message);
                                 return (
                                     <AgentMessage
