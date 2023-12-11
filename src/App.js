@@ -20,7 +20,6 @@ import { AuthContext, AuthProvider } from "./contexts/AuthContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import { NewsProvider } from "./contexts/NewsContext";
 import { ProfileProvider } from "./contexts/ProfileContext";
-import "./styles/App.css";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 

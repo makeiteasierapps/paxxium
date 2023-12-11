@@ -1,12 +1,12 @@
-import React, { useContext, useEffect } from 'react';
-import Carousel from 'react-spring-3d-carousel';
-import { NewsContext } from '../../../contexts/NewsContext';
-import NewsCard from './NewsCard';
-import { styled, Box } from '@mui/system';
-import Button from '@mui/material/Button';
-import { TextField } from '@mui/material';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import { TextField } from "@mui/material";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { Box, styled } from "@mui/system";
+import { useContext, useEffect } from "react";
+import Carousel from "react-spring-3d-carousel";
+import { NewsContext } from "../../../contexts/NewsContext";
+import NewsCard from "./NewsCard";
 
 // Styled Components
 
@@ -19,18 +19,18 @@ const SearchButton = styled(Button)(({ theme }) => ({
 }));
 
 const SearchContainer = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: theme.spacing(2),
 }));
 
 const CarouselContainer = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    width: '90%',
-    height: '70%',
+    width: "80vw",
+    height: "60vh",
+    margin: "auto",
     [`@media (max-width: ${theme.breakpoints.values.sm}px)`]: {
-        width: '100%', // take up 100% of parent's width on small screens
+        width: "100vw", // take up 100% of screen width on small screens
     },
 }));
 
@@ -59,24 +59,23 @@ const NewsCarousel = () => {
 
     return (
         <>
-            <Button onClick={aiNewsFetch} variant="contained">
+            <Button
+                id="ai-fetch-news-button"
+                onClick={aiNewsFetch}
+                variant="contained"
+            >
                 Let AI pick your news
             </Button>
-            <CarouselContainer>
-                {newsData.length > 0 ? (
-                    <Carousel slides={newsSlides} goToSlide={slideIndex} />
-                ) : (
-                    <p>No news data available</p>
-                )}
-            </CarouselContainer>
-            <SearchContainer>
+            <SearchContainer id="search-container">
                 <SearchField
+                    id="search-field"
                     label="Search"
                     variant="outlined"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
                 <SearchButton
+                    id="search-button"
                     onClick={(event) => {
                         event.preventDefault();
                         fetchNewsData(query);
@@ -104,6 +103,17 @@ const NewsCarousel = () => {
                     label="Hide read articles"
                 />
             </SearchContainer>
+            <CarouselContainer id="carousel-container">
+                {newsData.length > 0 ? (
+                    <Carousel
+                        id="carousel"
+                        slides={newsSlides}
+                        goToSlide={slideIndex}
+                    />
+                ) : (
+                    <p>No news data available</p>
+                )}
+            </CarouselContainer>
         </>
     );
 };

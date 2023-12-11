@@ -1,49 +1,33 @@
-import React, { memo, useState, useContext, useEffect } from 'react';
-import { ChatContext } from '../../../contexts/ChatContext';
-
-import { AuthContext } from '../../../contexts/AuthContext';
-import { styled, Box } from '@mui/system';
-import { Button } from '@mui/material';
-import Chat from './chat_container/Chat';
-import Debate from '../chat/debate/Debate';
-
-import AgentMenu from './AgentMenu';
+import { Button } from "@mui/material";
+import { Box, styled } from "@mui/system";
+import { memo, useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../../contexts/AuthContext";
+import { ChatContext } from "../../../contexts/ChatContext";
+import Debate from "../chat/debate/Debate";
+import AgentMenu from "./AgentMenu";
+import Chat from "./chat_container/Chat";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 // Styled components
-const StyledMain = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    height: '100vh', // adjust this as per your needs
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.background.default,
-}));
-
-const ChatsContainer = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: theme.spacing(2),
-    
+const Container = styled(Box)(() => ({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
 }));
 
 const Settings = styled(Box)(({ theme }) => ({
-    width: '69%',
+    width: "100%",
+    maxWidth: 600,
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(2),
     marginTop: theme.spacing(2),
-    boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.63)',
+    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
 }));
 
-const SettingsContainer = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: 0,
-    marginBottom: 0,
+const Chats = styled(Box)(({ theme }) => ({
+    marginTop: theme.spacing(2),
+    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
 }));
 
 const ChatDashboard = () => {
@@ -58,15 +42,15 @@ const ChatDashboard = () => {
         const getChatData = async () => {
             try {
                 const response = await fetch(`${backendUrl}/chat`, {
-                    method: 'GET',
+                    method: "GET",
                     headers: {
                         Authorization: idToken,
                     },
-                    credentials: 'include',
+                    credentials: "include",
                 });
 
                 if (!response.ok)
-                    throw new Error('Failed to load user conversations');
+                    throw new Error("Failed to load user conversations");
 
                 const data = await response.json();
                 // data is an array of objects
@@ -90,22 +74,22 @@ const ChatDashboard = () => {
 
     return (
         <>
-            <SettingsContainer>
+            <Container id="settings-container">
                 {settingsOpen && (
-                    <Settings>
+                    <Settings id="settings">
                         <AgentMenu />
                     </Settings>
                 )}
                 <Button onClick={() => setSettingsOpen(!settingsOpen)}>
-                    {settingsOpen ? 'Hide' : 'Menu'}
+                    {settingsOpen ? "Hide" : "Menu"}
                 </Button>
-            </SettingsContainer>
-            <StyledMain>
-                <ChatsContainer>
+            </Container>
+            <Container id="chats-container">
+                <Chats id="chats">
                     {agentArray
                         .filter((agent) => agent.is_open)
                         .map((agent) => {
-                            if (agent.agent_model === 'AgentDebate') {
+                            if (agent.agent_model === "AgentDebate") {
                                 return (
                                     <Debate
                                         key={agent.id}
@@ -128,8 +112,8 @@ const ChatDashboard = () => {
                                 );
                             }
                         })}
-                </ChatsContainer>
-            </StyledMain>
+                </Chats>
+            </Container>
         </>
     );
 };
