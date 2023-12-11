@@ -1,9 +1,9 @@
-import { Box, Tab, Tabs, styled } from "@mui/material";
+import { Tab, Tabs, styled } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-// Function to generate accessibility properties for tabs
-// This function provides flexibility, reduces errors, promotes code reusability, and improves readability
+// generates accessibility properties for tabs
+// flexibile, reduces errors, promotes code reusability, improves readability
 function a11yProps(index) {
     // Return an object with id and aria-controls properties
     // These properties are used by screen readers and other assistive technologies
@@ -15,11 +15,18 @@ function a11yProps(index) {
 
 // Styled Components
 const StyledNavTabs = styled(Tabs)(({ theme }) => ({
-    position: "fixed",
+    position: "sticky",
     top: "48px", // replace '64px' with the height of your AppBar
     zIndex: theme.zIndex.appBar,
-    width: "100%",
     backgroundColor: theme.palette.background.default,
+    // Remove the tab indicator
+    "& .MuiTabs-indicator": {
+        display: "none",
+    },
+    borderWidth: 0,
+    borderBottomWidth: 1,
+    borderStyle: "solid",
+    borderColor: "divider",
 }));
 
 // Define NavTabs component
@@ -45,40 +52,28 @@ const NavTabs = () => {
 
     // Render the NavTabs component
     return (
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <StyledNavTabs
-                value={selectedTab}
-                sx={{
-                    // Remove the tab indicator
-                    "& .MuiTabs-indicator": {
-                        display: "none",
-                    },
-                }}
-                aria-label="navigation tabs"
-                variant="fullWidth"
-                textColor="secondary"
-            >
-                {/* Use the a11yProps function to generate unique id and aria-controls values for each tab */}
-                <Tab
-                    label="Home"
-                    {...a11yProps(0)}
-                    component={Link}
-                    to="/home"
-                />
-                <Tab
-                    label="Agents"
-                    {...a11yProps(1)}
-                    component={Link}
-                    to="/agents"
-                />
-                <Tab
-                    label="Profile"
-                    {...a11yProps(2)}
-                    component={Link}
-                    to="/profile"
-                />
-            </StyledNavTabs>
-        </Box>
+        <StyledNavTabs
+            id="nav-tabs"
+            value={selectedTab}
+            aria-label="navigation tabs"
+            variant="fullWidth"
+            textColor="secondary"
+        >
+            {/* Use the a11yProps function to generate unique id and aria-controls values for each tab */}
+            <Tab label="Home" {...a11yProps(0)} component={Link} to="/home" />
+            <Tab
+                label="Agents"
+                {...a11yProps(1)}
+                component={Link}
+                to="/agents"
+            />
+            <Tab
+                label="Profile"
+                {...a11yProps(2)}
+                component={Link}
+                to="/profile"
+            />
+        </StyledNavTabs>
     );
 };
 

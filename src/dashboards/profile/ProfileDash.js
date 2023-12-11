@@ -1,23 +1,21 @@
-import { useContext } from 'react';
-import User from './components/User';
-import Questions from './components/Questions';
-import { styled } from '@mui/material/styles';
-import { Paper, Button, Box } from '@mui/material';
-import { ProfileContext } from './ProfileContext';
-import { AuthContext } from '../../auth/AuthContext';
+import { Box, Button, Paper } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { useContext } from "react";
+import { AuthContext } from "../../auth/AuthContext";
+import { ProfileContext } from "./ProfileContext";
+import Questions from "./components/Questions";
+import User from "./components/User";
 import {
-    handleUserUpdate,
     handleQuestionsUpdate,
-} from './handlers/profileHandlers';
+    handleUserUpdate,
+} from "./handlers/profileHandlers";
 
 const MainContainer = styled(Paper)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
     padding: theme.spacing(2),
-    margin: 'auto',
-    width: '100%',
-    maxWidth: '800px',
-    height: '100%',
+    margin: "auto",
+    maxWidth: "800px",
     backgroundColor: theme.palette.background.paper,
 }));
 
@@ -37,10 +35,11 @@ const ProfileDash = () => {
     };
 
     return (
-        <MainContainer>
+        <MainContainer id="main-container">
             <User />
             <Questions />
             <Button
+                id="update-profile-button"
                 variant="contained"
                 onClick={() => handleUpdate(idToken, profileData, answers)}
                 sx={{ margin: 3 }}
@@ -51,11 +50,11 @@ const ProfileDash = () => {
                 sx={{
                     margin: 3,
                     padding: 2,
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
                 }}
             >
-                {analysis ? analysis : 'Analyze Profile'}
+                {analysis ? analysis : "Analyze Profile"}
             </Box>
             <Button
                 variant="contained"

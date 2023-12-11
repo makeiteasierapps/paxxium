@@ -1,27 +1,25 @@
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from '@mui/material/styles';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
-import { useContext, useEffect } from 'react';
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { useContext, useEffect } from "react";
 import {
     Navigate,
     Route,
     BrowserRouter as Router,
     Routes,
-} from 'react-router-dom';
-import { theme } from './Theme';
-import LoginPage from './auth/LoginPage';
-import SignUpPage from './auth/SignUpPage';
-import ChatDash from './dashboards/agent/AgentDash';
-import HomeDash from './dashboards/home/HomeDash';
-import TitleBar from './dashboards/main/AppBar';
-import MainDash from './dashboards/main/MainDash';
-import ProfileDash from './dashboards/profile/ProfileDash';
-import { AuthContext, AuthProvider, backendUrl } from './auth/AuthContext';
-import { ChatProvider } from './dashboards/agent/chat/ChatContext';
-import { NewsProvider } from './dashboards/home/news/NewsContext';
-import { ProfileProvider } from './dashboards/profile/ProfileContext';
-import './styles/App.css';
-
+} from "react-router-dom";
+import { theme } from "./Theme";
+import { AuthContext, AuthProvider, backendUrl } from "./auth/AuthContext";
+import LoginPage from "./auth/LoginPage";
+import SignUpPage from "./auth/SignUpPage";
+import ChatDash from "./dashboards/agent/AgentDash";
+import { ChatProvider } from "./dashboards/agent/chat/ChatContext";
+import HomeDash from "./dashboards/home/HomeDash";
+import { NewsProvider } from "./dashboards/home/news/NewsContext";
+import TitleBar from "./dashboards/main/AppBar";
+import MainDash from "./dashboards/main/MainDash";
+import { ProfileProvider } from "./dashboards/profile/ProfileContext";
+import ProfileDash from "./dashboards/profile/ProfileDash";
 
 const AuthenticatedApp = () => {
     const db = getFirestore();
@@ -35,7 +33,7 @@ const AuthenticatedApp = () => {
         setIsAuthorized,
     } = useContext(AuthContext);
 
-    const isAuth = localStorage.getItem('isAuthorized') === 'true';
+    const isAuth = localStorage.getItem("isAuthorized") === "true";
 
     // Fetches auth status from the db then loads the user into state.
     useEffect(() => {
@@ -44,9 +42,9 @@ const AuthenticatedApp = () => {
             if (idToken && user) {
                 try {
                     const response = await fetch(`${backendUrl}/auth_check`, {
-                        method: 'POST',
+                        method: "POST",
                         headers: {
-                            'Content-Type': 'application/json',
+                            "Content-Type": "application/json",
                             Authorization: idToken,
                         },
                         body: JSON.stringify({
@@ -59,16 +57,16 @@ const AuthenticatedApp = () => {
                     // Checks if admin has grtanted access to the app
                     if (responseData.auth_status) {
                         setIsAuthorized(true);
-                        localStorage.setItem('isAuthorized', 'true');
+                        localStorage.setItem("isAuthorized", "true");
                         setUid(user.uid);
-                        const userDoc = await getDoc(doc(db, 'users', uid));
+                        const userDoc = await getDoc(doc(db, "users", uid));
                         if (!userDoc.exists()) {
-                            throw new Error('No user found in Firestore');
+                            throw new Error("No user found in Firestore");
                         }
                         setUsername(userDoc.data().username);
                     }
                 } catch (error) {
-                    console.error('Failed to fetch:', error);
+                    console.error("Failed to fetch:", error);
                 }
             }
         };
@@ -81,7 +79,7 @@ const AuthenticatedApp = () => {
             {isAuth && <TitleBar />}
             {isAuth ? (
                 <Routes>
-                    {['/', '/dashboard', '/home'].map((path, i) => {
+                    {["/", "/dashboard", "/home"].map((path, i) => {
                         return (
                             <Route
                                 path={path}

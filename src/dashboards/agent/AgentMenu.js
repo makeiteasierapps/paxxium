@@ -1,43 +1,15 @@
-import { useState, useContext } from 'react';
-import { styled } from '@mui/system';
-import { TextField, MenuItem, FormGroup, Box } from '@mui/material';
-import ChatSettings from './chat/components/ChatSettings';
-import DebateSettings from '../agent/debate/DebateSettings';
-import { AuthContext, backendUrl } from '../../auth/AuthContext';
-import { ChatContext } from '../../dashboards/agent/chat/ChatContext';
-
-// Styled components
-const SettingsContainer = styled(FormGroup)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-}));
-
-const LoadChat = styled(TextField)({
-    flex: 1,
-    width: '111px',
-    alignContent: 'center',
-});
-
-const SelectAgent = styled(TextField)(({ theme }) => ({
-    flex: 1,
-    width: '111px',
-    alignContent: 'center',
-    marginRight: theme.spacing(2),
-}));
-
-const Container = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'row',
-    paddingBottom: theme.spacing(1),
-    width: '100%',
-}));
+import { Grid, MenuItem, TextField } from "@mui/material";
+import { useContext, useState } from "react";
+import { AuthContext, backendUrl } from "../../auth/AuthContext";
+import { ChatContext } from "../../dashboards/agent/chat/ChatContext";
+import DebateSettings from "../agent/debate/DebateSettings";
+import ChatSettings from "./chat/components/ChatSettings";
 
 const AgentMenu = () => {
-    const [selectedAgent, setSelectedAgent] = useState('Chat');
-    const [selectedChatId] = useState('');
     const { idToken } = useContext(AuthContext);
     const { agentArray, setAgentArray } = useContext(ChatContext);
+    const [selectedAgent, setSelectedAgent] = useState("Chat");
+    const [selectedChatId] = useState("");
 
     const handleLoadChat = async (event) => {
         const selectedId = event.target.value;
@@ -47,17 +19,17 @@ const AgentMenu = () => {
             const response = await fetch(
                 `${backendUrl}/chat/update_visibility`,
                 {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                         Authorization: idToken,
                     },
                     body: JSON.stringify({ id: selectedId, is_open: true }),
-                    credentials: 'include',
+                    credentials: "include",
                 }
             );
 
-            if (!response.ok) throw new Error('Failed to update chat');
+            if (!response.ok) throw new Error("Failed to update chat");
 
             // Update the local state only after the database has been updated successfully
             setAgentArray((prevAgents) =>
@@ -73,24 +45,33 @@ const AgentMenu = () => {
     };
 
     return (
-        <SettingsContainer>
-            <Container>
-                <SelectAgent
+        <Grid container spacing={2}>
+            <Grid item xs={12} sm={3}>
+                <TextField
+                    required
                     select
+                    id="selectAgent"
+                    name="selectAgent"
                     label="Select Agent"
+                    fullWidth
+                    variant="standard"
                     value={selectedAgent}
                     onChange={(event) => setSelectedAgent(event.target.value)}
-                    variant="standard"
                 >
                     <MenuItem value="Chat">Chat</MenuItem>
                     <MenuItem value="Debate">Debate</MenuItem>
-                </SelectAgent>
-                <LoadChat
+                </TextField>
+            </Grid>
+            <Grid item xs={12} sm={9}>
+                <TextField
                     select
+                    id="loadChat"
+                    name="loadChat"
                     label="Load Chat"
+                    fullWidth
+                    variant="standard"
                     value={selectedChatId}
                     onChange={handleLoadChat}
-                    variant="standard"
                 >
                     {agentArray.map((agent) => {
                         return (
@@ -99,10 +80,10 @@ const AgentMenu = () => {
                             </MenuItem>
                         );
                     })}
-                </LoadChat>
-            </Container>
-            {selectedAgent === 'Chat' ? <ChatSettings /> : <DebateSettings />}
-        </SettingsContainer>
+                </TextField>
+            </Grid>
+            {selectedAgent === "Chat" ? <ChatSettings /> : <DebateSettings />}
+        </Grid>
     );
 };
 

@@ -1,21 +1,9 @@
 import LogoutIcon from "@mui/icons-material/Logout";
-import {
-    AppBar,
-    Box,
-    IconButton,
-    Toolbar,
-    Typography,
-    styled,
-} from "@mui/material";
+import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
 import { signOut } from "firebase/auth";
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext, auth } from "../../auth/AuthContext";
-
-// Styled components
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
-    position: "fixed",
-}));
 
 const TitleBar = () => {
     const navigate = useNavigate();
@@ -36,25 +24,24 @@ const TitleBar = () => {
     };
 
     return (
-        <Box sx={{ display: "flex" }}>
-            <StyledAppBar>
-                <Toolbar variant="dense">
-                    <Typography
-                        variant="h5"
-                        noWrap
-                        fontFamily={"Montserrat"}
-                        component="div"
-                        flexGrow={1}
-                        align="center"
-                    >
-                        Welcome {username}
-                    </Typography>
-                    <IconButton onClick={handleLogout}>
-                        <LogoutIcon sx={{ color: "#fff" }} />
-                    </IconButton>
-                </Toolbar>
-            </StyledAppBar>
-        </Box>
+        <AppBar id="header" position="sticky" sx={{ top: 0 }}>
+            <Toolbar variant="dense">
+                <Typography
+                    id="welcome-message"
+                    variant="h5"
+                    noWrap
+                    fontFamily={"Montserrat"}
+                    component="div"
+                    flexGrow={1}
+                    align="center"
+                >
+                    Welcome {username}
+                </Typography>
+                <IconButton id="logout-button" onClick={handleLogout}>
+                    <LogoutIcon sx={{ color: "#fff" }} />
+                </IconButton>
+            </Toolbar>
+        </AppBar>
     );
 };
 

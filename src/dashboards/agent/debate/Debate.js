@@ -1,45 +1,44 @@
-import { useEffect, useState, useRef, useContext, useCallback } from 'react';
-import io from 'socket.io-client';
-import { styled } from '@mui/system';
-import { List, Box } from '@mui/material';
-import ChatBar from '../chat/components/ChatBar';
-import DebateMessage from './DebateMessage';
-import { AuthContext, backendUrl } from '../../../auth/AuthContext';
-import { ChatContext } from '../../../dashboards/agent/chat/ChatContext';
-import { processToken } from '../utils/processToken';
-import { handleIncomingMessageStream } from '../chat/handlers/handleIncomingMessageStream';
-import { formatBlockMessage } from '../utils/messageFormatter';
+import { Box, List } from "@mui/material";
+import { styled } from "@mui/system";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import io from "socket.io-client";
+import { AuthContext, backendUrl } from "../../../auth/AuthContext";
+import { ChatContext } from "../../../dashboards/agent/chat/ChatContext";
+import ChatBar from "../chat/components/ChatBar";
+import { handleIncomingMessageStream } from "../chat/handlers/handleIncomingMessageStream";
+import { formatBlockMessage } from "../utils/messageFormatter";
+import { processToken } from "../utils/processToken";
+import DebateMessage from "./DebateMessage";
 
 // Syled components
-const DebateContainerStyled = styled(Box)(({ theme }) => ({
-    height: '80vh',
-    width: '70%',
-    display: 'flex',
-    flexDirection: 'column',
-    boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.63)',
-    overflow: 'auto',
-    borderRadius: '5px',
+const DebateContainerStyled = styled(Box)(() => ({
+    height: "75vh",
+    display: "flex",
+    flexDirection: "column",
+    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
+    overflow: "auto",
+    borderRadius: "5px",
 }));
 
 const MessageArea = styled(List)({
     flexGrow: 1,
-    overflowY: 'auto',
-    width: '100%',
+    overflowY: "auto",
+    width: "100%",
 });
 
-const MessagesContainer = styled('div')({
+const MessagesContainer = styled("div")({
     flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
-    whiteSpace: 'pre-line',
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+    whiteSpace: "pre-line",
 });
 
 const Debate = ({ id, chatName, topic }) => {
     const socketRef = useRef(null);
     const [queue, setQueue] = useState([]);
     const ignoreNextTokenRef = useRef(false);
-    const languageRef = useRef('markdown');
+    const languageRef = useRef("markdown");
     const [debateMessages, setDebateMessages] = useState({});
 
     const { insideCodeBlock, setInsideCodeBlock } = useContext(ChatContext);
@@ -49,18 +48,18 @@ const Debate = ({ id, chatName, topic }) => {
     const fetchMessages = useCallback(async () => {
         try {
             const requestData = {
-                agentModel: 'AgentDebate',
+                agentModel: "AgentDebate",
             };
             const response = await fetch(`${backendUrl}/${id}/messages`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                     Authorization: idToken,
                 },
-                credentials: 'include',
+                credentials: "include",
                 body: JSON.stringify(requestData),
             });
-            if (!response.ok) throw new Error('Failed to fetch messages');
+            if (!response.ok) throw new Error("Failed to fetch messages");
             const data = await response.json();
             const newMessages = { [id]: data.messages };
             return newMessages;
@@ -91,10 +90,10 @@ const Debate = ({ id, chatName, topic }) => {
             }
 
             // Join the room named after the debate's id
-            socketRef.current.emit('join', { room: id });
+            socketRef.current.emit("join", { room: id });
 
             // Send 'start_debate' event to the server
-            socketRef.current.emit('start_debate', {
+            socketRef.current.emit("start_debate", {
                 uid_debate_id_tuple: [uid, id],
                 topic: topic,
                 turn: turn,
@@ -107,7 +106,7 @@ const Debate = ({ id, chatName, topic }) => {
     useEffect(() => {
         if (!socketRef.current) return;
 
-        socketRef.current.on('debate_started', (data) => {
+        socketRef.current.on("debate_started", (data) => {
             setDebateMessages((prevMessages) => {
                 return {
                     ...prevMessages,
@@ -123,7 +122,7 @@ const Debate = ({ id, chatName, topic }) => {
 
             // Continue the debate if there are more turns
             if (data.hasMoreTurns) {
-                socketRef.current.emit('start_debate', {
+                socketRef.current.emit("start_debate", {
                     uid_debate_id_tuple: [uid, id],
                     topic: topic,
                     turn: debateMessages[id].length, // The turn is the current number of messages
@@ -131,7 +130,7 @@ const Debate = ({ id, chatName, topic }) => {
             }
         });
 
-        return () => socketRef.current.off('debate_started');
+        return () => socketRef.current.off("debate_started");
     }, [
         uid,
         id,
@@ -147,8 +146,8 @@ const Debate = ({ id, chatName, topic }) => {
         };
 
         socketRef.current = io.connect(backendUrl);
-        socketRef.current.emit('join', { room: id });
-        socketRef.current.on('token', handleToken);
+        socketRef.current.emit("join", { room: id });
+        socketRef.current.on("token", handleToken);
     }, [id]);
 
     useEffect(() => {
@@ -181,7 +180,7 @@ const Debate = ({ id, chatName, topic }) => {
                             let formattedMessage = message;
                             if (message) {
                                 formattedMessage = formatBlockMessage(message);
-                                if (message.message_from === 'agent1') {
+                                if (message.message_from === "agent1") {
                                     return (
                                         <DebateMessage
                                             key={`${index}-${subIndex}`}
@@ -189,7 +188,7 @@ const Debate = ({ id, chatName, topic }) => {
                                             agent="agent1"
                                         />
                                     );
-                                } else if (message.message_from === 'agent2') {
+                                } else if (message.message_from === "agent2") {
                                     return (
                                         <DebateMessage
                                             key={`${index}-${subIndex}`}
