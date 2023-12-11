@@ -10,24 +10,14 @@ import Chat from "./chat_container/Chat";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 // Styled components
-const StyledMain = styled(Box)(({ theme }) => ({
+const Container = styled(Box)(() => ({
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
-    height: "100vh", // adjust this as per your needs
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.background.default,
-}));
-
-const ChatsContainer = styled(Box)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: theme.spacing(2),
+    alignItems: "center",
 }));
 
 const Settings = styled(Box)(({ theme }) => ({
+    width: "100%",
     maxWidth: 600,
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(2),
@@ -35,12 +25,9 @@ const Settings = styled(Box)(({ theme }) => ({
     boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
 }));
 
-const SettingsContainer = styled(Box)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    padding: 0,
-    marginBottom: 0,
+const Chats = styled(Box)(({ theme }) => ({
+    marginTop: theme.spacing(2),
+    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
 }));
 
 const ChatDashboard = () => {
@@ -87,18 +74,18 @@ const ChatDashboard = () => {
 
     return (
         <>
-            <SettingsContainer>
+            <Container id="settings-container">
                 {settingsOpen && (
-                    <Settings>
+                    <Settings id="settings">
                         <AgentMenu />
                     </Settings>
                 )}
                 <Button onClick={() => setSettingsOpen(!settingsOpen)}>
                     {settingsOpen ? "Hide" : "Menu"}
                 </Button>
-            </SettingsContainer>
-            <StyledMain>
-                <ChatsContainer>
+            </Container>
+            <Container id="chats-container">
+                <Chats id="chats">
                     {agentArray
                         .filter((agent) => agent.is_open)
                         .map((agent) => {
@@ -125,8 +112,8 @@ const ChatDashboard = () => {
                                 );
                             }
                         })}
-                </ChatsContainer>
-            </StyledMain>
+                </Chats>
+            </Container>
         </>
     );
 };
