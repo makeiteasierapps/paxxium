@@ -82,12 +82,6 @@ class UserService:
 
         return decrypted_key.plaintext
 
-    def update_profile(self, uid, updates):
-        self.db.collection('users').document(uid).set(updates, merge=True)
-        
-        return {'message': 'User updated successfully'}, 200
-
-
     def get_profile(self, uid):
         user_doc = self.db.collection('users').document(uid).get(['first_name', 'last_name', 'username'])
         
@@ -138,12 +132,16 @@ class UserService:
         parsed_response = response['text']
         return parsed_response
     
-    def update_news_topics(self, user_id, news_topics):
-        # Convert comma-separated string to list and trim spaces and convert to lower case
-        news_topics_list = [topic.lower().strip() for topic in news_topics.split(',')]
-
-        # Update the user's document
-        user_ref = self.db.collection('users').document(user_id)
-        user_ref.update({
-            'news_topics': firestore.ArrayUnion(news_topics_list)
-        })
+    def get_profile_analysis(self, uid):
+        user_doc = self.db.collection('users').document(uid).get(['analysis'])
+        
+        return user_doc.to_dict()
+    
+    def update_user_profile(self, uid, updates):
+        user_ref = self.db.collection('users').document(uid)
+        
+        if 'news_topics' in updates:
+            news_topics_list = [topic.lower().strip() for topic in updates['news_topics'].split(',')]
+            updates['news_topics'] = firestore.ArrayUnion(news_topics_list)
+        
+        user_ref.update(updates)

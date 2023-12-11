@@ -24,11 +24,18 @@ def create_chat():
     chat_constants = data['chatConstants']
     use_profile_data = data['useProfileData']
 
+
     master_agent_service = current_app.master_agent_service
     chat_service = current_app.chat_service
 
+    user_analysis = None
+    if use_profile_data:
+        us = current_app.user_service
+        profile_analysis = us.get_profile_analysis(uid)
+        user_analysis = profile_analysis['analysis']
+
     new_chat_id = chat_service.create_chat_in_db(uid, chat_name, agent_model, system_prompt, chat_constants, use_profile_data)
-    master_agent_service.check_and_set_agent_instance(uid, new_chat_id, system_prompt, chat_constants, agent_model)
+    master_agent_service.check_and_set_agent_instance(uid, new_chat_id, system_prompt, chat_constants, agent_model, user_analysis)
     
     chat_data = {
         'id': new_chat_id,
@@ -92,12 +99,26 @@ def update_settings():
         return {'message': 'Invalid token'}, 403
     
     data = request.get_json()
-    # Update the database
     chat_service = current_app.chat_service
-    chat_service.update_settings(uid, data.get('id'), data.get('chat_name'), data.get('agent_model'), data.get('system_prompt'), data.get('chat_constants'), data.get('use_profile_data'))
+    use_profile_data = data.get('use_profile_data')
+    chat_name = data.get('chat_name')
+    new_chat_id = data.get('id')
+    agent_model = data.get('agent_model')
+    system_prompt = data.get('system_prompt')
+    chat_constants = data.get('chat_constants')
 
+    # Update the database
+    chat_service.update_settings(uid, new_chat_id, chat_name, agent_model, system_prompt, chat_constants, use_profile_data)
+
+    user_analysis = None
+    us = current_app.user_service
+    profile_analysis = us.get_profile_analysis(uid)
+    
+    if use_profile_data:
+        user_analysis = profile_analysis['analysis']
+    
     # Update the agent instance
     master_agent_service = current_app.master_agent_service
-    master_agent_service.check_and_set_agent_instance(uid, data.get('id'), data.get('system_prompt'), data.get('chat_constants'), data.get('agent_model'), )
+    master_agent_service.check_and_set_agent_instance(uid, new_chat_id, system_prompt, chat_constants, agent_model, user_analysis)
 
     return jsonify({'message': 'Conversation updated'}), 200

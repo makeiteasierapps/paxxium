@@ -9,19 +9,17 @@ import {
     Routes,
 } from "react-router-dom";
 import { theme } from "./Theme";
-import LoginPage from "./components/auth/LoginPage";
-import SignUpPage from "./components/auth/SignUpPage";
-import ChatDashboard from "./components/dashboards/chat/ChatDashboard";
-import Home from "./components/dashboards/home/Home";
-import TitleBar from "./components/dashboards/main/AppBar";
-import MainDash from "./components/dashboards/main/MainDash";
-import Profile from "./components/dashboards/profile/Profile";
-import { AuthContext, AuthProvider } from "./contexts/AuthContext";
-import { ChatProvider } from "./contexts/ChatContext";
-import { NewsProvider } from "./contexts/NewsContext";
-import { ProfileProvider } from "./contexts/ProfileContext";
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import { AuthContext, AuthProvider, backendUrl } from "./auth/AuthContext";
+import LoginPage from "./auth/LoginPage";
+import SignUpPage from "./auth/SignUpPage";
+import ChatDash from "./dashboards/agent/AgentDash";
+import { ChatProvider } from "./dashboards/agent/chat/ChatContext";
+import HomeDash from "./dashboards/home/HomeDash";
+import { NewsProvider } from "./dashboards/home/news/NewsContext";
+import TitleBar from "./dashboards/main/AppBar";
+import MainDash from "./dashboards/main/MainDash";
+import { ProfileProvider } from "./dashboards/profile/ProfileContext";
+import ProfileDash from "./dashboards/profile/ProfileDash";
 
 const AuthenticatedApp = () => {
     const db = getFirestore();
@@ -88,7 +86,7 @@ const AuthenticatedApp = () => {
                                 element={
                                     <MainDash>
                                         <NewsProvider>
-                                            <Home />
+                                            <HomeDash />
                                         </NewsProvider>
                                     </MainDash>
                                 }
@@ -101,7 +99,7 @@ const AuthenticatedApp = () => {
                         element={
                             <MainDash>
                                 <ChatProvider>
-                                    <ChatDashboard />
+                                    <ChatDash />
                                 </ChatProvider>
                             </MainDash>
                         }
@@ -111,7 +109,7 @@ const AuthenticatedApp = () => {
                         element={
                             <MainDash>
                                 <ProfileProvider>
-                                    <Profile />
+                                    <ProfileDash />
                                 </ProfileProvider>
                             </MainDash>
                         }

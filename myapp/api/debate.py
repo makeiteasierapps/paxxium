@@ -1,4 +1,4 @@
-from flask_socketio import emit, join_room
+from flask_socketio import emit
 from flask import Blueprint, request, current_app
 from myapp.services.debate_services import DebateManager
 
@@ -57,12 +57,9 @@ def start_debate(data):
    
     debate_manager = debate_managers[uid_debate_id_tuple]
     response_content, has_more_turns, agent_responding = debate_manager.start_debate(topic, turn)
-
-    # Join the room named after the debate's id
-    join_room(debate_manager.conversation_id)
-
+    
     emit('debate_started', {'hasMoreTurns': has_more_turns, 'message': {
-            'message_content': response_content,
+            'content': response_content,
             'message_from': agent_responding,
             'agent_model': 'AgentDebate',
             'topic': topic,
