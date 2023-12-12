@@ -15,6 +15,7 @@ import UserMessage from "./components/UserMessage";
 // STYLED COMPONENTS
 const ChatContainerStyled = styled(Box)(() => ({
     height: "75vh",
+    width:"75vw",
     display: "flex",
     flexDirection: "column",
     boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",

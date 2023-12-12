@@ -1,7 +1,13 @@
-import { Box, Tab, Tabs, TextField, Typography } from "@mui/material";
-import { styled } from "@mui/system";
-import React, { useContext, useEffect, useState } from "react";
+import { Box, Tab } from "@mui/material";
+import React, { useContext, useState } from "react";
 import { ProfileContext } from "../ProfileContext";
+
+import {
+    StyledTabs,
+    MainPaper,
+    Question,
+    Answer,
+} from "../styledProfileComponents";
 
 const questions = {
     "Personal Interests": [
@@ -66,42 +72,6 @@ const questions = {
         "Are you open to exploring new technologies and gadgets, or do you prefer sticking to what you are familiar with?",
     ],
 };
-// Styled Components
-const MainPaper = styled(Box)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    width: "100%",
-    marginTop: theme.spacing(2),
-}));
-const StyledTabs = styled(Tabs)(({ theme }) => ({
-    "& .MuiTabs-indicator": {
-        display: "none",
-    },
-}));
-const Question = styled(Typography)(({ theme }) => ({
-    marginBottom: theme.spacing(2),
-}));
-const Answer = styled(TextField)(({ theme }) => ({
-    marginBottom: theme.spacing(2),
-    "& .MuiOutlinedInput-root": {
-        "& fieldset": {
-            borderColor: theme.palette.secondary.dark,
-        },
-        "&.Mui-focused fieldset": {
-            borderColor: theme.palette.secondary.light,
-        },
-        "&:hover fieldset": {
-            borderColor: theme.palette.secondary.light,
-        },
-        "&.Mui-disabled fieldset": {
-            borderColor: theme.palette.secondary.dark,
-        },
-    },
-    "& label.Mui-focused": {
-        color: theme.palette.secondary.light,
-    },
-}));
 
 const Questions = () => {
     const { answers, handleAnswerChange } = useContext(ProfileContext);

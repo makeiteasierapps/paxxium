@@ -1,74 +1,10 @@
-import { Avatar, Box, TextField, Typography } from "@mui/material";
-import { styled } from "@mui/system";
+import { Box } from "@mui/material";
 import { useContext, useState } from "react";
 import { ProfileContext } from "../ProfileContext";
 
 import shaunoAvatar from "../../../assets/images/shaunoAvatar.png";
 
-// Syled Components
-const UserContainer = styled(Box)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    padding: theme.spacing(2),
-    margin: "auto",
-    width: "100%",
-    maxWidth: "800px",
-    height: "50%",
-    backgroundColor: theme.palette.background.paper,
-}));
-
-const AvatarContainer = styled(Box)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: theme.spacing(4),
-}));
-
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-    width: 96,
-    height: 100,
-    margin: theme.spacing(1),
-    alignSelf: "center",
-}));
-
-const TextFieldContainer = styled(Box)(({ theme }) => ({
-    display: "flex",
-    height: "100%",
-    flexDirection: "column",
-    justifyContent: "start",
-    alignItems: "center",
-}));
-
-const Username = styled(Typography)(({ theme }) => ({
-    fontSize: "2rem",
-    marginLeft: theme.spacing(3),
-    color: theme.palette.secondary.dark,
-}));
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-    margin: theme.spacing(1),
-    width: "80%",
-    borderRadius: "5px",
-    padding: 0,
-    "& .MuiOutlinedInput-root": {
-        "&.Mui-focused fieldset": {
-            borderColor: theme.palette.secondary.light,
-        },
-        "&.Mui-disabled fieldset": {
-            border: `2px solid ${theme.palette.secondary.dark}`,
-        },
-        "&:not(.Mui-disabled):hover fieldset": {
-            borderColor: theme.palette.secondary.light,
-        },
-    },
-    "& label.Mui-focused": {
-        color: theme.palette.secondary.light,
-    },
-    "& .MuiInputLabel-outlined": {
-        color: theme.palette.secondary.dark,
-    },
-}));
+import {UserContainer, AvatarContainer, StyledAvatar, StyledTextField, Username, TextFieldContainer} from "../styledProfileComponents";
 
 const User = () => {
     const [isEditing, setIsEditing] = useState(false);

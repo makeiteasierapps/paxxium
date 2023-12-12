@@ -1,22 +1,18 @@
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {
-    Button,
-    Card,
-    CardContent,
-    CardMedia,
-    IconButton,
-    Tooltip,
-    Typography,
-} from "@mui/material";
+import { Button, Tooltip, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { useContext, useState } from "react";
-import { AuthContext } from "../../../../auth/AuthContext";
+import { AuthContext, backendUrl } from "../../../../auth/AuthContext";
 import { NewsContext } from "../NewsContext";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import {
+    StyledCard,
+    StyledCardMedia,
+    StyledCardContent,
+    StyledIconButton,
+} from "../styledNewsComponents";
 
 const NewsCard = ({ news, index }) => {
     const { markNewsAsRead, deleteNewsArticle, setSlideIndex } =
@@ -71,30 +67,13 @@ const NewsCard = ({ news, index }) => {
             transition={{ duration: 0.9 }}
             style={{ height: "100%" }}
         >
-            <Card
-                key={news.id}
-                sx={{
-                    maxWidth: 400,
-                    overflowY: "scroll",
-                    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.75)",
-                }}
-                onClick={() => setSlideIndex(index)}
-            >
-                <CardMedia
-                    sx={{ height: 200, position: "relative" }}
-                    image={news.image}
-                >
+            <StyledCard key={news.id} onClick={() => setSlideIndex(index)}>
+                <StyledCardMedia image={news.image}>
                     <Tooltip title="Mark read" placement="top-end">
-                        <IconButton
-                            sx={{
-                                position: "absolute",
-                                top: 0,
-                                right: 0,
-                                opacity: 0.3,
-                                "&:hover": { opacity: 1 },
-                            }}
+                        <StyledIconButton
+                            style={{ right: 0 }}
                             onClick={(e) => {
-                                e.stopPropagation(); // Prevent triggering Card's onClick
+                                e.stopPropagation();
                                 if (!news.is_read) {
                                     markArticleRead();
                                 }
@@ -105,27 +84,21 @@ const NewsCard = ({ news, index }) => {
                             ) : (
                                 <CheckBoxOutlineBlankIcon />
                             )}
-                        </IconButton>
+                        </StyledIconButton>
                     </Tooltip>
                     <Tooltip title="Trash" placement="top-start">
-                        <IconButton
-                            sx={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                opacity: 0.3,
-                                "&:hover": { opacity: 1 },
-                            }}
+                        <StyledIconButton
+                            style={{ left: 0 }}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setOpenDialog(true);
                             }}
                         >
                             <DeleteIcon />
-                        </IconButton>
+                        </StyledIconButton>
                     </Tooltip>
-                </CardMedia>
-                <CardContent sx={{ height: 300 }}>
+                </StyledCardMedia>
+                <StyledCardContent>
                     <Typography variant="h5" component="div" gutterBottom>
                         {news.title}
                     </Typography>
@@ -135,8 +108,8 @@ const NewsCard = ({ news, index }) => {
                     <Button variant="outlined" href={news.url}>
                         Read More
                     </Button>
-                </CardContent>
-            </Card>
+                </StyledCardContent>
+            </StyledCard>
             <DeleteConfirmationDialog
                 open={openDialog}
                 handleClose={() => setOpenDialog(false)}
