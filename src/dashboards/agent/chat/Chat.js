@@ -45,6 +45,7 @@ const Chat = ({
     agentModel,
     useProfileData,
 }) => {
+    const nodeRef = useRef(null);
     const socketRef = useRef(null);
     const [queue, setQueue] = useState([]);
     const ignoreNextTokenRef = useRef(false);
@@ -139,6 +140,12 @@ const Chat = ({
         }
     }, [queue, setMessages, setInsideCodeBlock, insideCodeBlock, id]);
 
+    // scrolls chat window to the bottom
+    useEffect(() => {
+        const node = nodeRef.current;
+        node.scroll(0, node.scrollHeight);
+    }, [messages]);
+
     return (
         <ChatContainerStyled
             onClick={() => {
@@ -155,7 +162,7 @@ const Chat = ({
                 backendUrl={backendUrl}
             />
             <MessagesContainer item xs={9} id="messages-container">
-                <MessageArea>
+                <MessageArea ref={nodeRef}>
                     {messages[id]?.map((message, index) => {
                         let formattedMessage = message;
                         if (message.type === "database") {

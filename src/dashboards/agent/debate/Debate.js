@@ -35,6 +35,7 @@ const MessagesContainer = styled("div")({
 });
 
 const Debate = ({ id, chatName, topic }) => {
+    const nodeRef = useRef(null);
     const socketRef = useRef(null);
     const [queue, setQueue] = useState([]);
     const ignoreNextTokenRef = useRef(false);
@@ -42,7 +43,6 @@ const Debate = ({ id, chatName, topic }) => {
     const [debateMessages, setDebateMessages] = useState({});
 
     const { insideCodeBlock, setInsideCodeBlock } = useContext(ChatContext);
-
     const { uid, idToken } = useContext(AuthContext);
 
     const fetchMessages = useCallback(async () => {
@@ -166,11 +166,17 @@ const Debate = ({ id, chatName, topic }) => {
         }
     }, [queue, setInsideCodeBlock, insideCodeBlock, id, setDebateMessages]);
 
+    // scrolls chat window to the bottom
+    useEffect(() => {
+        const node = nodeRef.current;
+        node.scroll(0, node.scrollHeight);
+    }, [debateMessages]);
+
     return (
         <DebateContainerStyled>
             <ChatBar chatName={chatName} id={id} />
             <MessagesContainer item xs={9}>
-                <MessageArea>
+                <MessageArea ref={nodeRef}>
                     {debateMessages[id]?.map((messageObj, index) => {
                         // Check if messageObj is an array, if not convert it into an array
                         const messages = Array.isArray(messageObj)
