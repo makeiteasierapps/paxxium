@@ -13,13 +13,23 @@ import MessageInput from "./components/MessageInput";
 import UserMessage from "./components/UserMessage";
 
 // STYLED COMPONENTS
-const ChatContainerStyled = styled(Box)(() => ({
-    height: "75vh",
+const ChatContainerStyled = styled(Box)(({ theme }) => ({
     display: "flex",
     flexDirection: "column",
-    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
+    minWidth: "80vw",
+    maxWidth: "90vw",
+    minHeight: "40vh",
+    maxHeight: "75vh",
     overflow: "auto",
     borderRadius: "5px",
+    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
+    // xs & sm screens: resize to take up most of the screen
+    [theme.breakpoints.down("sm")]: {
+        minWidth: "100vw",
+        maxWidth: "100vw",
+        minHeight: "75vh",
+        maxHeight: "75vh",
+    },
 }));
 
 const MessageArea = styled(List)({
