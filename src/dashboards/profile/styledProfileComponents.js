@@ -85,19 +85,24 @@ export const Username = styled(Typography)(({ theme }) => ({
 }));
 
 export const StyledTextField = styled(TextField)(({ theme }) => ({
+    marginBottom: theme.spacing(2),
     margin: theme.spacing(1),
     width: "80%",
     borderRadius: "5px",
     padding: 0,
     "& .MuiOutlinedInput-root": {
+        "& fieldset": {
+            borderColor: theme.palette.secondary.dark,
+        },
         "&.Mui-focused fieldset": {
             borderColor: theme.palette.secondary.light,
         },
-        "&.Mui-disabled fieldset": {
-            border: `2px solid ${theme.palette.secondary.dark}`,
-        },
-        "&:not(.Mui-disabled):hover fieldset": {
+        "&:hover fieldset": {
             borderColor: theme.palette.secondary.light,
+        },
+        "&.Mui-disabled fieldset": {
+            borderColor: theme.palette.secondary.dark,
+            border: `2px solid ${theme.palette.secondary.dark}`,
         },
     },
     "& label.Mui-focused": {

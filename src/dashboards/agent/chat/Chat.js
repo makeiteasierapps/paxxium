@@ -1,5 +1,3 @@
-import { Box, List } from "@mui/material";
-import { styled } from "@mui/system";
 import { memo, useContext, useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import { AuthContext, backendUrl } from "../../../auth/AuthContext";
@@ -12,30 +10,11 @@ import ChatBar from "./components/ChatBar";
 import MessageInput from "./components/MessageInput";
 import UserMessage from "./components/UserMessage";
 
-// STYLED COMPONENTS
-const ChatContainerStyled = styled(Box)(() => ({
-    height: "75vh",
-    width:"75vw",
-    display: "flex",
-    flexDirection: "column",
-    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
-    overflow: "auto",
-    borderRadius: "5px",
-}));
-
-const MessageArea = styled(List)({
-    flexGrow: 1,
-    overflowY: "auto",
-    width: "100%",
-});
-
-const MessagesContainer = styled("div")({
-    flexGrow: 1,
-    display: "flex",
-    flexDirection: "column",
-    overflow: "hidden",
-    whiteSpace: "pre-line",
-});
+import {
+    MessagesContainer,
+    MessageArea,
+    ChatContainerStyled,
+} from "../agentStyledComponents";
 
 const Chat = ({
     id,

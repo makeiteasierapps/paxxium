@@ -1,10 +1,9 @@
-import { Button, FormGroup, TextField } from "@mui/material";
+import { Button, FormGroup, TextField, Grid } from "@mui/material";
 import { styled } from "@mui/system";
 import { useContext, useState } from "react";
-import { AuthContext } from "../../../auth/AuthContext";
+import { AuthContext, backendUrl } from "../../../auth/AuthContext";
 import { ChatContext } from "../../../dashboards/agent/chat/ChatContext";
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import { Settings } from "../agentStyledComponents";
 
 // Styled components
 const FormContainer = styled(FormGroup)(({ theme }) => ({
@@ -46,7 +45,7 @@ function DebateSettings() {
     };
 
     return (
-        <FormContainer id="debate-form">
+        <Grid item xs={12}>
             <TextField
                 required
                 multiline
@@ -96,7 +95,7 @@ function DebateSettings() {
             >
                 Start Debate
             </Button>
-        </FormContainer>
+        </Grid>
     );
 }
 

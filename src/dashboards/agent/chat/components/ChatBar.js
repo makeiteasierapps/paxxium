@@ -1,10 +1,9 @@
 import { useContext } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
+import { Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CommentsDisabledIcon from '@mui/icons-material/CommentsDisabled';
-import { styled } from '@mui/system';
-import { AuthContext } from '../../../../auth/AuthContext';
+import { AuthContext, backendUrl } from '../../../../auth/AuthContext';
 import { ChatContext } from '../ChatContext';
 import {
     handleClearMessages,
@@ -12,23 +11,7 @@ import {
     handleCloseChat,
 } from '../handlers/chatBarHandlers';
 
-const Bar = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: theme.spacing(2),
-    borderBottom: '1px solid #e0e0e0',
-}));
-
-const ChatBarIcons = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-}));
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import { Bar, ChatBarIcons } from '../../agentStyledComponents';
 
 const ChatBar = ({ chatName, id }) => {
     const { setMessages, setAgentArray } = useContext(ChatContext);

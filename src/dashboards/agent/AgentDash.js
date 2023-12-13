@@ -1,34 +1,12 @@
 import { Button } from "@mui/material";
-import { Box, styled } from "@mui/system";
 import { memo, useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../auth/AuthContext";
+import { AuthContext, backendUrl } from "../../auth/AuthContext";
 import AgentMenu from "./AgentMenu";
 import Chat from "./chat/Chat";
 import { ChatContext } from "./chat/ChatContext";
 import Debate from "./debate/Debate";
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
-// Styled components
-const Container = styled(Box)(() => ({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-}));
-
-const Settings = styled(Box)(({ theme }) => ({
-    width: "100%",
-    maxWidth: 600,
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(2),
-    marginTop: theme.spacing(2),
-    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
-}));
-
-const Chats = styled(Box)(({ theme }) => ({
-    marginTop: theme.spacing(2),
-    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
-}));
+import { Container, Settings, Chats } from "./agentStyledComponents";
 
 const AgentDash = () => {
     const { setSelectedAgent, agentArray, setAgentArray } =

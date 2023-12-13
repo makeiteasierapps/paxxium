@@ -9,10 +9,11 @@ const AgentMenu = () => {
     const { idToken } = useContext(AuthContext);
     const { agentArray, setAgentArray } = useContext(ChatContext);
     const [selectedAgent, setSelectedAgent] = useState("Chat");
-    const [selectedChatId] = useState("");
+    const [selectedAgentId, setSelectedAgentId] = useState('');
 
     const handleLoadChat = async (event) => {
         const selectedId = event.target.value;
+        setSelectedAgentId(selectedId);
 
         // This is done so that the chat visibility persists even after the page is refreshed
         try {
@@ -70,7 +71,7 @@ const AgentMenu = () => {
                     label="Load Chat"
                     fullWidth
                     variant="standard"
-                    value={selectedChatId}
+                    value={selectedAgentId}
                     onChange={handleLoadChat}
                 >
                     {agentArray.map((agent) => {
