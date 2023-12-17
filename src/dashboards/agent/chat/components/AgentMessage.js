@@ -1,43 +1,12 @@
 import { Icon } from "@iconify/react";
-import { Avatar, Checkbox, ListItem, ListItemIcon } from "@mui/material";
-import { blueGrey } from "@mui/material/colors";
-import { styled } from "@mui/system";
+import { Avatar, ListItemIcon, Box } from "@mui/material";
 import { useState } from "react";
-
-const AgentMessageContainer = styled(ListItem)({
-    backgroundColor: blueGrey[700],
-    wordBreak: "break-word",
-    alignItems: "flex-start",
-    flexDirection: "column",
-});
-
-const MessageContent = styled("div")({
-    maxHeight: "100%",
-    overflowY: "auto",
-    overflowX: "hidden",
-    width: "100%",
-    whiteSpace: "pre-wrap",
-});
-
-const StyledCheckbox = styled(Checkbox)({
-    color: blueGrey[100],
-    "&.Mui-checked": {
-        color: "#1C282E",
-    },
-});
-
-const StyledHeader = styled("div")({
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-});
+import { MessageContainer, MessageContent, StyledHeader, StyledCheckbox } from "../../agentStyledComponents";
 
 const AgentMessage = ({ message }) => {
-    // State for checkbox and processed messages
     const [checked, setChecked] = useState(false);
     return (
-        <AgentMessageContainer>
+        <MessageContainer >
             <StyledHeader>
                 <ListItemIcon>
                     <Avatar
@@ -60,7 +29,7 @@ const AgentMessage = ({ message }) => {
             <MessageContent>
                 {message.map((msg, index) => {
                     if (msg.type === "text") {
-                        return <p key={`text${index}`}>{msg.content}</p>;
+                        return <Box key={`text${index}`}>{msg.content}</Box>;
                     } else if (msg.type === "code") {
                         return (
                             <pre
@@ -78,7 +47,7 @@ const AgentMessage = ({ message }) => {
                     return null;
                 })}
             </MessageContent>
-        </AgentMessageContainer>
+        </MessageContainer>
     );
 };
 

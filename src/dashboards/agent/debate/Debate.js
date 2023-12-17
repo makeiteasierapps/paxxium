@@ -1,5 +1,3 @@
-import { Box, List } from "@mui/material";
-import { styled } from "@mui/system";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import { AuthContext, backendUrl } from "../../../auth/AuthContext";
@@ -9,30 +7,8 @@ import { handleIncomingMessageStream } from "../chat/handlers/handleIncomingMess
 import { formatBlockMessage } from "../utils/messageFormatter";
 import { processToken } from "../utils/processToken";
 import DebateMessage from "./DebateMessage";
+import { MessageArea, MessagesContainer, ChatContainerStyled } from "../agentStyledComponents";
 
-// Syled components
-const DebateContainerStyled = styled(Box)(() => ({
-    height: "75vh",
-    display: "flex",
-    flexDirection: "column",
-    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.63)",
-    overflow: "auto",
-    borderRadius: "5px",
-}));
-
-const MessageArea = styled(List)({
-    flexGrow: 1,
-    overflowY: "auto",
-    width: "100%",
-});
-
-const MessagesContainer = styled("div")({
-    flexGrow: 1,
-    display: "flex",
-    flexDirection: "column",
-    overflow: "hidden",
-    whiteSpace: "pre-line",
-});
 
 const Debate = ({ id, chatName, topic }) => {
     const nodeRef = useRef(null);
@@ -173,7 +149,7 @@ const Debate = ({ id, chatName, topic }) => {
     }, [debateMessages]);
 
     return (
-        <DebateContainerStyled>
+        <ChatContainerStyled>
             <ChatBar chatName={chatName} id={id} />
             <MessagesContainer item xs={9}>
                 <MessageArea ref={nodeRef}>
@@ -209,7 +185,7 @@ const Debate = ({ id, chatName, topic }) => {
                     })}
                 </MessageArea>
             </MessagesContainer>
-        </DebateContainerStyled>
+        </ChatContainerStyled>
     );
 };
 

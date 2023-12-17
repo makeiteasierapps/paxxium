@@ -1,38 +1,16 @@
-import { TextField } from "@mui/material";
-import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { Box, styled } from "@mui/system";
 import React, { useContext, useEffect } from "react";
 import Carousel from "react-spring-3d-carousel";
 import { NewsContext } from "../NewsContext";
 import NewsCard from "./NewsCard";
-
-// Styled Components
-
-const SearchField = styled(TextField)(({ theme }) => ({
-    marginRight: theme.spacing(1),
-}));
-
-const SearchButton = styled(Button)(({ theme }) => ({
-    margin: theme.spacing(1),
-}));
-
-const SearchContainer = styled(Box)(({ theme }) => ({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: theme.spacing(2),
-}));
-
-const CarouselContainer = styled(Box)(({ theme }) => ({
-    width: "80vw",
-    height: "60vh",
-    margin: "auto",
-    [`@media (max-width: ${theme.breakpoints.values.sm}px)`]: {
-        width: "100vw", // take up 100% of screen width on small screens
-    },
-}));
+import {
+    AiSearchButton,
+    SearchContainer,
+    SearchField,
+    SearchButton,
+    CarouselContainer,
+} from "../styledNewsComponents";
 
 const NewsCarousel = () => {
     const {
@@ -59,13 +37,14 @@ const NewsCarousel = () => {
 
     return (
         <>
-            <Button
+            <AiSearchButton
+                style={{}}
                 id="ai-fetch-news-button"
                 onClick={aiNewsFetch}
                 variant="contained"
             >
                 Let AI pick your news
-            </Button>
+            </AiSearchButton>
             <SearchContainer id="search-container">
                 <SearchField
                     id="search-field"
