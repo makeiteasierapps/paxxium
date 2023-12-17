@@ -35,7 +35,12 @@ const AgentDash = () => {
                 setAgentArray(data);
 
                 if (data.length > 0) {
-                    setSelectedAgent(data[0]);
+                    const chatAgent = data.find(
+                        (agent) =>
+                            agent.is_open === true &&
+                            agent.agent_model !== "AgentDebate"
+                    );
+                    if (chatAgent) setSelectedAgent(chatAgent);
                 }
             } catch (error) {
                 console.error(error);
